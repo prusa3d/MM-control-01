@@ -202,7 +202,8 @@ bool home_idler()
 		{
 			move(1, 0,0);
 			delayMicroseconds(100);
-			uint16_t sg = tmc2130_read_sg(0);
+			//uint16_t sg =
+			tmc2130_read_sg(0);
 			//printf_P(PSTR("SG=%d\n"), tmc2130_read_sg(0));
 			//if ((i > 2) && (sg < 100))	break;
 		}
@@ -227,7 +228,7 @@ bool home_selector()
 	 
 	return true;
 }
-bool home()
+void home()
 {
 	shr16_set_led(0x2aa);
 	

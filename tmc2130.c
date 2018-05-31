@@ -52,7 +52,7 @@
 #define tmc2130_rd(axis, addr, rval) tmc2130_rx(axis, addr, rval)
 #define tmc2130_wr(axis, addr, wval) tmc2130_tx(axis, addr | 0x80, wval)
 
-uint8_t tmc2130_tx(uint8_t axis, uint8_t addr, uint32_t wval);
+static void tmc2130_tx(uint8_t axis, uint8_t addr, uint32_t wval);
 uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval);
 uint8_t tmc2130_usteps2mres(uint16_t usteps);
 
@@ -212,12 +212,6 @@ int8_t tmc2130_init_axis(uint8_t axis)
 	return 0;
 }
 
-uint8_t tmc2130_check_axis(uint8_t axis)
-{
-	return 0x3f;
-}
-
-
 
 int8_t tmc2130_init()
 {
@@ -315,7 +309,7 @@ inline void tmc2130_cs_high(uint8_t axis)
 #define TMC2130_SPI_TXRX       spi_txrx
 #define TMC2130_SPI_LEAVE()
 
-uint8_t tmc2130_tx(uint8_t axis, uint8_t addr, uint32_t wval)
+static void tmc2130_tx(uint8_t axis, uint8_t addr, uint32_t wval)
 {
 	//datagram1 - request
 	TMC2130_SPI_ENTER();

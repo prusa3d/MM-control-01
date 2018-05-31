@@ -3,7 +3,7 @@
 #ifndef _MOTION_h
 #define _MOTION_h
 
-extern bool home();
+extern void home();
 extern bool home_idler();
 extern bool home_selector();
 
