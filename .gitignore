@@ -8,3 +8,6 @@
 .project
 .settings
 /Debug
+/.vs/MM-control-01/v14
+/__vm/.MM-control-01.vsarduino.h
+/main.cpp~RFdf1346e.TMP

@@ -48,10 +48,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\MM-control-01;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\libraries;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\libraries;C:\Users\Sasa\Documents\Arduino\libraries;C:\Users\Sasa\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\libraries;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\cores\arduino;C:\Users\Sasa\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\variants\prusa_mm_control;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\avr\include\;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\avr\include\avr\;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>$(ProjectDir)__vm\.MM-control-01.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Users\Pavel\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\libraries;C:\Users\Pavel\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Users\Pavel\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\variants\prusa_mm_control;C:\Users\Pavel\Documents\PavelSindler\MMU-FW-fork\MM-control-01;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>C:\Users\Pavel\Documents\PavelSindler\MMU-FW-fork\MM-control-01\__vm\.MM-control-01.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_prusa_mm_control;ARDUINO_ARCH_AVR;USB_VID=0x2c99;USB_PID=0x0004;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_prusa_mm_control;ARDUINO_ARCH_AVR;USB_VID=0x2c99;USB_PID=0x0004;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -106,6 +106,9 @@
     <ClInclude Include="spi.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="timeout.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClInclude Include="tmc2130.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -113,7 +116,6 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="__vm\.MM-control-01.vsarduino.h" />
-    <ClInclude Include="__vm\.MMU_FW.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abtn3.c" />

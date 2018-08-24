@@ -116,6 +116,8 @@ void load_filament_withSensor()
 		park_idler(false);
 		do
 		{
+
+
 			shr16_set_led(0x000);
 			delay(800);
 			if (!_isOk)
@@ -360,6 +362,7 @@ void load_filament_inPrinter()
 {
 	// loads filament after confirmed by printer into the Bontech pulley gears so they can grab them
 
+	if (isIdlerParked) park_idler(true); // if idler is in parked position un-park him get in contact with filament
 	set_pulley_dir_push();
 
 	//PLA
