@@ -51,7 +51,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\MM-Control;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\libraries;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\libraries;C:\Users\Sasa\Documents\Arduino\libraries;C:\Users\Sasa\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\libraries;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\arduino\avr\cores\arduino;C:\Users\Sasa\AppData\Local\arduino15\packages\PrusaResearch\hardware\avr\1.0.0\variants\prusa_mm_control;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\avr\include\;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\avr\include\avr\;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\InstalledPrograms\Arduino\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.MM-Control.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_prusa_mm_control;ARDUINO_ARCH_AVR;USB_VID=0x2c99;USB_PID=0x0004;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_prusa_mm_control;ARDUINO_ARCH_AVR;USB_VID=0x2c99;USB_PID=0x0004;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -104,6 +104,9 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="spi.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="timeout.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="tmc2130.h">
