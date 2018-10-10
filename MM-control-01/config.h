@@ -78,7 +78,7 @@
 #define ADC_CHAN_MSK      0b0000000000100000 //used AD channels bit mask (ADC5)
 #define ADC_CHAN_CNT      1          //number of used channels)
 #define ADC_OVRSAMPL      1          //oversampling multiplier
-#define ADC_READY         _adc_ready //ready callback
+//#define ADC_READY         _adc_ready //ready callback
 
 
 //signals (from interrupts to main loop)
