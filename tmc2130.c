@@ -174,7 +174,7 @@ inline int8_t __currh(uint8_t axis)
 	switch (axis)
 	{
 	case 0: return 1;   
-	case 1: return 20;  
+	case 1: return 25;  
 	case 2: return 30;   
 	}
 	return 16;
