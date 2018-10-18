@@ -31,6 +31,7 @@ SET(ASMFLAGS "${OPT} ${WARN} ${MCU}")
 SET(CMAKE_C_FLAGS ${CFLAGS})
 SET(CMAKE_CXX_FLAGS ${CXXFLAGS})
 SET(CMAKE_ASM_FLAGS ${ASMFLAGS})
+SET(CMAKE_EXE_LINKER_FLAGS "-fuse-linker-plugin -Wl,--gc-sections")
 
 
 project(MM-control-01 C CXX ASM)
