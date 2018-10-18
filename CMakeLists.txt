@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_C_COMPILER avr-gcc)
 SET(CMAKE_CXX_COMPILER avr-g++)
+SET(CMAKE_CAT cat)
 
 SET(CSTANDARD "-std=gnu11")
 SET(CPPSTANDARD "-std=gnu++11")
@@ -74,4 +75,32 @@ set(SOURCES
 )
 add_executable(MM-control-01 ${SOURCES})
 target_include_directories(MM-control-01 PRIVATE board core)
+
+
+add_custom_command(
+	OUTPUT		MM-control-01.hex
+	MAIN_DEPENDENCY	MM-control-01.hex.tmp
+	DEPENDS		${CMAKE_SOURCE_DIR}/MM-control-01.hex.in
+	COMMAND		${CMAKE_CAT}
+	ARGS		${CMAKE_SOURCE_DIR}/MM-control-01.hex.in
+			MM-control-01.hex.tmp
+			> MM-control-01.hex
+	COMMENT		"Generating HEX image"
+	VERBATIM
+)
+
+add_custom_command(
+	OUTPUT		MM-control-01.hex.tmp
+	MAIN_DEPENDENCY	MM-control-01
+	COMMAND		${CMAKE_OBJCOPY}
+	ARGS		-O ihex -R .eeprom
+			MM-control-01
+			MM-control-01.hex.tmp
+	VERBATIM
+)
+
+add_custom_target(
+	hex ALL
+	DEPENDS MM-control-01.hex
+)
 
