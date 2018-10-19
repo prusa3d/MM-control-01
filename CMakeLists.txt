@@ -47,6 +47,12 @@ configure_file(
 ${CMAKE_SOURCE_DIR}/MM-control-01/version.h.in
 version.h
 )
+# The 'real' git information file
+set(GITREV_BARE_FILE dirty.h)
+# The temporary git information file
+set(GITREV_BARE_TMP dirty-tmp.h)
+set(GITREV_FILE ${CMAKE_BINARY_DIR}/${GITREV_BARE_FILE})
+set(GITREV_TMP ${CMAKE_BINARY_DIR}/${GITREV_BARE_TMP})
 
 set(SOURCES 
 	MM-control-01/abtn3.c
@@ -86,7 +92,7 @@ set(SOURCES
 	core/wiring_analog.c
 	core/wiring.c	
 )
-add_executable(MM-control-01 ${SOURCES})
+add_executable(MM-control-01 ${SOURCES} ${GITREV_TMP})
 target_include_directories(MM-control-01 PRIVATE board core ${CMAKE_BINARY_DIR})
 
 
@@ -117,3 +123,14 @@ add_custom_target(
 	DEPENDS MM-control-01.hex
 )
 
+
+
+add_custom_command(
+  OUTPUT ${GITREV_TMP}
+  COMMAND ${CMAKE_COMMAND} -E echo_append "#define FW_LOCAL_CHANGES " > ${GITREV_TMP}
+  COMMAND ${GIT_EXECUTABLE} diff-index --quiet HEAD -- && echo 0 >> ${GITREV_TMP} || echo 1 >> ${GITREV_TMP}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GITREV_TMP} ${GITREV_FILE}
+  COMMAND ${CMAKE_COMMAND} -E remove ${GITREV_TMP}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  VERBATIM
+)
