@@ -36,6 +36,18 @@ SET(CMAKE_EXE_LINKER_FLAGS "-fuse-linker-plugin -Wl,--gc-sections")
 
 project(MM-control-01 C CXX ASM)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(GetGitRevisionDescription)
+
+get_git_head_revision(DUMMY GIT_COMMIT_HASH)
+set(GIT_COMMITS_MASTER 666)
+git_local_changes(GIT_LOCAL_CHANGES)
+
+configure_file(
+${CMAKE_SOURCE_DIR}/MM-control-01/version.h.in
+version.h
+)
+
 set(SOURCES 
 	MM-control-01/abtn3.c
 	MM-control-01/adc.c
@@ -75,7 +87,7 @@ set(SOURCES
 	core/wiring.c	
 )
 add_executable(MM-control-01 ${SOURCES})
-target_include_directories(MM-control-01 PRIVATE board core)
+target_include_directories(MM-control-01 PRIVATE board core ${CMAKE_BINARY_DIR})
 
 
 add_custom_command(
