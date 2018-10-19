@@ -39,8 +39,8 @@ project(MM-control-01 C CXX ASM)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GetGitRevisionDescription)
 
-get_git_head_revision(DUMMY GIT_COMMIT_HASH)
-set(GIT_COMMITS_MASTER 666)
+get_git_head_revision(GIT_HEAD_REF GIT_COMMIT_HASH)
+git_commits_in_master(GIT_COMMITS_MASTER)
 git_local_changes(GIT_LOCAL_CHANGES)
 
 configure_file(
