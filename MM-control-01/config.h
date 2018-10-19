@@ -68,12 +68,24 @@
 #define TMC2130_TCOOLTHRS_1    450
 #define TMC2130_TCOOLTHRS_2    450
 
-#define AX_IDL 2
-#define AX_SEL 1
-#define AX_PUL 0
-//0 - IDLER
+//0 - PULLEY
 //1 - SELECTOR
-//2 - PULLEY
+//2 - IDLER
+#define AX_PUL 0
+#define AX_SEL 1
+#define AX_IDL 2
+
+// currents
+#define CURRENT_HOLDING_STEALTH {1, 7, 16}
+#define CURRENT_HOLDING_NORMAL {1, 10, 22}
+#define CURRENT_RUNNING_STEALTH {35, 35, 35}
+#define CURRENT_RUNNING_NORMAL {30, 35, 35}
+#define CURRENT_HOMING {1, 35, 30}
+
+//mode
+#define HOMING_MODE 0
+#define NORMAL_MODE 1
+#define STEALTH_MODE 2
 
 //ADC configuration
 #define ADC_CHAN_MSK      0b0000000000100000 //used AD channels bit mask (ADC5)
