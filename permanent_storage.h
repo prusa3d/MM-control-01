@@ -40,7 +40,8 @@ public:
 	bool increase();
 	bool decrease();
 	~BowdenLength();
-private:
+
+public:
 	uint8_t m_filament; //!< Selected filament
 	uint16_t m_length;  //!< Selected filament bowden length
 };

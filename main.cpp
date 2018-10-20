@@ -398,7 +398,12 @@ void process_commands(FILE* inout)
 				fprintf_P(inout, PSTR("Invalid length\r\n")); 
 			}
 		}
-		else if(strcmp_P(line,PSTR("!CMODE")) == 0)
+		else if (strcmp_P(line,PSTR("!CALI")) == 0)
+		{
+			fprintf_P(inout, PSTR("Entering Filamint Calibration Mode\r\n")); 
+			settings_select_filament();
+		}
+		else if(strcmp_P(line,PSTR("!SETUP")) == 0)
 		{
 			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
 			setupMenu();

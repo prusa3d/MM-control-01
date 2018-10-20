@@ -7,6 +7,7 @@
 #include "motion.h"
 #include "permanent_storage.h"
 #include "main.h"
+#include "uart.h"
 
 const int ButtonPin = A2;
 
@@ -31,7 +32,8 @@ void settings_select_filament()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
-				if (active_extruder < 5) settings_bowden_length();
+				if (active_extruder < 5) 
+					settings_bowden_length();
 				else
 				{
 					select_extruder(4);
@@ -76,6 +78,7 @@ void setupMenu()
 	bool eraseLocked = true;
 
 		
+	fprintf_P(uart0io,PSTR("\r\nEntered Setup Menu\r\n"));
 
 	do
 	{
@@ -90,32 +93,46 @@ void setupMenu()
 		{
 		case Btn::right:
 			if (_menu > 0) { _menu--; delay(800); }
+			fprintf_P(uart0io,PSTR("B Right\r\n"));
 			break;
 		case Btn::middle:
 				
 			switch (_menu)
 			{
 				case 1:
+					fprintf_P(uart0io,PSTR("Selected settings_select_filament\r\n"));
 					settings_select_filament();
 					_exit = true;
 					break;
 				case 2:
 					if (!eraseLocked)
 					{
+						fprintf_P(uart0io,PSTR("Erasing BowdenLength\r\n"));
 						BowdenLength::eraseAll();
 						_exit = true;
 					}
+					else
+					{
+						fprintf_P(uart0io,PSTR("Locked BowdenLength\r\n"));
+					}
 					break;
 				case 3: //unlock erase
+					fprintf_P(uart0io,PSTR("Unlocked erase\r\n"));
 					eraseLocked = false;
 					break;
 				case 4: // exit menu
+					fprintf_P(uart0io,PSTR("Exit Setup\r\n"));
 					_exit = true;
 					break;
 			}
 			break;
 		case Btn::left:
-			if (_menu < 4) { _menu++; delay(800); }
+			if (_menu < 4)
+			{ 
+				_menu++;
+				delay(800);
+			}
+			fprintf_P(uart0io,PSTR("B Left\r\n"));
 			break;
 		default:
 			break;
@@ -162,6 +179,7 @@ void settings_bowden_length()
 	{
 		BowdenLength bowdenLength;
 		load_filament_withSensor();
+		fprintf_P(uart0io,PSTR("Selected #: %d\r\n"),bowdenLength.m_filament);
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
 		do
@@ -174,6 +192,7 @@ void settings_bowden_length()
 				{
 					move(0, 0, -bowdenLength.stepSize);
 					delay(400);
+					fprintf_P(uart0io,PSTR("Dec: %d\r\n"),bowdenLength.m_length);
 				}
 				break;
 
@@ -182,8 +201,10 @@ void settings_bowden_length()
 				{
 					move(0, 0, bowdenLength.stepSize);
 					delay(400);
+					fprintf_P(uart0io,PSTR("Inc: %d\r\n"),bowdenLength.m_length);
 				}
 				break;
+
 			default:
 				break;
 			}
@@ -197,6 +218,8 @@ void settings_bowden_length()
 
 
 		} while (buttonClicked() != Btn::middle);
+		
+		fprintf_P(uart0io,PSTR("Len: %d\r\n"),bowdenLength.m_length);
 
 		unload_filament_withSensor();
 	}
