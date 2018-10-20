@@ -5,28 +5,12 @@
 #include "mmctl.h"
 #include <avr/eeprom.h>
 
-//! @brief EEPROM data layout
-//!
-//! Do not remove, reorder or change size of existing fields.
-//! Otherwise values stored with previous version of firmware would be broken.
-//! It is possible to add fields in the end of this struct, ensure that erased EEPROM is handled well.
-typedef struct
-{
-	uint8_t eepromLengthCorrection; //!< legacy bowden length correction
-	uint16_t eepromBowdenLen[5];    //!< Bowden length for each filament
-}eeprom_t;
 
-static eeprom_t * const eepromBase = reinterpret_cast<eeprom_t*>(0); //!< First EEPROM address
-static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
-static const uint16_t eepromLengthCorrectionBase = 7900u; //!< legacy bowden length correction base
-static const uint16_t eepromBowdenLenDefault = 8900u; //!< Default bowden length
-static const uint16_t eepromBowdenLenMinimum = 6900u; //!< Minimum bowden length
-static const uint16_t eepromBowdenLenMaximum = 10900u; //!< Maximum bowden length
 
 //! @brief Is filament number valid?
 //! @retval true valid
 //! @retval false invalid
-static bool validFilament(uint8_t filament)
+bool validFilament(uint8_t filament)
 {
 	if (filament < (sizeof(eeprom_t::eepromBowdenLen)/sizeof(eeprom_t::eepromBowdenLen[0]))) return true;
 	else return false;

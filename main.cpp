@@ -16,7 +16,7 @@
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"
-
+#include "uart.h"
 
 int8_t sys_state = 0;
 uint8_t sys_signals = 0;
@@ -25,7 +25,7 @@ int _c = 0;
 uint8_t tmc2130_mode = NORMAL_MODE;
 
 #if (UART_COM == 0)
-FILE* uart_com = uart0io;
+FILE* uart_com = uart0io;//USB
 #elif (UART_COM == 1)
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
@@ -91,7 +91,6 @@ void setup()
 	shr16_set_led(0x000);
 
 	init_Pulley();
-
 
 	// if FINDA is sensing filament do not home
 	while (digitalRead(A1) == 1)
@@ -196,9 +195,11 @@ void manual_extruder_selector()
 //! middle | feed filament
 //!
 //! @copydoc manual_extruder_selector()
+
 void loop()
 {
 	process_commands(uart_com);
+	process_commands(uart0io);
 
 	if (!isPrinting)
 	{
@@ -220,8 +221,28 @@ extern "C" {
 
 void process_commands(FILE* inout)
 {
-	static char line[32];
-	static int count = 0;
+	//static char line[32];
+	//static int count = 0;
+	
+	static char line_usb[32];
+	static int count_usb = 0;
+
+	static char line_hw[32];
+	static int count_hw = 0;
+
+	char* line;
+	int count = 0;
+	if(inout == uart0io)
+	{
+		line = line_usb;
+		count = count_usb;
+	}
+	else
+	{
+		line = line_hw;
+		count = count_hw;
+	}
+	
 	int c = -1;
 	if (count < 32)
 	{
@@ -230,6 +251,8 @@ void process_commands(FILE* inout)
 			if (c == '\r') c = 0;
 			if (c == '\n') c = 0;
 			line[count++] = c;
+			if(inout == uart0io)
+				printf_P(PSTR("%c"),c);
 		}
 	}
 	else
@@ -243,7 +266,8 @@ void process_commands(FILE* inout)
 	if ((count > 0) && (c == 0))
 	{
 		//line received
-		//printf_P(PSTR("line received: '%s' %d\n"), line, count);
+		if(inout == uart0io)
+			printf_P(PSTR("\r\nline received: '%s' %d\r\n"), line, count);
 		count = 0;
 		if (sscanf_P(line, PSTR("T%d"), &value) > 0)
 		{
@@ -344,9 +368,52 @@ void process_commands(FILE* inout)
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
+		else if(strcmp_P(line, PSTR("!D")) == 0)
+		{
+			fprintf_P(inout, PSTR("DUMPING TUBE LENGTH CALIBRATION\r\n")); 
+			for(int i=0;i<5;i++)
+			{
+				uint8_t filament = i;
+				if (1)//validFilament(filament))
+				{
+					uint16_t bowdenLength = eeprom_read_word(&(eepromBase->eepromBowdenLen[filament]));
+
+					fprintf_P(inout,PSTR("%d:%d\r\n"),i,bowdenLength);
+					//if (validBowdenLen(bowdenLength)) 
+					//	return bowdenLength;
+				}
+			}
+		}
+		else if(sscanf_P(line,PSTR("!S%d,%d"),&value,&value0) > 0)
+		{
+			if(value < 0 || value > 4)
+			{
+				fprintf_P(inout, PSTR("Invalid extruder #\r\n")); 
+			}
+			fprintf_P(inout, PSTR("Storing Extruder Tube Length %d to %d\r\n"),value,value0); 
+			if (validFilament(value))
+				eeprom_update_word(&(eepromBase->eepromBowdenLen[value]), value0);
+			else
+			{
+				fprintf_P(inout, PSTR("Invalid length\r\n")); 
+			}
+		}
+		else if(strcmp_P(line,PSTR("!CMODE")) == 0)
+		{
+			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
+			setupMenu();
+		}
 	}
 	else
 	{ //nothing received
+	}
+	if(inout == uart0io)
+	{
+		count_usb = count;
+	}
+	else
+	{
+		count_hw = count;
 	}
 }
 
