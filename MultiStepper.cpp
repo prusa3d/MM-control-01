@@ -64,6 +64,18 @@ boolean MultiStepper::run()
     return ret;
 }
 
+void MultiStepper::wait()
+{
+    uint8_t i;
+    boolean finished = false;
+    while (!finished) {
+        finished = true;
+        for (i = 0; i < _num_steppers; i++)
+            if (_steppers[i]->run())
+                finished = false;
+    }
+}
+
 // Blocks until all steppers reach their target position and are stopped
 void    MultiStepper::runSpeedToPosition()
 {

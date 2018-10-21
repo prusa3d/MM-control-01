@@ -61,6 +61,10 @@ public:
     /// want blocking consider using run() instead.
     void    runSpeedToPosition();
 
+    // wait until all moves are done
+    // not coordinated
+    void wait();
+
 private:
     /// Array of pointers to the steppers we are controlling.
     /// Fills from 0 onwards
