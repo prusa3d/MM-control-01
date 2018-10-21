@@ -125,5 +125,22 @@
 //number of extruders
 #define EXTRUDERS 5
 
+#define SELECTOR_MAX_SPEED 2000.0
+#define PULLEY_MAX_SPEED 1500.0
+#define IDLER_MAX_SPEED 2000.0
+
+#define SELECTOR_MAX_ACCEL 4000.0
+#define PULLEY_MAX_ACCEL 4000.0
+#define IDLER_MAX_ACCEL 4000.0
+
+#define SELECTOR_HOMING_SPEED 1500
+#define IDLER_HOMING_SPEED 1200
+
+// Used for homing check
+// These number of steps must be without a stall
+// for the homing to be successful
+#define SELECTOR_TRAY_LENGTH 3500
+#define IDLER_DRUM_STEP_LENGTH 2000
+
 //diagnostic functions
 //#define _DIAG

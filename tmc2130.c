@@ -210,6 +210,10 @@ int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_
 	return 0;
 }
 
+void tmc2130_set_sg_thr(int axis, int val) {
+	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)val) << 16));
+}
+
 int8_t tmc2130_init_axis_current_normal(uint8_t axis, uint8_t current_h, uint8_t current_r)
 {
 	//normal mode
