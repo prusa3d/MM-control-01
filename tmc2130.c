@@ -8,7 +8,7 @@
 
 #define TMC2130_CS_0 //signal d5  - PC6
 #define TMC2130_CS_1 //signal d6  - PD7
-#define TMC2130_CS_2 //signal d7  - PE6
+#define TMC2130_CS_2 //signal d7  - PB7
 
 #define TMC2130_ST_0 //signal d4  - PD4
 #define TMC2130_ST_1 //signal d8  - PB4
