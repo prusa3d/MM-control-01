@@ -90,6 +90,7 @@ void setup()
 	shr16_set_ena(7);
 	shr16_set_led(0x000);
 
+	init_steppers();
 	init_Pulley();
 
 

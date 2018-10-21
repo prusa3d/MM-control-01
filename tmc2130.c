@@ -8,7 +8,7 @@
 
 #define TMC2130_CS_0 //signal d5  - PC6
 #define TMC2130_CS_1 //signal d6  - PD7
-#define TMC2130_CS_2 //signal d7  - PE6
+#define TMC2130_CS_2 //signal d7  - PB7
 
 #define TMC2130_ST_0 //signal d4  - PD4
 #define TMC2130_ST_1 //signal d8  - PB4
@@ -208,6 +208,10 @@ int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_
 	tmc2130_wr_PWMCONF(axis, 4 * current_r, 2, 2, 1, 0, 0);
 	tmc2130_wr_TPWMTHRS(axis, 0);
 	return 0;
+}
+
+void tmc2130_set_sg_thr(int axis, int val) {
+	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)val) << 16));
 }
 
 int8_t tmc2130_init_axis_current_normal(uint8_t axis, uint8_t current_h, uint8_t current_r)

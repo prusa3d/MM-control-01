@@ -10,6 +10,9 @@
 #include "mmctl.h"
 #include "motion.h"
 #include "Buttons.h"
+#include "stepper.h"
+
+extern Stepper pulley_stepper;
 
 int active_extruder = -1;
 int previous_extruder = -1;
@@ -29,34 +32,36 @@ bool feed_filament()
 	int _delay = 0;
 	park_idler(true);
 
-	set_pulley_dir_push();
 	if(tmc2130_mode == NORMAL_MODE)	
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
 	else
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
 
+	pulley_stepper.move(20000);
 	do
 	{
-		do_pulley_step();
+		pulley_stepper.one_step();
 		
 		_c++;
 		if (_c > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
 		if (_c > 100) { shr16_set_led(0x000); _c = 0; _delay++; };
 
-		if (digitalRead(A1) == 1) { _loaded = true; _feed = false; };
+		if (digitalRead(A1) == 1) {
+			_loaded = true;
+			_feed = false;
+			// We want to unload 600 steps from here, so set the new destination
+			pulley_stepper.move(-600);
+		};
 		if (buttonClicked() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
-		delayMicroseconds(4000);
 	} while (_feed);
 
 	if (_loaded)
 	{
 		// unload to PTFE tube
-		set_pulley_dir_pull();
-		for (int i = 600; i > 0; i--)   // 570
-		{
-			do_pulley_step();
-			delayMicroseconds(3000);
-		}
+		pulley_stepper.runToPosition();
+	} else {
+		// Stop as quickly as possible with deceleration
+		pulley_stepper.wait_stop();
 	}
 
 
