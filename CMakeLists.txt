@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_C_COMPILER avr-gcc)
 SET(CMAKE_CXX_COMPILER avr-g++)
-SET(CMAKE_CAT cat)
+find_program(CAT cat)
 
 SET(CSTANDARD "-std=gnu11")
 SET(CPPSTANDARD "-std=gnu++11")
@@ -100,7 +100,7 @@ add_custom_command(
 	OUTPUT		MM-control-01.hex
 	MAIN_DEPENDENCY	MM-control-01.hex.tmp
 	DEPENDS		${CMAKE_SOURCE_DIR}/MM-control-01.hex.in
-	COMMAND		${CMAKE_CAT}
+	COMMAND		${CAT}
 	ARGS		${CMAKE_SOURCE_DIR}/MM-control-01.hex.in
 			MM-control-01.hex.tmp
 			> MM-control-01.hex
