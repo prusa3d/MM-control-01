@@ -134,3 +134,10 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   VERBATIM
 )
+
+if ("Windows" STREQUAL CMAKE_HOST_SYSTEM_NAME)
+configure_file(
+${CMAKE_SOURCE_DIR}/build.bat.in
+build.bat
+)
+endif()
