@@ -193,14 +193,17 @@ int8_t tmc2130_init_axis(uint8_t axis, uint8_t mode)
 void tmc2130_disable_axis(uint8_t axis, uint8_t mode)
 {
 	//temporary solution, use enable pin instead
-	if (mode == STEALTH_MODE) tmc2130_init_axis_current_stealth(axis, 0, 0);
-	else tmc2130_init_axis_current_normal(axis, 0, 0);
+	if (mode == STEALTH_MODE) 
+		tmc2130_init_axis_current_stealth(axis, 0, 0);
+	else 
+		tmc2130_init_axis_current_normal(axis, 0, 0);
 }
 
 int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_t current_r)
 {
 	//stealth mode
-	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) return -1;
+	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) 
+		return -1;
 	tmc2130_wr(axis, TMC2130_REG_TPOWERDOWN, 0x00000000);
 	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)TMC2130_SG_THR) << 16));
 	tmc2130_wr(axis, TMC2130_REG_TCOOLTHRS, 0);
@@ -213,7 +216,8 @@ int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_
 int8_t tmc2130_init_axis_current_normal(uint8_t axis, uint8_t current_h, uint8_t current_r)
 {
 	//normal mode
-	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) return -1;
+	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) 
+		return -1;
 	tmc2130_wr(axis, TMC2130_REG_TPOWERDOWN, 0x00000000);
 	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)__sg_thr(axis)) << 16));
 	tmc2130_wr(axis, TMC2130_REG_TCOOLTHRS, __tcoolthrs(axis));

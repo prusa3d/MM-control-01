@@ -178,8 +178,10 @@ void settings_bowden_length()
 	if (!isFilamentLoaded)
 	{
 		BowdenLength bowdenLength;
-		load_filament_withSensor();
 		fprintf_P(uart0io,PSTR("Selected #: %d\r\n"),bowdenLength.m_filament);
+		fprintf_P(uart0io,PSTR("Current Len: %d\r\n"),bowdenLength.m_length);
+
+		load_filament_withSensor();
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
 		do

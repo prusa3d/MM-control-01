@@ -268,11 +268,20 @@ void process_commands(FILE* inout)
 		//line received
 		if(inout == uart0io)
 			printf_P(PSTR("\r\nline received: '%s' %d\r\n"), line, count);
+		else if(strcmp_P(line,PSTR("P0")) != 0)
+			fprintf_P(uart0io,PSTR("line received: '%s' %d\r\n"), line, count);
 		count = 0;
 		if (sscanf_P(line, PSTR("T%d"), &value) > 0)
 		{
 			//T-code scanned
-			if ((value >= 0) && (value < EXTRUDERS))
+			if(value == 999)
+			{
+				tmc2130_disable_axis(AX_PUL,STEALTH_MODE);
+				tmc2130_disable_axis(AX_SEL,STEALTH_MODE);
+				tmc2130_disable_axis(AX_IDL,STEALTH_MODE);
+				fprintf_P(inout, PSTR("ok\n"));
+			}
+			else if ((value >= 0) && (value < EXTRUDERS))
 			{
 				switch_extruder_withSensor(value);
 
@@ -407,6 +416,38 @@ void process_commands(FILE* inout)
 		{
 			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
 			setupMenu();
+		}
+		else if(strcmp_P(line,PSTR("!DISABLE")) == 0)
+		{
+			tmc2130_disable_axis(AX_PUL,STEALTH_MODE);
+			tmc2130_disable_axis(AX_SEL,STEALTH_MODE);
+			tmc2130_disable_axis(AX_IDL,STEALTH_MODE);
+		}
+		else if(sscanf_P(line,PSTR("!L%d"),&value) > 0)
+		{
+			if ((value >= 0) && (value < EXTRUDERS) && !isFilamentLoaded)
+			{
+				fprintf_P(inout, PSTR("Loading #%d\r\n"),value); 
+
+				select_extruder(value);
+				//feed_filament();
+				load_filament_withSensor();
+
+			}	
+			else
+				fprintf_P(inout, PSTR("Load cmd error\r\n")); 	
+//			tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+		}
+		else if(strcmp_P(line,PSTR("!U")) == 0)
+		{
+			if (isFilamentLoaded)
+			{
+				fprintf_P(inout, PSTR("Unloading\r\n")); 
+
+				unload_filament_withSensor();
+			}
+			else
+				fprintf_P(inout, PSTR("Unload cmd error\r\n")); 
 		}
 	}
 	else
