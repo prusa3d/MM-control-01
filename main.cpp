@@ -223,7 +223,8 @@ void process_commands(FILE* inout)
 {
 	//static char line[32];
 	//static int count = 0;
-	
+	static 	BowdenLength *pbowdenLength = 0;
+
 	static char line_usb[32];
 	static int count_usb = 0;
 
@@ -412,6 +413,24 @@ void process_commands(FILE* inout)
 			fprintf_P(inout, PSTR("Entering Filamint Calibration Mode\r\n")); 
 			settings_select_filament();
 		}
+		else if (strcmp_P(line,PSTR("!INC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->decrease())
+			{
+				move(0, 0, pbowdenLength->stepSize);
+				delay(400);
+				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
+			}
+		}
+		else if (strcmp_P(line,PSTR("!DEC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->decrease())
+			{
+				move(0, 0, -pbowdenLength->stepSize);
+				delay(400);
+				fprintf_P(uart0io,PSTR("Dec: %d\r\n"),pbowdenLength->m_length);
+			}
+		}
 		else if(strcmp_P(line,PSTR("!SETUP")) == 0)
 		{
 			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
@@ -431,8 +450,9 @@ void process_commands(FILE* inout)
 
 				select_extruder(value);
 				//feed_filament();
-				load_filament_withSensor();
+				pbowdenLength = new BowdenLength();
 
+				load_filament_withSensor();
 			}	
 			else
 				fprintf_P(inout, PSTR("Load cmd error\r\n")); 	
@@ -445,6 +465,8 @@ void process_commands(FILE* inout)
 				fprintf_P(inout, PSTR("Unloading\r\n")); 
 
 				unload_filament_withSensor();
+				if(pbowdenLength)
+					delete pbowdenLength;
 			}
 			else
 				fprintf_P(inout, PSTR("Unload cmd error\r\n")); 
