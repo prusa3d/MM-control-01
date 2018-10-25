@@ -1,3 +1,3 @@
 dist: trusty
 script:
-  - bash build.sh
+  - bash -x build.sh
