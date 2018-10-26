@@ -3,7 +3,8 @@ script:
   - bash -x build.sh
 deploy:
   provider: releases
-  api_key: a272af12b3d30e49fae7036a0ffe1bbcd265abc6
+  user: mkbel-travis-MM-control
+  password: testpasswordtravis
   file: MM-control-01.hex
   skip_cleanup: true
   on:
