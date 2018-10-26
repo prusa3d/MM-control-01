@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 BUILD_ENV="1.0.0"
 BUILD_GENERATOR="Ninja"
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
