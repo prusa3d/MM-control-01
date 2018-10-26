@@ -4,7 +4,7 @@ script:
 deploy:
   provider: releases
   api_key: $ACCESS_TOKEN
-  file: MM-control-01.hex
+  file: ../MM-control-01-build/MM-control-01.hex
   skip_cleanup: true
   on:
     tags: true
