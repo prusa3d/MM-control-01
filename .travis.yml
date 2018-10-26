@@ -3,7 +3,7 @@ script:
   - bash -x build.sh
 deploy:
   provider: releases
-  api_key: c500d82b27bea05d5023df6433cc3a5d7e4b6f31
+  api_key: $ACCESS_TOKEN
   file: MM-control-01.hex
   skip_cleanup: true
   on:
