@@ -1,3 +1,10 @@
 dist: trusty
 script:
   - bash -x build.sh
+deploy:
+  provider: releases
+  api_key:  bca48ebbf511ca3e5aaa215ad2b81f663ebaa4a6
+  file: MM-control-01.hex
+  skip_cleanup: true
+  on:
+    tags: true
