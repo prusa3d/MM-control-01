@@ -413,24 +413,7 @@ void process_commands(FILE* inout)
 			fprintf_P(inout, PSTR("Entering Filamint Calibration Mode\r\n")); 
 			settings_select_filament();
 		}
-		else if (strcmp_P(line,PSTR("!INC"))==0)
-		{
-			if (pbowdenLength != 0 && pbowdenLength->decrease())
-			{
-				move(0, 0, pbowdenLength->stepSize);
-				delay(400);
-				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
-			}
-		}
-		else if (strcmp_P(line,PSTR("!DEC"))==0)
-		{
-			if (pbowdenLength != 0 && pbowdenLength->decrease())
-			{
-				move(0, 0, -pbowdenLength->stepSize);
-				delay(400);
-				fprintf_P(uart0io,PSTR("Dec: %d\r\n"),pbowdenLength->m_length);
-			}
-		}
+		
 		else if(strcmp_P(line,PSTR("!SETUP")) == 0)
 		{
 			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
@@ -453,6 +436,9 @@ void process_commands(FILE* inout)
 				pbowdenLength = new BowdenLength();
 
 				load_filament_withSensor();
+
+				tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+
 			}	
 			else
 				fprintf_P(inout, PSTR("Load cmd error\r\n")); 	
@@ -470,6 +456,29 @@ void process_commands(FILE* inout)
 			}
 			else
 				fprintf_P(inout, PSTR("Unload cmd error\r\n")); 
+		}
+		else if (strcmp_P(line,PSTR("!INC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->increase() && isFilamentLoaded)
+			{
+				move(0, 0, 10*pbowdenLength->stepSize);
+				delay(400);
+				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
+			}
+			else
+				fprintf_P(uart0io,PSTR("Cannot increase\r\n"),pbowdenLength->m_length);
+
+		}
+		else if (strcmp_P(line,PSTR("!DEC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->decrease() && isFilamentLoaded)
+			{
+				move(0, 0, -pbowdenLength->stepSize);
+				delay(400);
+				fprintf_P(uart0io,PSTR("Dec: %d\r\n"),pbowdenLength->m_length);
+			}
+			else
+				fprintf_P(uart0io,PSTR("Cannot decrease\r\n"),pbowdenLength->m_length);
 		}
 	}
 	else
