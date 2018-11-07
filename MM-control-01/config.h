@@ -1,7 +1,8 @@
-//config.h - main configuration file
+//! @file
+//! @brief main configuration file
 
-#define FW_VERSION 102 //example: 103 means version 1.0.3
-#define FW_BUILDNR 132 //number of commits in 'master'
+#ifndef CONFIG_H_
+#define CONFIG_H_
 
 //timer0
 //#define TIMER0_EVERY_1ms    _every_1ms    //1ms callback
@@ -90,7 +91,7 @@
 #define ADC_CHAN_MSK      0b0000000000100000 //used AD channels bit mask (ADC5)
 #define ADC_CHAN_CNT      1          //number of used channels)
 #define ADC_OVRSAMPL      1          //oversampling multiplier
-#define ADC_READY         _adc_ready //ready callback
+//#define ADC_READY         _adc_ready //ready callback
 
 
 //signals (from interrupts to main loop)
@@ -127,3 +128,5 @@
 
 //diagnostic functions
 //#define _DIAG
+
+#endif //CONFIG_H_

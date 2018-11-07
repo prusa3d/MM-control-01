@@ -2,8 +2,46 @@
 MMU 3-axis stepper control
 
 ## Building
+### Cmake
+You need cmake, avr-gcc, avr-libc and cmake supported build system (e.g. ninja) installed.
+
+Out of source tree build is recommended, in case of Eclipse CDT project file generation is necceessary. If you don't want out of source tree build, you can skip this step.
+~~~
+cd ..
+mkdir MM-control-01_cmake
+cd MM-control-01_cmake
+~~~
+Generate build system - consult cmake --help for build systems generators and IDE project files supported on your platform.
+~~~
+cmake -G "build system generator" path_to_source
+~~~
+example 1 - build system only
+~~~
+cmake -G "Ninja" ../MM-control-01
+~~~
+example 2 - build system and project file for your IDE
+~~~
+cmake -G "Eclipse CDT4 - Ninja ../MM-control-01
+~~~
+Invoke build system you selected in previous step. Example:
+~~~
+ninja
+~~~
+file MM-control-01.hex is generated.
+
 ### Arduino
-Recomended version is arduino 1.8.5.
+Recomended version is arduino 1.8.5.  
+in MM-control-01 subfolder create file version.h  
+use version.h.in as template, replace ${value} with numbers or strings according to comments in template file.  
+create file dirty.h with content if you are building unmodified git commit
+~~~
+#define FW_LOCAL_CHANGES 0
+~~~
+or
+~~~
+#define FW_LOCAL_CHANGES 1
+~~~
+if you have uncommitted local changes.
 #### Adding MMUv2 board
 In Arduino IDE open File / Settings  
 Set Additional boards manager URL to:  

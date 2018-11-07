@@ -1,5 +1,6 @@
 //! @file
 
+
 #include "main.h"
 #include <Arduino.h>
 #include <stdio.h>
@@ -16,6 +17,7 @@
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"
+#include "version.h"
 
 
 int8_t sys_state = 0;
