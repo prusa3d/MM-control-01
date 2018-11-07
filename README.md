@@ -1,6 +1,21 @@
 # MM-control-01
 MMU 3-axis stepper control
 
+## Table of contents
+
+<!--ts-->
+   * [Building](#building)
+     * [Cmake](#cmake)
+       * [Automatic, remote, using travis-ci](#automatic-remote-using-travis-ci)
+       * [Automatic, local, using script and prepared tools package](#automatic-local-using-script-and-prepared-tools-package)
+       * [Manually with installed tools](#manually-with-installed-tools)
+     * [Arduino](#arduino)
+     * [PlatformIO](#platformio)
+   * [Flashing](#flashing)
+   * [Building documentation](#building-documentation)
+     
+<!--te-->
+
 ## Building
 ### Cmake
 #### Automatic, remote, using travis-ci
