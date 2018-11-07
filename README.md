@@ -3,6 +3,28 @@ MMU 3-axis stepper control
 
 ## Building
 ### Cmake
+#### Automatic, remote, using travis-ci
+
+Create new github user, eg. your_user_name-your_repository_name-travis. This step is not mandatory, only recomended to limit access rights for travis to single repository. Grant this user access to your repository. Register this user on https://travis-ci.org/. Create API key for this user. In Github click on this user, settings, Developer settings, Personal access tokens, Generate new token, select public_repo, click on Generate token. Copy this token.
+Login into https://travis-ci.org/ enable build of your repository, click on repository setting, add environment variable ACCESS_TOKEN as value paste your token.
+
+#### Automatic, local, using script and prepared tools package
+##### Linux
+
+You need unzip and wget tools.
+
+run ./build.sh
+
+It downloads neccessary tools, extracts it to ../MM-build-env-\<version\>, creates ../MM-control-01-build folder, configures build scripts in it and builds it using ninja.
+
+##### Windows
+
+Download MM-build-env-Win64-<version>.zip from https://github.com/prusa3d/MM-build-env/releases. Unpack it. Run configure.bat. This opens cmake-gui with preconfigured tools paths. Select path where is your source code located, select where you wish to build - out of source build is recomended. Click on generate, select generator - Ninja, or \<Your favourite IDE\> - Ninja.
+  
+Run build.bat generated in your binary directory.
+
+#### Manually with installed tools
+
 You need cmake, avr-gcc, avr-libc and cmake supported build system (e.g. ninja) installed.
 
 Out of source tree build is recommended, in case of Eclipse CDT project file generation is necceessary. If you don't want out of source tree build, you can skip this step.
