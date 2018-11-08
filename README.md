@@ -23,6 +23,8 @@ MMU 3-axis stepper control
 Create new github user, eg. your_user_name-your_repository_name-travis. This step is not mandatory, only recomended to limit access rights for travis to single repository. Grant this user access to your repository. Register this user on https://travis-ci.org/. Create API key for this user. In Github click on this user, settings, Developer settings, Personal access tokens, Generate new token, select public_repo, click on Generate token. Copy this token.
 Login into https://travis-ci.org/ enable build of your repository, click on repository setting, add environment variable ACCESS_TOKEN as value paste your token.
 
+Each commit is build, but only for tagged commits MM-control-01.hex is attached to your release by travis.
+
 #### Automatic, local, using script and prepared tools package
 ##### Linux
 
