@@ -21,7 +21,7 @@ MMU 3-axis stepper control
 #### Automatic, remote, using travis-ci
 
 Create new github user, eg. your_user_name-your_repository_name-travis. This step is not mandatory, only recomended to limit access rights for travis to single repository. Grant this user access to your repository. Register this user on https://travis-ci.org/. Create API key for this user. In Github click on this user, settings, Developer settings, Personal access tokens, Generate new token, select public_repo, click on Generate token. Copy this token.
-Login into https://travis-ci.org/ enable build of your repository, click on repository setting, add environment variable ACCESS_TOKEN as value paste your token.
+Login into https://travis-ci.org/ enable build of your repository, click on repository setting, add environment variable ACCESS_TOKEN. As value paste your token.
 
 Each commit is build, but only for tagged commits MM-control-01.hex is attached to your release by travis.
 
@@ -103,7 +103,12 @@ PlatformIO build is not supported by Prusa Research, please report any PlatformI
 #### Arduino
 click Upload
 #### Slic3er
-Hex file needs to be edited to be recognized as for MMUv2, to be specified later (in several years)
+Hex file needs to be edited to be recognized as for MMUv2 in case of Arduino build. This is done automatically in cmake build.
+
+Add following line to the begining of MM-control-01.hex:
+~~~
+; device = mm-control
+~~~
 #### Avrdude
 Board needs to be reset to bootloader. Bootloader has 5 seconds timeout and then returns to the application.
 
