@@ -21,7 +21,7 @@ static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
 static const uint16_t eepromLengthCorrectionBase = 7900u; //!< legacy bowden length correction base
 static const uint16_t eepromBowdenLenDefault = 8900u; //!< Default bowden length
 static const uint16_t eepromBowdenLenMinimum = 6900u; //!< Minimum bowden length
-static const uint16_t eepromBowdenLenMaximum = 10900u; //!< Maximum bowden length
+static const uint16_t eepromBowdenLenMaximum = 16000u; //!< Maximum bowden length
 
 //! @brief Is filament number valid?
 //! @retval true valid
