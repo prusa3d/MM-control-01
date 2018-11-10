@@ -102,7 +102,7 @@ void setupMenu()
 				case 2:
 					if (!eraseLocked)
 					{
-						BowdenLength::eraseAll();
+						eepromEraseAll();
 						_exit = true;
 					}
 					break;
