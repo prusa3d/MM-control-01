@@ -12,7 +12,7 @@
 //! Do not remove, reorder or change size of existing fields.
 //! Otherwise values stored with previous version of firmware would be broken.
 //! It is possible to add fields in the end of this struct, ensure that erased EEPROM is handled well.
-typedef struct
+typedef struct __attribute__ ((packed))
 {
 	uint8_t eepromLengthCorrection; //!< legacy bowden length correction
 	uint16_t eepromBowdenLen[5];    //!< Bowden length for each filament
