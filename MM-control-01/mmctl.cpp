@@ -11,7 +11,7 @@
 #include "motion.h"
 #include "Buttons.h"
 
-int active_extruder = -1;
+int active_extruder = 0;
 int previous_extruder = -1;
 bool isFilamentLoaded = false;
 bool isIdlerParked = false;
@@ -72,7 +72,6 @@ bool switch_extruder_withSensor(int new_extruder)
 	
 	isPrinting = true;
 	bool _return = false;
-	if (!isHomed) { home(); }
 	
 	if (active_extruder == 5)
 	{
@@ -92,6 +91,7 @@ bool switch_extruder_withSensor(int new_extruder)
 	{
 		if (!isFilamentLoaded)
 		{
+		    if (!isHomed) { home(); }
 			shr16_set_led(2 << 2 * (4 - active_extruder));
 			load_filament_withSensor(); // just load filament if not loaded
 			_return = true;
@@ -104,6 +104,7 @@ bool switch_extruder_withSensor(int new_extruder)
 	else
 	{
 		if (isFilamentLoaded) { unload_filament_withSensor(); } // unload filament first
+		if (!isHomed) { home(); }
 		set_positions(previous_extruder, active_extruder); // move idler and selector to new filament position
 		
 		shr16_set_led(2 << 2 * (4 - active_extruder));

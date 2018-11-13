@@ -47,11 +47,20 @@ void cut_filament()
 {
 }
 
+//! @brief Compute steps for idler needed to change filament
+//! @par current_filament Currently selected filament
+//! @par next_filament Filament to be selected
+//! @return idler steps
+int getIdlerSteps(int current_filament, int next_filament)
+{
+    return ((current_filament - next_filament) * idler_steps);
+}
+
 void set_positions(int _current_extruder, int _next_extruder)
 {
 	// steps to move to new position of idler and selector
 	int _selector_steps = ((_current_extruder - _next_extruder) * selector_steps) * -1;
-	int _idler_steps = (_current_extruder - _next_extruder) * idler_steps;
+	int _idler_steps = getIdlerSteps(_current_extruder, _next_extruder);
 
 	// move both to new position
 	move_proportional(_idler_steps, _selector_steps);
@@ -70,6 +79,8 @@ void eject_filament(int extruder)
 	//if there is still filament detected by PINDA unload it first
 	if (isFilamentLoaded)  unload_filament_withSensor();
 	
+	select_extruder(active_extruder); //Enforce home idler and selector.
+
 	if (isIdlerParked) park_idler(true); // if idler is in parked position un-park him get in contact with filament
 	
 	tmc2130_init_axis(AX_PUL, tmc2130_mode);
@@ -113,6 +124,7 @@ void recover_after_eject()
 
 void load_filament_withSensor()
 {
+    FilamentLoaded::set(active_extruder);
 	if (isIdlerParked) park_idler(true); // if idler is in parked position un-park him get in contact with filament
 
 	tmc2130_init_axis(AX_PUL, tmc2130_mode);
@@ -515,10 +527,29 @@ void park_idler(bool _unpark)
 	 
 }
 
-bool home_idler()
+
+//! @brief home idler
+//!
+//! @par toLastFilament
+//!   - true
+//! Move idler to previously loaded filament and disengage. Returns true.
+//! Does nothing if last filament used is not known and returns false.
+//!   - false (default)
+//! Move idler to filament 0 and disengage. Returns true.
+//!
+//! @retval true Succeeded
+//! @retval false Failed
+bool home_idler(bool toLastFilament)
 {
 	int _c = 0;
 	int _l = 0;
+	uint8_t filament = 0; //Not needed, just to suppress compiler warning.
+	if(toLastFilament)
+	{
+	    if(!FilamentLoaded::get(filament)) return false;
+	}
+
+	move(-10, 0, 0); // move a bit in opposite direction
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
@@ -536,12 +567,44 @@ bool home_idler()
 			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
 		}
 	}
+
+	move(idler_steps_after_homing, 0, 0); // move to initial position
+
+
+    if (toLastFilament)
+    {
+        int idlerSteps = getIdlerSteps(0,filament);
+        move_proportional(idlerSteps, 0);
+    }
+
+	park_idler(false);
+
 	return true;
 }
 
 bool home_selector()
 {
+    // if FINDA is sensing filament do not home
+    while (digitalRead(A1) == 1)
+    {
+        while (Btn::right != buttonClicked())
+        {
+            if (digitalRead(A1) == 1)
+            {
+                shr16_set_led(0x2aa);
+            }
+            else
+            {
+                shr16_set_led(0x155);
+            }
+            delay(300);
+            shr16_set_led(0x000);
+            delay(300);
+        }
+    }
 	 
+    move(0, -100,0); // move a bit in opposite direction
+
 	int _c = 0;
 	int _l = 2;
 
@@ -562,23 +625,21 @@ bool home_selector()
 		}
 	}
 	
+	move(0, selector_steps_after_homing,0); // move to initial position
+
 	return true;
 }
 
 void home()
 {
-	move(-10, -100,0); // move a bit in opposite direction
 	
 	// home both idler and selector
 	home_idler();
+
 	home_selector();
 	
 	shr16_set_led(0x155);
-	move(idler_steps_after_homing, selector_steps_after_homing,0); // move to initial position
 
-	active_extruder = 0;
-
-	park_idler(false);
 	shr16_set_led(0x000);
 	
 	isFilamentLoaded = false; 

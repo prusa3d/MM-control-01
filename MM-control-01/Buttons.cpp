@@ -31,6 +31,7 @@ void settings_select_filament()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
+			    if (!isHomed) { home(); }
 				if (active_extruder < 5) settings_bowden_length();
 				else
 				{
