@@ -104,8 +104,7 @@ void setup()
 	{
 		setupMenu();
 	}
-	
-	
+	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
 }
 
