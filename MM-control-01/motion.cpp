@@ -430,6 +430,19 @@ void unload_filament_withSensor()
 	isFilamentLoaded = false; // filament unloaded 
 }
 
+//! @brief Do 320 pulley steps slower and 450 steps faster with decreasing motor current.
+//!
+//! @n d = 6.3 mm        pulley diameter
+//! @n c = pi * d        pulley circumference
+//! @n FSPR = 200        full steps per revolution (stepper motor constant) (1.8 deg/step)
+//! @n mres = 2          microstep resolution (uint8_t __res(AX_PUL))
+//! @n SPR = FSPR * mres steps per revolution
+//! @n T1 = 2600 us      step period first segment
+//! @n T2 = 2200 us      step period second segment
+//! @n v1 = (1 / T1) / SPR * c = 19.02 mm/s  speed first segment
+//! @n s1 =   320    / SPR * c = 15.80 mm    distance first segment
+//! @n v2 = (1 / T2) / SPR * c = 22.48 mm/s  speed second segment
+//! @n s2 =   450    / SPR * c = 22.26 mm    distance second segment
 void load_filament_inPrinter()
 {
 	// loads filament after confirmed by printer into the Bontech pulley gears so they can grab them
