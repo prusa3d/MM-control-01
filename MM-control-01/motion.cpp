@@ -285,8 +285,8 @@ void unload_filament_withSensor()
 	set_pulley_dir_pull();
 
 	float _speed = 2000;
-	float _first_point = 1800;
-	float _second_point = 8700;   
+	const float _first_point = 1800;
+	const float _second_point = 8700;
 	int _endstop_hit = 0;
 
 
@@ -302,7 +302,7 @@ void unload_filament_withSensor()
 		if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 550) _speed = _speed - 2;
 
 		delayMicroseconds(_speed);
-		if (digitalRead(A1) == 0 && _unloadSteps < 2500) _endstop_hit++;
+		if (digitalRead(A1) == 0) _endstop_hit++;
 
 	} while (_endstop_hit < 100 && _unloadSteps > 0);
 
