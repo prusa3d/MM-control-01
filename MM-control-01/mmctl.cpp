@@ -153,13 +153,6 @@ void select_extruder(int new_extruder)
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 }
 
-bool service_position()
-{
-	move(0, 600, 0);
-
-	return true;
-}
-
 void led_blink(int _no)
 {
 	shr16_set_led(1 << 2 * _no);
