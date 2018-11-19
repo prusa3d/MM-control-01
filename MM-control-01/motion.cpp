@@ -674,7 +674,7 @@ void move_proportional(int _idler, int _selector)
 	int _start = _selector - 250;
 	int _end = 250;
 
-	do
+	while (_selector != 0 || _idler != 0 );
 	{
 		if (_idler_pos >= 1)
 		{
@@ -704,7 +704,7 @@ void move_proportional(int _idler, int _selector)
 		if (_speed > 900 && _selector > _start) { _speed = _speed - 10; }
 		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
 
-	} while (_selector != 0 || _idler != 0 );
+	}
 }
 
 void move(int _idler, int _selector, int _pulley)
