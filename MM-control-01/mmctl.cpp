@@ -67,10 +67,17 @@ bool feed_filament()
 	return true;
 }
 
-bool switch_extruder_withSensor(int new_extruder)
+//! @brief Change filament
+//!
+//! Unload filament, if different filament than requested is currently loaded,
+//! or homing wasn't done yet.
+//! Home if not homed.
+//! Switch to requested filament (this does nothing if requested filament is currently selected).
+//! Load filament if not loaded.
+//! @par new_extruder Filament to be selected
+void switch_extruder_withSensor(int new_extruder)
 {
 	isPrinting = true;
-	bool _return = false;
 	
 	if (active_extruder == 5)
 	{
@@ -85,17 +92,27 @@ bool switch_extruder_withSensor(int new_extruder)
 	previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
-    if (isFilamentLoaded) { unload_filament_withSensor(); } // unload filament first
-    if (!isHomed) { home(); }
-    set_positions(previous_extruder, active_extruder); // move idler and selector to new filament position
+    if (isFilamentLoaded && ((previous_extruder != active_extruder) || !isHomed))
+    {
+        unload_filament_withSensor();
+    }
+
+    if (!isHomed)
+    {
+        home();
+    }
+
+    set_positions(previous_extruder, active_extruder);
 
     shr16_set_led(2 << 2 * (4 - active_extruder));
-    load_filament_withSensor(); // load new filament
-    _return = true;
+
+    if (!isFilamentLoaded)
+    {
+            load_filament_withSensor();
+    }
 
 	shr16_set_led(0x000);
 	shr16_set_led(1 << 2 * (4 - active_extruder));
-	return _return;
 }
 
 //! @brief select extruder
