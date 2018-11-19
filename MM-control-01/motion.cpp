@@ -566,7 +566,6 @@ bool home_idler(bool toLastFilament)
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
-		move(0, (c * 5) * -1,0);
 		delay(50);
 		for (int i = 0; i < 2000; i++)
 		{
