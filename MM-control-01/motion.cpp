@@ -667,13 +667,13 @@ void move_proportional(int _idler, int _selector)
 	_idler = set_idler_direction(_idler);
 	_selector = set_selector_direction(_selector);
 
-	float _idler_step = (float)_idler/(float)_selector;
+	float _idler_step = _selector ? (float)_idler/(float)_selector : 1.0;
 	float _idler_pos = 0;
 	int _speed = 2500;
 	int _start = _selector - 250;
 	int _end = 250;
 
-	while (_selector != 0 || _idler != 0 );
+	while (_selector != 0 || _idler != 0 )
 	{
 		if (_idler_pos >= 1)
 		{
