@@ -138,7 +138,7 @@ void select_extruder(int new_extruder)
 			move(0, 700, 0);
 			++previous_extruder;
 		}
-        if (previous_extruder == 5)
+	    else if (previous_extruder == 5)
         {
             move(0, -700, 0);
             previous_extruder = 4;
