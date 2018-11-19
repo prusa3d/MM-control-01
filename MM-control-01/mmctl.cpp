@@ -115,17 +115,14 @@ void switch_extruder_withSensor(int new_extruder)
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 }
 
-//! @brief select extruder
+//! @brief Select filament
 //!
-//! Known limitation is, that if extruder 5 - service position was selected before
-//! it is not possible to select any other extruder than extruder 4.
+//! Does not unload or load filament, just moves selector and idler,
+//! caller is responsible for ensuring, that filament is not loaded when caled.
 //!
-//! @param new_extruder Extruder to be selected
-//! @return
-bool select_extruder(int new_extruder)
+//! @param new_extruder Filament to be selected
+void select_extruder(int new_extruder)
 {
-
-	bool _return = false;
 	if (!isHomed) { home(); }
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
@@ -133,38 +130,27 @@ bool select_extruder(int new_extruder)
 	int previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
-	if (previous_extruder == active_extruder)
+	if (previous_extruder != active_extruder)
 	{
-		if (!isFilamentLoaded)
-		{
-			_return = true;
-		}
-	}
-	else
-	{
+
 		if (new_extruder == 5)
 		{
 			move(0, 700, 0);
+			++previous_extruder;
 		}
-		else
-		{
-			if (previous_extruder == 5)
-			{
-				move(0, -700, 0);
-			}
-			else
-			{
-				if (isIdlerParked) park_idler(true);
-				set_positions(previous_extruder, active_extruder); // move idler and selector to new filament position
-				park_idler(false);
-			}
-		}
-		_return = true;
+        if (previous_extruder == 5)
+        {
+            move(0, -700, 0);
+            previous_extruder = 4;
+        }
+
+        if (isIdlerParked) park_idler(true);
+        set_positions(previous_extruder, active_extruder); // move idler and selector to new filament position
+        park_idler(false);
 	}
 
 	shr16_set_led(0x000);
 	shr16_set_led(1 << 2 * (4 - active_extruder));
-	return _return;
 }
 
 bool service_position()

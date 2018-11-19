@@ -17,7 +17,7 @@ extern bool isIdlerParked;
 
 extern void switch_extruder_withSensor(int new_extruder);
 
-extern bool select_extruder(int new_extruder);
+extern void select_extruder(int new_extruder);
 extern bool service_position();
 
 extern bool feed_filament();
