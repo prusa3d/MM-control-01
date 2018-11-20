@@ -16,8 +16,6 @@ extern uint16_t shr16_v;
 
 extern void shr16_init(void);
 
-extern void shr16_write(uint16_t v);
-
 extern void shr16_set_led(uint16_t led);
 
 extern void shr16_set_ena(uint8_t ena);
