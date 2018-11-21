@@ -19,28 +19,28 @@ void settings_bowden_length();
 //! Park position (one behind last filament) can be also selected.
 //! Activating calibration in park position exits selector.
 //!
-void settings_select_filament()
+//! @retval true exit
+//! @retval false to be called again
+bool settings_select_filament()
 {
-	while (1)
-	{
-		manual_extruder_selector();
+    manual_extruder_selector();
 
-		if(Btn::middle == buttonClicked())
-		{
-			shr16_set_led(2 << 2 * (4 - active_extruder));
-			delay(500);
-			if (Btn::middle == buttonClicked())
-			{
-			    if (!isHomed) { home(); }
-				if (active_extruder < 5) settings_bowden_length();
-				else
-				{
-					select_extruder(0);
-					return;
-				}
-			}
-		}
-	}
+    if(Btn::middle == buttonClicked())
+    {
+        shr16_set_led(2 << 2 * (4 - active_extruder));
+        delay(500);
+        if (Btn::middle == buttonClicked())
+        {
+            if (!isHomed) { home(); }
+            if (active_extruder < 5) settings_bowden_length();
+            else
+            {
+                select_extruder(0);
+                return true;
+            }
+        }
+    }
+	return false;
 }
 
 //!	@brief Show setup menu
@@ -62,77 +62,95 @@ void settings_select_filament()
 //! @n 1 - active
 //! @n 0 - inactive
 //!
-void setupMenu()
+//! @retval true continue
+//! @retval false exit
+bool setupMenu()
 {
-	shr16_set_led(0x000);
-	delay(200);
-	shr16_set_led(0x2aa);
-	delay(1200);
-	shr16_set_led(0x000);
-	delay(600);
+    static bool onEnter = true;
+    if (onEnter)
+    {
+        shr16_set_led(0x000);
+        delay(200);
+        shr16_set_led(0x2aa);
+        delay(1200);
+        shr16_set_led(0x000);
+        delay(600);
+        onEnter = false;
+    }
 
-	int _menu = 0;
+	static int _menu = 0;
 	bool _exit = false;
-	bool eraseLocked = true;
+	static bool eraseLocked = true;
+	static bool inBowdenCalibration = false;
 
-		
-
-	do
+	if (inBowdenCalibration)
 	{
-		shr16_set_led(1 << 2 * 4);
-		delay(1);
-		shr16_set_led(2 << 2 * 4);
-		delay(1);
-		shr16_set_led(2 << 2 * _menu);
-		delay(1);
+	    _exit = settings_select_filament();
+	}
+	else
+	{
 
-		switch (buttonClicked())
-		{
-		case Btn::right:
-			if (_menu > 0) { _menu--; delay(800); }
-			break;
-		case Btn::middle:
-				
-			switch (_menu)
-			{
-				case 1:
-					settings_select_filament();
-					_exit = true;
-					break;
-				case 2:
-					if (!eraseLocked)
-					{
-						eepromEraseAll();
-						_exit = true;
-					}
-					break;
-				case 3: //unlock erase
-					eraseLocked = false;
-					break;
-				case 4: // exit menu
-					_exit = true;
-					break;
-			}
-			break;
-		case Btn::left:
-			if (_menu < 4) { _menu++; delay(800); }
-			break;
-		default:
-			break;
-		}
+        shr16_set_led(1 << 2 * 4);
+        delay(1);
+        shr16_set_led(2 << 2 * 4);
+        delay(1);
+        shr16_set_led(2 << 2 * _menu);
+        delay(1);
+
+        switch (buttonClicked())
+        {
+        case Btn::right:
+            if (_menu > 0) { _menu--; delay(800); }
+            break;
+        case Btn::middle:
+
+            switch (_menu)
+            {
+            case 0:
+                break;
+            case 1:
+
+                inBowdenCalibration = true;
+                break;
+            case 2:
+                if (!eraseLocked)
+                {
+                    eepromEraseAll();
+                    _exit = true;
+                }
+                break;
+            case 3: //unlock erase
+                eraseLocked = false;
+                break;
+            case 4: // exit menu
+                _exit = true;
+                break;
+            }
+            break;
+        case Btn::left:
+            if (_menu < 4) { _menu++; delay(800); }
+            break;
+        default:
+            break;
+        }
+	}
 		
-	} while (!_exit);
 
+    if (_exit)
+    {
+        shr16_set_led(0x000);
+        delay(400);
+        shr16_set_led(0x2aa);
+        delay(400);
+        shr16_set_led(0x000);
+        delay(400);
 
-	shr16_set_led(0x000);
-	delay(400);
-	shr16_set_led(0x2aa);
-	delay(400);
-	shr16_set_led(0x000);
-	delay(400);
+        shr16_set_led(0x000);
+        shr16_set_led(1 << 2 * (4 - active_extruder));
 
-	shr16_set_led(0x000);
-	shr16_set_led(1 << 2 * (4 - active_extruder));
+        return false;
+    }
+    return true;
 }
 
 //! @brief Set bowden length
