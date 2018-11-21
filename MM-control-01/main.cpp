@@ -20,10 +20,6 @@
 #include "version.h"
 
 
-int8_t sys_state = 0;
-uint8_t sys_signals = 0;
-int _loop = 0;
-int _c = 0;
 uint8_t tmc2130_mode = NORMAL_MODE;
 
 #if (UART_COM == 0)
