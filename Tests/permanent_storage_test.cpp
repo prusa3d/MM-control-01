@@ -710,6 +710,18 @@ TEST_CASE( "Erase EEPROM.", "[permanent_storage]" )
     writes = 0;
 }
 
+TEST_CASE( "Init EEPROM.", "[permanent_storage]" )
+{
+    CHECK(eeprom == eeprom_empty);
+    permanentStorageInit();
+    CHECK(eeprom == eeprom_empty);
+    eeprom_update_byte(reinterpret_cast<uint8_t*>(E2END), 0x1);
+    CHECK(eeprom != eeprom_empty);
+    permanentStorageInit();
+    CHECK(eeprom == eeprom_empty);
+    writes = 0;
+}
+
 TEST_CASE( "Set and get filament.", "[permanent_storage]" )
 {
     uint8_t filament = 0xff;
@@ -753,6 +765,7 @@ TEST_CASE( "Set and get filament.", "[permanent_storage]" )
     CHECK(writes == 807);
     CHECK(eeprom == eeprom_801);
 
+
     corrupt = 11;
     CHECK(true == FilamentLoaded::get(filament));
     CHECK(1 == filament);
@@ -771,6 +784,13 @@ TEST_CASE( "Set and get filament.", "[permanent_storage]" )
     CHECK(writes == 812);
 
     corrupt = -1;
+
+    permanentStorageInit();
+    CHECK(writes == 812);
+    CHECK(eeprom == eeprom_802);
+    eeprom_update_byte(reinterpret_cast<uint8_t*>(E2END), 0x1);
+    permanentStorageInit();
+    CHECK(eeprom == eeprom_empty);
 
     eepromEraseAll();
     writes = 0;

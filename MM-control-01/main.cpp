@@ -62,7 +62,7 @@ void process_commands(FILE* inout);
 //! @n b - blinking
 void setup()
 {
-
+    permanentStorageInit();
 	shr16_init(); // shift register
 	led_blink(0);
 

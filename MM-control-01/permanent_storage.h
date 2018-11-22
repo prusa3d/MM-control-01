@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+void permanentStorageInit();
+
 void eepromEraseAll();
 
 //! @brief Read manipulate and store bowden length

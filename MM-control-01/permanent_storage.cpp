@@ -12,6 +12,8 @@
 //! Do not remove, reorder or change size of existing fields.
 //! Otherwise values stored with previous version of firmware would be broken.
 //! It is possible to add fields in the end of this struct, ensure that erased EEPROM is handled well.
+//! Last byte in EEPROM is reserved for layoutVersion. If some field is repurposed, layoutVersion
+//! needs to be changed to force EEPROM erase.
 typedef struct __attribute__ ((packed))
 {
 	uint8_t eepromLengthCorrection; //!< legacy bowden length correction
@@ -19,7 +21,9 @@ typedef struct __attribute__ ((packed))
 	uint8_t eepromFilamentStatus[3];//!< Majority vote status of eepromFilament wear leveling
 	uint8_t eepromFilament[800];    //!< Top nibble status, bottom nibble last filament loaded
 }eeprom_t;
-static_assert(sizeof(eeprom_t) - 1 <= E2END, "eeprom_t doesn't fit into EEPROM available.");
+static_assert(sizeof(eeprom_t) - 2 <= E2END, "eeprom_t doesn't fit into EEPROM available.");
+//! @brief EEPROM layout version
+static const uint8_t layoutVersion = 0xff;
 
 static eeprom_t * const eepromBase = reinterpret_cast<eeprom_t*>(0); //!< First EEPROM address
 static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
@@ -27,6 +31,21 @@ static const uint16_t eepromLengthCorrectionBase = 7900u; //!< legacy bowden len
 static const uint16_t eepromBowdenLenDefault = 8900u; //!< Default bowden length
 static const uint16_t eepromBowdenLenMinimum = 6900u; //!< Minimum bowden length
 static const uint16_t eepromBowdenLenMaximum = 10900u; //!< Maximum bowden length
+
+void permanentStorageInit()
+{
+    if (eeprom_read_byte((uint8_t*)E2END) != layoutVersion) eepromEraseAll();
+}
+
+//! @brief Erase whole EEPROM
+void eepromEraseAll()
+{
+    for (uint16_t i = 0; i < E2END; i++)
+    {
+        eeprom_update_byte((uint8_t*)i, static_cast<uint8_t>(eepromEmpty));
+    }
+    eeprom_update_byte((uint8_t*)E2END, layoutVersion);
+}
 
 //! @brief Is filament number valid?
 //! @retval true valid
@@ -118,14 +137,6 @@ BowdenLength::~BowdenLength()
 	if (validFilament(m_filament))eeprom_update_word(&(eepromBase->eepromBowdenLen[m_filament]), m_length);
 }
 
-//! @brief Erase whole EEPROM
-void eepromEraseAll()
-{
-	for (uint16_t i = 0; i <= E2END; i++)
-	{
-		eeprom_update_byte((uint8_t*)i, static_cast<uint8_t>(eepromEmpty));
-	}
-}
 
 //! @brief Get filament storage status
 //!
@@ -313,3 +324,4 @@ void FilamentLoaded::getNext(uint8_t& status)
         break;
     }
 }
+
