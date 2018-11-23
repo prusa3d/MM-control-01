@@ -240,7 +240,7 @@ int8_t tmc2130_init(uint8_t mode)
 
 	PORTC |= 0x40; //PC6 CSN U5
 	PORTD |= 0x80; //PD7 CSN U6
-	PORTB |= 0x80; //PB7 ???
+	PORTB |= 0x80; //PB7 CSN U7
 
 	DDRD |= 0x10;
 	DDRB |= 0x10;

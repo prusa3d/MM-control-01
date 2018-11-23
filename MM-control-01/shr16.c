@@ -6,6 +6,8 @@
 
 uint16_t shr16_v;
 
+static void shr16_write(uint16_t v);
+
 void shr16_init(void)
 {
 	DDRC |= 0x80;
@@ -23,7 +25,7 @@ void shr16_write(uint16_t v)
 {
 	PORTB &= ~0x40;
 	asm("nop");
-	uint16_t m; for (m = 0x8000; m; m >>= 1)
+	for (uint16_t m = 0x8000; m; m >>= 1)
 	{
 		if (m & v)
 			PORTB |= 0x20;
@@ -48,13 +50,13 @@ void shr16_set_led(uint16_t led)
 void shr16_set_ena(uint8_t ena)
 {
 	ena ^= 7;
-	ena = ((ena & 1) << 1) | ((ena & 2) << 2) | ((ena & 4) << 3);
+	ena = ((ena & 1) << 1) | ((ena & 2) << 2) | ((ena & 4) << 3); // 0. << 1 == 1., 1. << 2 == 3., 2. << 3 == 5.
 	shr16_write((shr16_v & ~SHR16_ENA_MSK) | ena);
 }
 
 void shr16_set_dir(uint8_t dir)
 {
-	dir = (dir & 1) | ((dir & 2) << 1) | ((dir & 4) << 2);
+	dir = (dir & 1) | ((dir & 2) << 1) | ((dir & 4) << 2); // 0., 1. << 1 == 2., 2. << 2 == 4.
 	shr16_write((shr16_v & ~SHR16_DIR_MSK) | dir);
 }
 
