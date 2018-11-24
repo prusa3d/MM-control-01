@@ -62,7 +62,7 @@ void process_commands(FILE* inout);
 //! @n b - blinking
 void setup()
 {
-
+    permanentStorageInit();
 	shr16_init(); // shift register
 	led_blink(0);
 
@@ -93,28 +93,9 @@ void setup()
 	shr16_set_led(0x000);
 
 	init_Pulley();
-
-
-	// if FINDA is sensing filament do not home
-	while (digitalRead(A1) == 1)
-	{
-		while (Btn::right != buttonClicked())
-		{
-			if (digitalRead(A1) == 1)
-			{
-				shr16_set_led(0x2aa);
-			}
-			else
-			{
-				shr16_set_led(0x155);
-			}
-			delay(300);
-			shr16_set_led(0x000);
-			delay(300);
-		}
-	}
 	
-	home();
+	home_idler(true);
+
 	//add reading previously stored mode (stealth/normal) from eeprom
 	tmc2130_init(tmc2130_mode); // trinamic, initialize all axes
 	
@@ -123,8 +104,8 @@ void setup()
 	{
 		setupMenu();
 	}
-	
-	
+	if (digitalRead(A1) == 1) isFilamentLoaded = true;
+
 }
 
 
@@ -211,6 +192,7 @@ void loop()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
+			    if (!isHomed) { home(); }
 				feed_filament();
 			}
 		}

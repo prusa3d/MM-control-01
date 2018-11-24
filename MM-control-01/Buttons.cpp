@@ -31,10 +31,10 @@ void settings_select_filament()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
+			    if (!isHomed) { home(); }
 				if (active_extruder < 5) settings_bowden_length();
 				else
 				{
-					select_extruder(4);
 					select_extruder(0);
 					return;
 				}
@@ -102,7 +102,7 @@ void setupMenu()
 				case 2:
 					if (!eraseLocked)
 					{
-						BowdenLength::eraseAll();
+						eepromEraseAll();
 						_exit = true;
 					}
 					break;

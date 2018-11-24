@@ -47,11 +47,20 @@ void cut_filament()
 {
 }
 
+//! @brief Compute steps for idler needed to change filament
+//! @par current_filament Currently selected filament
+//! @par next_filament Filament to be selected
+//! @return idler steps
+int getIdlerSteps(int current_filament, int next_filament)
+{
+    return ((current_filament - next_filament) * idler_steps);
+}
+
 void set_positions(int _current_extruder, int _next_extruder)
 {
 	// steps to move to new position of idler and selector
 	int _selector_steps = ((_current_extruder - _next_extruder) * selector_steps) * -1;
-	int _idler_steps = (_current_extruder - _next_extruder) * idler_steps;
+	int _idler_steps = getIdlerSteps(_current_extruder, _next_extruder);
 
 	// move both to new position
 	move_proportional(_idler_steps, _selector_steps);
@@ -70,6 +79,8 @@ void eject_filament(int extruder)
 	//if there is still filament detected by PINDA unload it first
 	if (isFilamentLoaded)  unload_filament_withSensor();
 	
+	select_extruder(active_extruder); //Enforce home idler and selector.
+
 	if (isIdlerParked) park_idler(true); // if idler is in parked position un-park him get in contact with filament
 	
 	tmc2130_init_axis(AX_PUL, tmc2130_mode);
@@ -113,6 +124,7 @@ void recover_after_eject()
 
 void load_filament_withSensor()
 {
+    FilamentLoaded::set(active_extruder);
 	if (isIdlerParked) park_idler(true); // if idler is in parked position un-park him get in contact with filament
 
 	tmc2130_init_axis(AX_PUL, tmc2130_mode);
@@ -273,8 +285,8 @@ void unload_filament_withSensor()
 	set_pulley_dir_pull();
 
 	float _speed = 2000;
-	float _first_point = 1800;
-	float _second_point = 8700;   
+	const float _first_point = 1800;
+	const float _second_point = 8700;
 	int _endstop_hit = 0;
 
 
@@ -290,7 +302,7 @@ void unload_filament_withSensor()
 		if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 550) _speed = _speed - 2;
 
 		delayMicroseconds(_speed);
-		if (digitalRead(A1) == 0 && _unloadSteps < 2500) _endstop_hit++;
+		if (digitalRead(A1) == 0) _endstop_hit++;
 
 	} while (_endstop_hit < 100 && _unloadSteps > 0);
 
@@ -418,6 +430,19 @@ void unload_filament_withSensor()
 	isFilamentLoaded = false; // filament unloaded 
 }
 
+//! @brief Do 320 pulley steps slower and 450 steps faster with decreasing motor current.
+//!
+//! @n d = 6.3 mm        pulley diameter
+//! @n c = pi * d        pulley circumference
+//! @n FSPR = 200        full steps per revolution (stepper motor constant) (1.8 deg/step)
+//! @n mres = 2          microstep resolution (uint8_t __res(AX_PUL))
+//! @n SPR = FSPR * mres steps per revolution
+//! @n T1 = 2600 us      step period first segment
+//! @n T2 = 2200 us      step period second segment
+//! @n v1 = (1 / T1) / SPR * c = 19.02 mm/s  speed first segment
+//! @n s1 =   320    / SPR * c = 15.80 mm    distance first segment
+//! @n v2 = (1 / T2) / SPR * c = 22.48 mm/s  speed second segment
+//! @n s2 =   450    / SPR * c = 22.26 mm    distance second segment
 void load_filament_inPrinter()
 {
 	// loads filament after confirmed by printer into the Bontech pulley gears so they can grab them
@@ -515,14 +540,32 @@ void park_idler(bool _unpark)
 	 
 }
 
-bool home_idler()
+
+//! @brief home idler
+//!
+//! @par toLastFilament
+//!   - true
+//! Move idler to previously loaded filament and disengage. Returns true.
+//! Does nothing if last filament used is not known and returns false.
+//!   - false (default)
+//! Move idler to filament 0 and disengage. Returns true.
+//!
+//! @retval true Succeeded
+//! @retval false Failed
+bool home_idler(bool toLastFilament)
 {
 	int _c = 0;
 	int _l = 0;
+	uint8_t filament = 0; //Not needed, just to suppress compiler warning.
+	if(toLastFilament)
+	{
+	    if(!FilamentLoaded::get(filament)) return false;
+	}
+
+	move(-10, 0, 0); // move a bit in opposite direction
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
-		move(0, (c * 5) * -1,0);
 		delay(50);
 		for (int i = 0; i < 2000; i++)
 		{
@@ -536,12 +579,44 @@ bool home_idler()
 			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
 		}
 	}
+
+	move(idler_steps_after_homing, 0, 0); // move to initial position
+
+
+    if (toLastFilament)
+    {
+        int idlerSteps = getIdlerSteps(0,filament);
+        move_proportional(idlerSteps, 0);
+    }
+
+	park_idler(false);
+
 	return true;
 }
 
 bool home_selector()
 {
+    // if FINDA is sensing filament do not home
+    while (digitalRead(A1) == 1)
+    {
+        while (Btn::right != buttonClicked())
+        {
+            if (digitalRead(A1) == 1)
+            {
+                shr16_set_led(0x2aa);
+            }
+            else
+            {
+                shr16_set_led(0x155);
+            }
+            delay(300);
+            shr16_set_led(0x000);
+            delay(300);
+        }
+    }
 	 
+    move(0, -100,0); // move a bit in opposite direction
+
 	int _c = 0;
 	int _l = 2;
 
@@ -562,23 +637,21 @@ bool home_selector()
 		}
 	}
 	
+	move(0, selector_steps_after_homing,0); // move to initial position
+
 	return true;
 }
 
 void home()
 {
-	move(-10, -100,0); // move a bit in opposite direction
 	
 	// home both idler and selector
 	home_idler();
+
 	home_selector();
 	
 	shr16_set_led(0x155);
-	move(idler_steps_after_homing, selector_steps_after_homing,0); // move to initial position
 
-	active_extruder = 0;
-
-	park_idler(false);
 	shr16_set_led(0x000);
 	
 	isFilamentLoaded = false; 
@@ -594,13 +667,13 @@ void move_proportional(int _idler, int _selector)
 	_idler = set_idler_direction(_idler);
 	_selector = set_selector_direction(_selector);
 
-	float _idler_step = (float)_idler/(float)_selector;
+	float _idler_step = _selector ? (float)_idler/(float)_selector : 1.0;
 	float _idler_pos = 0;
 	int _speed = 2500;
 	int _start = _selector - 250;
 	int _end = 250;
 
-	do
+	while (_selector != 0 || _idler != 0 )
 	{
 		if (_idler_pos >= 1)
 		{
@@ -630,7 +703,7 @@ void move_proportional(int _idler, int _selector)
 		if (_speed > 900 && _selector > _start) { _speed = _speed - 10; }
 		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
 
-	} while (_selector != 0 || _idler != 0 );
+	}
 }
 
 void move(int _idler, int _selector, int _pulley)

@@ -7,8 +7,7 @@
 #include <inttypes.h>
 
 extern void home();
-extern bool home_idler();
-extern bool home_selector();
+extern bool home_idler(bool toLastFilament = false);
  
 extern int8_t filament_type[EXTRUDERS];
 
