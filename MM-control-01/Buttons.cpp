@@ -173,15 +173,15 @@ void settings_bowden_length()
 			{
 			case Btn::right:
 				if (bowdenLength.decrease()) move(0, 0, -bowdenLength.stepSize);
-                save_millis=millis();
-                if ((save_millis-last_press)>500) delay(400);
-                last_press = save_millis;
+				save_millis=millis();
+				if ((save_millis-last_press)>500) delay(400);
+				last_press = save_millis;
 				break;
 			case Btn::left:
 				if (bowdenLength.increase()) move(0, 0, bowdenLength.stepSize);
-                save_millis=millis();
-                if ((save_millis-last_press)>500) delay(400);
-                last_press = save_millis;
+				save_millis=millis();
+				if ((save_millis-last_press)>500) delay(400);
+				last_press = save_millis;
 				break;
 			default:
 				break;
