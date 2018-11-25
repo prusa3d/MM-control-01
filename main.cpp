@@ -461,7 +461,7 @@ void process_commands(FILE* inout)
 		{
 			if (pbowdenLength != 0 && pbowdenLength->increase() && isFilamentLoaded)
 			{
-				move(0, 0, 10*pbowdenLength->stepSize);
+				move(0, 0, pbowdenLength->stepSize);
 				delay(400);
 				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
 			}
