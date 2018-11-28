@@ -9,6 +9,7 @@
 #include "mmctl.h"
 #include "Buttons.h"
 #include "permanent_storage.h"
+#include "pins.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 
@@ -494,18 +495,18 @@ void init_Pulley()
 
 void do_pulley_step()
 {
-	PORTB |= 0x10;
+    pulley_step_pin_set();
 	asm("nop");
-	PORTB &= ~0x10;
+	pulley_step_pin_reset();
 	asm("nop");
 }
 
 #if 0
 void do_idler_step()
 {
-	PORTD |= 0x40;
+    idler_step_pin_set();
 	asm("nop");
-	PORTD &= ~0x40;
+	idler_step_pin_reset();
 	asm("nop");
 }
 #endif
@@ -663,18 +664,18 @@ void move_proportional(int _idler, int _selector)
 	{
 		if (_idler_pos >= 1)
 		{
-			if (_idler > 0) { PORTD |= 0x40; }
+			if (_idler > 0) { idler_step_pin_set(); }
 		}
-		if (_selector > 0) { PORTD |= 0x10; }
+		if (_selector > 0) { selector_step_pin_set(); }
 		
 		asm("nop");
 		
 		if (_idler_pos >= 1)
 		{
-			if (_idler > 0) { PORTD &= ~0x40; _idler--;  }
+			if (_idler > 0) { idler_step_pin_reset(); _idler--;  }
 		}
 
-		if (_selector > 0) { PORTD &= ~0x10; _selector--; }
+		if (_selector > 0) { selector_step_pin_reset(); _selector--; }
 		asm("nop");
 
 		if (_idler_pos >= 1)
@@ -704,13 +705,13 @@ void move(int _idler, int _selector, int _pulley)
 
 	do
 	{
-		if (_idler > 0) { PORTD |= 0x40; }
-		if (_selector > 0) { PORTD |= 0x10;}
-		if (_pulley > 0) { PORTB |= 0x10; }
+		if (_idler > 0) { idler_step_pin_set(); }
+		if (_selector > 0) { selector_step_pin_set();}
+		if (_pulley > 0) { pulley_step_pin_set(); }
 		asm("nop");
-		if (_idler > 0) { PORTD &= ~0x40; _idler--; delayMicroseconds(1000); }
-		if (_selector > 0) { PORTD &= ~0x10; _selector--;  delayMicroseconds(800); }
-		if (_pulley > 0) { PORTB &= ~0x10; _pulley--;  delayMicroseconds(700); }
+		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000); }
+		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(800); }
+		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
 		if (_acc > 0) { delayMicroseconds(_acc*10); _acc = _acc - 1; }; // super pseudo acceleration control

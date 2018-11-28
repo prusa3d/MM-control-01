@@ -5,6 +5,7 @@
 #include "spi.h"
 #include <stdio.h>
 #include <avr/pgmspace.h>
+#include "pins.h"
 
 #define TMC2130_CS_0 //signal d5  - PC6
 #define TMC2130_CS_1 //signal d6  - PD7
@@ -242,12 +243,12 @@ int8_t tmc2130_init(uint8_t mode)
 	PORTD |= 0x80; //PD7 CSN U6
 	PORTB |= 0x80; //PB7 CSN U7
 
-	DDRD |= 0x10;
-	DDRB |= 0x10;
-	DDRD |= 0x40;
-	PORTD &= ~0x10;	//PD4
-	PORTB &= ~0x10; //PB4
-	PORTD &= ~0x40; //PD6
+	selector_step_pin_init();
+	pulley_step_pin_init();
+	idler_step_pin_init();
+	selector_step_pin_reset(); //PD4
+	pulley_step_pin_reset();   //PB4
+	idler_step_pin_reset();    //PD6
 
 	int8_t ret = 0;
 	
