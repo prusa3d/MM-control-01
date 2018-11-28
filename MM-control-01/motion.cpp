@@ -10,41 +10,26 @@
 #include "Buttons.h"
 #include "permanent_storage.h"
 
-const int selector_steps_after_homing = -3700;
-const int idler_steps_after_homing = -130;
+int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 
-const int selector_steps = 2790/4;
-const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
-const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
+static const int selector_steps_after_homing = -3700;
+static const int idler_steps_after_homing = -130;
+
+static const int selector_steps = 2790/4;
+static const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
+static const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
 
 // endstop to tube  - 30 mm, 550 steps
 
-int selector_steps_for_eject = 0;
-int idler_steps_for_eject = 0;
+static int selector_steps_for_eject = 0;
+static int idler_steps_for_eject = 0;
 
-int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
+static int set_idler_direction(int _steps);
+static int set_selector_direction(int _steps);
+static int set_pulley_direction(int _steps);
 
-int set_idler_direction(int _steps);
-int set_selector_direction(int _steps);
-int set_pulley_direction(int _steps);
 
-void cut_filament();
-
-void park_idler(bool _unpark);
-
-void load_filament_inPrinter();
-void load_filament_withSensor();
-
-void do_pulley_step();
-void do_idler_step();
-
-void set_positions(int _current_extruder, int _next_extruder);
-
-bool checkOk();
-
-void cut_filament()
-{
-}
+static bool checkOk();
 
 //! @brief Compute steps for idler needed to change filament
 //! @par current_filament Currently selected filament
@@ -515,6 +500,7 @@ void do_pulley_step()
 	asm("nop");
 }
 
+#if 0
 void do_idler_step()
 {
 	PORTD |= 0x40;
@@ -522,6 +508,7 @@ void do_idler_step()
 	PORTD &= ~0x40;
 	asm("nop");
 }
+#endif
 
 void park_idler(bool _unpark)
 {
