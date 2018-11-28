@@ -17,7 +17,6 @@ const int selector_steps = 2790/4;
 const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
 const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
 
-const int bowden_length = 1000;
 // endstop to tube  - 30 mm, 550 steps
 
 int selector_steps_for_eject = 0;
