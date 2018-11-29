@@ -6,8 +6,9 @@
 #include "config.h"
 #include <inttypes.h>
 
-extern void home();
-extern bool home_idler(bool toLastFilament = false);
+void home();
+bool home_idler(bool toLastFilament = false);
+bool isHomed();
  
 extern int8_t filament_type[EXTRUDERS];
 

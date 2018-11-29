@@ -191,7 +191,7 @@ void loop()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
-			    if (!isHomed) { home(); }
+			    home();
 				feed_filament();
 			}
 		}

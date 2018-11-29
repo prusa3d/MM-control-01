@@ -18,7 +18,6 @@ bool isIdlerParked = false;
 int toolChanges = 0;
 
 bool isPrinting = false;
-bool isHomed = false;
 
 bool feed_filament()
 {
@@ -92,15 +91,12 @@ void switch_extruder_withSensor(int new_extruder)
 	previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
-    if (isFilamentLoaded && ((previous_extruder != active_extruder) || !isHomed))
+    if (isFilamentLoaded && ((previous_extruder != active_extruder) || !isHomed()))
     {
         unload_filament_withSensor();
     }
 
-    if (!isHomed)
-    {
-        home();
-    }
+    home();
 
     set_positions(previous_extruder, active_extruder);
 
@@ -123,7 +119,7 @@ void switch_extruder_withSensor(int new_extruder)
 //! @param new_extruder Filament to be selected
 void select_extruder(int new_extruder)
 {
-	if (!isHomed) { home(); }
+	home();
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 

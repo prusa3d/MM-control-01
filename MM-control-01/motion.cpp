@@ -12,6 +12,7 @@
 #include "pins.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
+static bool s_isHomed = false;
 
 static const int selector_steps_after_homing = -3700;
 static const int idler_steps_after_homing = -130;
@@ -597,22 +598,24 @@ bool home_selector()
 	return true;
 }
 
+//! @brief Home both idler and selector if already not done
 void home()
 {
-	
-	// home both idler and selector
-	home_idler();
+    if (!s_isHomed)
+    {
+        home_idler();
 
-	home_selector();
-	
-	shr16_set_led(0x155);
+        home_selector();
 
-	shr16_set_led(0x000);
-	
-	isFilamentLoaded = false; 
-	shr16_set_led(1 << 2 * (4-active_extruder));
+        shr16_set_led(0x155);
 
-  isHomed = true;
+        shr16_set_led(0x000);
+
+        isFilamentLoaded = false;
+        shr16_set_led(1 << 2 * (4-active_extruder));
+
+        s_isHomed = true;
+    }
 }
  
 
@@ -813,4 +816,9 @@ bool checkOk()
 	}
 
 	return _ret;
+}
+
+bool isHomed()
+{
+    return s_isHomed;
 }

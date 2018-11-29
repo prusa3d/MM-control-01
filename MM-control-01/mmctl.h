@@ -6,7 +6,6 @@
 #include "config.h"
 
 extern bool isPrinting;
-extern bool isHomed;
 extern int toolChanges;
 
 extern int active_extruder;
