@@ -15,7 +15,6 @@
 int active_extruder = 0;
 int previous_extruder = -1;
 bool isFilamentLoaded = false;
-int toolChanges = 0;
 bool isPrinting = false;
 
 static int selector_steps_for_eject = 0;
@@ -85,8 +84,6 @@ void switch_extruder_withSensor(int new_extruder)
 		move(0, -700, 0);
 		active_extruder = 4;
 	}
-	
-	toolChanges++;
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 

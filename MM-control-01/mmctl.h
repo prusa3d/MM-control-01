@@ -6,7 +6,6 @@
 #include "config.h"
 
 extern bool isPrinting;
-extern int toolChanges;
 extern int active_extruder;
 extern int previous_extruder;
 extern bool isFilamentLoaded;
