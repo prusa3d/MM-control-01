@@ -33,6 +33,19 @@ extern "C" {
 void process_commands(FILE* inout);
 }
 
+static void led_blink(int _no)
+{
+    shr16_set_led(1 << 2 * _no);
+    delay(40);
+    shr16_set_led(0x000);
+    delay(20);
+    shr16_set_led(1 << 2 * _no);
+    delay(40);
+
+    shr16_set_led(0x000);
+    delay(10);
+}
+
 //! @brief Initialization after reset
 //!
 //! button | action
