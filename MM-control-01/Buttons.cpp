@@ -180,6 +180,7 @@ void settings_bowden_length()
 	{
 		BowdenLength bowdenLength;
 		load_filament_withSensor();
+		bool btnHold = false;
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
 		do
@@ -190,19 +191,40 @@ void settings_bowden_length()
 			case Btn::right:
 				if (bowdenLength.decrease())
 				{
-					move(0, 0, -bowdenLength.stepSize);
-					delay(400);
+				    set_pulley_dir_pull();
+
+				    for(auto i = bowdenLength.stepSize; i > 0; --i)
+				    {
+                        delayMicroseconds(1200);
+                        do_pulley_step();
+				    }
+					if(!btnHold)
+					{
+					    delay(400);
+					    btnHold = true;
+					}
 				}
 				break;
 
 			case Btn::left:
 				if (bowdenLength.increase())
 				{
-					move(0, 0, bowdenLength.stepSize);
-					delay(400);
+				    set_pulley_dir_push();
+
+                    for(auto i = bowdenLength.stepSize; i > 0; --i)
+                    {
+                        delayMicroseconds(1200);
+                        do_pulley_step();
+                    }
+                    if(!btnHold)
+                    {
+                        delay(400);
+                        btnHold = true;
+                    }
 				}
 				break;
 			default:
+			    btnHold = false;
 				break;
 			}
 
