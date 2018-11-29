@@ -20,11 +20,8 @@
 #include "version.h"
 
 
-int8_t sys_state = 0;
-uint8_t sys_signals = 0;
-int _loop = 0;
-int _c = 0;
 uint8_t tmc2130_mode = NORMAL_MODE;
+static bool enterSetup = false;
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
@@ -92,17 +89,18 @@ void setup()
 	shr16_set_ena(7);
 	shr16_set_led(0x000);
 
+    // check if to goto the settings menu
+    if (buttonClicked() == Btn::middle)
+    {
+        enterSetup = true;
+    }
+
 	
 	home_idler(true);
 
 	//add reading previously stored mode (stealth/normal) from eeprom
 	tmc2130_init(tmc2130_mode); // trinamic, initialize all axes
 	
-	// check if to goto the settings menu
-	if (buttonClicked() == Btn::middle)
-	{
-		setupMenu();
-	}
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
 }
@@ -180,22 +178,30 @@ void manual_extruder_selector()
 //! @copydoc manual_extruder_selector()
 void loop()
 {
-	process_commands(uart_com);
+    process_commands(uart_com);
 
-	if (!isPrinting)
-	{
-		manual_extruder_selector();
-		if(Btn::middle == buttonClicked() && active_extruder < 5)
-		{
-			shr16_set_led(2 << 2 * (4 - active_extruder));
-			delay(500);
-			if (Btn::middle == buttonClicked())
-			{
-			    home();
-				feed_filament();
-			}
-		}
-	}
+    if (!isPrinting)
+    {
+        if (enterSetup)
+        {
+            enterSetup = setupMenu();
+        }
+        else
+        {
+            manual_extruder_selector();
+            if(Btn::middle == buttonClicked() && active_extruder < 5)
+            {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
+                delay(500);
+                if (Btn::middle == buttonClicked())
+                {
+                    home();
+                    feed_filament();
+                }
+            }
+        }
+    }
+
 }
 
 

@@ -29,7 +29,7 @@ inline bool operator& (Btn a, Btn b)
 	return static_cast<uint8_t>(a) & static_cast<uint8_t>(b);
 }
 
-void setupMenu();
+bool setupMenu();
 Btn buttonClicked();
 
 #endif //_BUTTONS_h
