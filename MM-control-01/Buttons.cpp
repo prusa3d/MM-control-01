@@ -182,7 +182,7 @@ void settings_bowden_length()
 				    }
 					if(!btnHold)
 					{
-					    delay(400);
+					    delay(500);
 					    btnHold = true;
 					}
 				}
@@ -200,7 +200,7 @@ void settings_bowden_length()
                     }
                     if(!btnHold)
                     {
-                        delay(400);
+                        delay(500);
                         btnHold = true;
                     }
 				}
