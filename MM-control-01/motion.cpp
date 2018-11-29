@@ -501,16 +501,6 @@ void do_pulley_step()
 	asm("nop");
 }
 
-#if 0
-void do_idler_step()
-{
-    idler_step_pin_set();
-	asm("nop");
-	idler_step_pin_reset();
-	asm("nop");
-}
-#endif
-
 void park_idler(bool _unpark)
 {
 
