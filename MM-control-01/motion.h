@@ -18,7 +18,6 @@ void load_filament_withSensor();
 void load_filament_inPrinter();
 void unload_filament_withSensor();
 void set_positions(int _current_extruder, int _next_extruder);
-void init_Pulley();
 void do_pulley_step();
 
 void set_idler_dir_down();

@@ -470,29 +470,6 @@ void load_filament_inPrinter()
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 
-void init_Pulley()
-{
-	float _speed = 3000;
-	
-
-	set_pulley_dir_push();
-	for (int i = 50; i > 0; i--)
-	{
-		do_pulley_step();
-		delayMicroseconds(_speed);
-		shr16_set_led(1 << 2 * (int)(i/50));
-	}
-
-	set_pulley_dir_pull();
-	for (int i = 50; i > 0; i--)
-	{
-		do_pulley_step();
-		delayMicroseconds(_speed);
-		shr16_set_led(1 << 2 * (4-(int)(i / 50)));
-	}
-
-}
-
 void do_pulley_step()
 {
     pulley_step_pin_set();
