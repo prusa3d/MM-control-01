@@ -4,7 +4,7 @@
 #include "shr16.h"
 #include "tmc2130.h"
 #include "mmctl.h"
-#include "motion.h"
+#include "stepper.h"
 #include "permanent_storage.h"
 #include "main.h"
 

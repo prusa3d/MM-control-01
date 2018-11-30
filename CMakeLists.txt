@@ -57,7 +57,7 @@ set(GITREV_TMP ${CMAKE_BINARY_DIR}/${GITREV_BARE_TMP})
 set(SOURCES 
 	MM-control-01/abtn3.c
 	MM-control-01/adc.c
-	MM-control-01/motion.cpp
+	MM-control-01/stepper.cpp
 	MM-control-01/main.cpp
 	MM-control-01/tmc2130.c
 	MM-control-01/permanent_storage.cpp

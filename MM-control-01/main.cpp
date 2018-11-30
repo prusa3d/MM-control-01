@@ -13,7 +13,7 @@
 #include "tmc2130.h"
 #include "abtn3.h"
 #include "mmctl.h"
-#include "motion.h"
+#include "stepper.h"
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"

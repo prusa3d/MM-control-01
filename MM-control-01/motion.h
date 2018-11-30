@@ -1,27 +1,19 @@
-// motion.h
+//! @file
+//! @brief Selector idler and pulley control
+//!
+//! Medium level motion control. Drive errors should be handled in this layer.
 
-#ifndef _MOTION_h
-#define _MOTION_h
+#ifndef MOTION_H_
+#define MOTION_H_
 
-#include "config.h"
-#include <inttypes.h>
+#include <stdint.h>
 
-extern int8_t filament_type[EXTRUDERS];
+void motion_set_idler(uint8_t filament);
+void motion_set_selector(uint8_t filament);
+void motion_set_idler_selector(uint8_t idler_selector);
+void motion_set_idler_selector(uint8_t idler, uint8_t selector);
+void motion_engage_idler();
+void motion_disengage_idler();
 
-void home();
-bool home_idler(bool toLastFilament = false);
-bool isHomed();
 
-int get_idler_steps(int current_filament, int next_filament);
-int get_selector_steps(int current_filament, int next_filament);
-
-void set_positions(int _current_extruder, int _next_extruder);
-void park_idler(bool _unpark);
-
-void do_pulley_step();
-void set_pulley_dir_pull();
-void set_pulley_dir_push();
-void move_proportional(int _idler, int _selector);
-
-#endif
-
+#endif //MOTION_H_

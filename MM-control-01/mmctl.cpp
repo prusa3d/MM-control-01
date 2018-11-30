@@ -8,7 +8,7 @@
 #include "spi.h"
 #include "tmc2130.h"
 #include "mmctl.h"
-#include "motion.h"
+#include "stepper.h"
 #include "Buttons.h"
 #include "permanent_storage.h"
 

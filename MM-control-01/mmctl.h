@@ -1,4 +1,6 @@
-//mmctl.h - multimaterial switcher control
+//! @file
+//! @brief High level multimaterial switcher control
+//!
 #ifndef _MMCTL_H
 #define _MMCTL_H
 
