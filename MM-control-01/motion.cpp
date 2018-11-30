@@ -10,6 +10,7 @@
 #include "Buttons.h"
 #include "permanent_storage.h"
 #include "pins.h"
+#include "tmc2130.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 static bool s_isHomed = false;
@@ -65,6 +66,7 @@ void do_pulley_step()
 	asm("nop");
 	pulley_step_pin_reset();
 	asm("nop");
+	if (tmc2130_read_gstat()) unrecoverable_error();
 }
 
 
@@ -237,6 +239,7 @@ void move_proportional(int _idler, int _selector)
 		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
 
 	}
+	if (tmc2130_read_gstat()) unrecoverable_error();
 }
 
 void move(int _idler, int _selector, int _pulley)

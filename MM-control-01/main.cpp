@@ -46,6 +46,17 @@ static void led_blink(int _no)
     delay(10);
 }
 
+void unrecoverable_error()
+{
+    while (1)
+    {
+        shr16_set_led(0x3ff);
+        delay(300);
+        shr16_set_led(0x000);
+        delay(300);
+    }
+}
+
 //! @brief Initialization after reset
 //!
 //! button | action

@@ -6,6 +6,7 @@
 #include "config.h"
 
 void manual_extruder_selector();
+void unrecoverable_error();
 
 extern uint8_t tmc2130_mode;
 
