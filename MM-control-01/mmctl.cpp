@@ -81,7 +81,7 @@ void switch_extruder_withSensor(int new_extruder)
 	
 	if (active_extruder == 5)
 	{
-		move(0, -700, 0);
+		move_proportional(0, -700);
 		active_extruder = 4;
 	}
 
@@ -130,12 +130,12 @@ void select_extruder(int new_extruder)
 
 		if (new_extruder == 5)
 		{
-			move(0, 700, 0);
+			move_proportional(0, 700);
 			++previous_extruder;
 		}
 	    else if (previous_extruder == 5)
         {
-            move(0, -700, 0);
+            move_proportional(0, -700);
             previous_extruder = 4;
         }
 

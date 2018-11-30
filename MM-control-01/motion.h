@@ -21,7 +21,6 @@ void park_idler(bool _unpark);
 void do_pulley_step();
 void set_pulley_dir_pull();
 void set_pulley_dir_push();
-void move(int _idler, int _selector, int _pulley);
 void move_proportional(int _idler, int _selector);
 
 #endif

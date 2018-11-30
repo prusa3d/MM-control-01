@@ -28,6 +28,7 @@ static int set_selector_direction(int _steps);
 static int set_pulley_direction(int _steps);
 static void set_idler_dir_down();
 static void set_idler_dir_up();
+static void move(int _idler, int _selector, int _pulley);
 
 //! @brief Compute steps for selector needed to change filament
 //! @par current_filament Currently selected filament
@@ -336,12 +337,12 @@ void park_idler(bool _unpark)
 
     if (_unpark && isIdlerParked) // get idler in contact with filament
     {
-        move(idler_parking_steps, 0,0);
+        move_proportional(idler_parking_steps, 0);
         isIdlerParked = false;
     }
     else if (!_unpark && !isIdlerParked) // park idler so filament can move freely
     {
-        move(idler_parking_steps*-1, 0,0);
+        move_proportional(idler_parking_steps*-1, 0);
         isIdlerParked = true;
     }
 
