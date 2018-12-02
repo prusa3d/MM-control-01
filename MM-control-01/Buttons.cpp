@@ -163,7 +163,11 @@ void settings_bowden_length()
 		BowdenLength bowdenLength;
 		load_filament_withSensor();
 
+#ifdef FW_12V
+		tmc2130_init_axis_current_stealth(AX_PUL, 1, 35);
+#else
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+#endif
 		do
 		{
 
