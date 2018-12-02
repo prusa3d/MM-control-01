@@ -3,6 +3,7 @@
 
 
 #include <inttypes.h>
+#include "version.h"
 #include "config.h"
 
 void manual_extruder_selector();

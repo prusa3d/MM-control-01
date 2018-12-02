@@ -63,6 +63,18 @@
     <ClInclude Include="__vm\.MM-Control.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dirty.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="permanent_storage.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timeout.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abtn3.c">
@@ -96,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Buttons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="permanent_storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,14 +17,18 @@
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"
-#include "version.h"
 
 
 int8_t sys_state = 0;
 uint8_t sys_signals = 0;
 int _loop = 0;
 int _c = 0;
-uint8_t tmc2130_mode = NORMAL_MODE;
+
+#ifdef FW_12V
+	uint8_t tmc2130_mode = STEALTH_MODE; // mk25
+#else
+	uint8_t tmc2130_mode = NORMAL_MODE; // mk3
+#endif
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
@@ -83,7 +87,12 @@ void setup()
 	spi_init();
 	led_blink(2);
 
-	tmc2130_init(HOMING_MODE); // trinamic, homing
+#ifdef FW_12V
+	tmc2130_init(HOMING_STEALTH_MODE); // trinamic, homing, mk25
+#else
+	tmc2130_init(HOMING_NORMAL_MODE); // trinamic, homing, mk3
+#endif
+
 	led_blink(3);
 
 	adc_init(); // ADC
@@ -98,14 +107,13 @@ void setup()
 
 	//add reading previously stored mode (stealth/normal) from eeprom
 	tmc2130_init(tmc2130_mode); // trinamic, initialize all axes
-	
+
 	// check if to goto the settings menu
 	if (buttonClicked() == Btn::middle)
 	{
 		setupMenu();
 	}
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
-
 }
 
 

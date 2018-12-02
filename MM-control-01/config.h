@@ -76,16 +76,18 @@
 #define AX_IDL 2
 
 // currents
-#define CURRENT_HOLDING_STEALTH {1, 7, 16}
+#define CURRENT_HOLDING_STEALTH {1, 7, 16} // {1, 7, 16}
 #define CURRENT_HOLDING_NORMAL {1, 10, 22}
-#define CURRENT_RUNNING_STEALTH {35, 35, 35}
+#define CURRENT_RUNNING_STEALTH {35, 35, 35} // {35, 35, 35}
 #define CURRENT_RUNNING_NORMAL {30, 35, 35}
-#define CURRENT_HOMING {1, 35, 30}
+#define CURRENT_HOMING_STEALTH {1, 35, 30}
+#define CURRENT_HOMING_NORMAL {1, 35, 30}
 
 //mode
-#define HOMING_MODE 0
-#define NORMAL_MODE 1
-#define STEALTH_MODE 2
+#define HOMING_NORMAL_MODE 0
+#define HOMING_STEALTH_MODE 1
+#define NORMAL_MODE 2
+#define STEALTH_MODE 3
 
 //ADC configuration
 #define ADC_CHAN_MSK      0b0000000000100000 //used AD channels bit mask (ADC5)

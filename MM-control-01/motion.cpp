@@ -264,8 +264,13 @@ void load_filament_withSensor()
 		{
 			do_pulley_step();
 
-			if (i > 10 && i < 4000 && _speed > 650) _speed = _speed - 4;
-			if (i > 100 && i < 4000 && _speed > 650) _speed = _speed - 1;
+#ifdef FW_12V
+			if (i > 10 && i < 4000 && _speed > 750) _speed = _speed - 4; // mk25
+			if (i > 100 && i < 4000 && _speed > 750) _speed = _speed - 1; // mk25
+#else
+			if (i > 10 && i < 4000 && _speed > 650) _speed = _speed - 4; // mk3
+			if (i > 100 && i < 4000 && _speed > 650) _speed = _speed - 1; // mk3
+#endif
 			if (i > 8000 && _speed < 3000) _speed = _speed + 2;
 			delayMicroseconds(_speed);
 		}
@@ -299,7 +304,12 @@ void unload_filament_withSensor()
 
 		if (_unloadSteps < 1400 && _speed < 6000) _speed = _speed + 3;
 		if (_unloadSteps < _first_point && _speed < 2500) _speed = _speed + 2;
-		if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 550) _speed = _speed - 2;
+#ifdef FW_12V
+		if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 750) _speed = _speed - 2; // bigger is slower, mk25
+#else
+		if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 550) _speed = _speed - 2; // bigger is slower, mk3
+#endif
+		
 
 		delayMicroseconds(_speed);
 		if (digitalRead(A1) == 0) _endstop_hit++;
