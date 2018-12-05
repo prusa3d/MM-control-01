@@ -115,9 +115,7 @@ void select_extruder(int new_extruder)
 
 	if (previous_extruder != active_extruder)
 	{
-        park_idler(true);
         motion_set_idler_selector((new_extruder < EXTRUDERS) ? new_extruder : (EXTRUDERS - 1) , new_extruder);
-        park_idler(false);
 	}
 
 	shr16_set_led(0x000);
