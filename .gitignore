@@ -14,3 +14,5 @@
 /__vm/.MM-control-01.vsarduino.h
 Doc
 /build-env
+/MM-control-01/*.hex
+/MM-control-01/version.h
