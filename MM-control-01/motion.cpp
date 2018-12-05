@@ -15,6 +15,7 @@ void motion_set_idler_selector(uint8_t idler_selector)
 
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
+    home();
     int idler_steps = get_idler_steps(s_idler, idler);
     int selector_steps = get_selector_steps(s_selector, selector);
 

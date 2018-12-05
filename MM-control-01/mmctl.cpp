@@ -87,8 +87,6 @@ void switch_extruder_withSensor(int new_extruder)
         unload_filament_withSensor();
     }
 
-    home();
-
     motion_set_idler_selector(active_extruder);
 
     shr16_set_led(2 << 2 * (4 - active_extruder));
@@ -110,8 +108,6 @@ void switch_extruder_withSensor(int new_extruder)
 //! @param new_extruder Filament to be selected
 void select_extruder(int new_extruder)
 {
-	home();
-
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
 	int previous_extruder = active_extruder;
