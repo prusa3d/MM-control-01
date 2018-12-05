@@ -16,7 +16,6 @@ bool isHomed();
 int get_idler_steps(int current_filament, int next_filament);
 int get_selector_steps(int current_filament, int next_filament);
 
-void set_positions(int _current_extruder, int _next_extruder);
 void park_idler(bool _unpark);
 
 void do_pulley_step();

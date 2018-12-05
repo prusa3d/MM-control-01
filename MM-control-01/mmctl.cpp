@@ -11,14 +11,12 @@
 #include "stepper.h"
 #include "Buttons.h"
 #include "permanent_storage.h"
+#include "motion.h"
 
 int active_extruder = 0;
 int previous_extruder = -1;
 bool isFilamentLoaded = false;
 bool isPrinting = false;
-
-static int selector_steps_for_eject = 0;
-static int idler_steps_for_eject = 0;
 
 bool feed_filament()
 {
@@ -78,12 +76,6 @@ bool feed_filament()
 void switch_extruder_withSensor(int new_extruder)
 {
 	isPrinting = true;
-	
-	if (active_extruder == 5)
-	{
-		move_proportional(0, -700);
-		active_extruder = 4;
-	}
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
@@ -97,7 +89,7 @@ void switch_extruder_withSensor(int new_extruder)
 
     home();
 
-    set_positions(previous_extruder, active_extruder);
+    motion_set_idler_selector(active_extruder);
 
     shr16_set_led(2 << 2 * (4 - active_extruder));
 
@@ -127,20 +119,8 @@ void select_extruder(int new_extruder)
 
 	if (previous_extruder != active_extruder)
 	{
-
-		if (new_extruder == 5)
-		{
-			move_proportional(0, 700);
-			++previous_extruder;
-		}
-	    else if (previous_extruder == 5)
-        {
-            move_proportional(0, -700);
-            previous_extruder = 4;
-        }
-
         park_idler(true);
-        set_positions(previous_extruder, active_extruder); // move idler and selector to new filament position
+        motion_set_idler_selector((new_extruder < EXTRUDERS) ? new_extruder : (EXTRUDERS - 1) , new_extruder);
         park_idler(false);
 	}
 
@@ -170,13 +150,7 @@ void eject_filament(int extruder)
     if (extruder <= 2) selector_position = 4;
     else selector_position = 0;
 
-
-    //count number of desired steps for selector and idler and store it in static variable
-    selector_steps_for_eject = get_selector_steps(active_extruder, selector_position);
-    idler_steps_for_eject = get_idler_steps(active_extruder, extruder);
-
-    //move selector and idler to new position
-    move_proportional(idler_steps_for_eject, selector_steps_for_eject);
+    motion_set_idler_selector(extruder, selector_position);
 
     //push filament forward
     do
@@ -195,7 +169,7 @@ void recover_after_eject()
 {
     //restore state before eject filament
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
-    move_proportional(-idler_steps_for_eject, -selector_steps_for_eject);
+    motion_set_idler_selector(active_extruder);
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 

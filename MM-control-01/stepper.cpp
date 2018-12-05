@@ -49,17 +49,6 @@ int get_idler_steps(int current_filament, int next_filament)
     return ((current_filament - next_filament) * idler_steps);
 }
 
-void set_positions(int _current_extruder, int _next_extruder)
-{
-	// steps to move to new position of idler and selector
-	int _selector_steps = get_selector_steps(_current_extruder, _next_extruder);
-	int _idler_steps = get_idler_steps(_current_extruder, _next_extruder);
-
-	// move both to new position
-	move_proportional(_idler_steps, _selector_steps);
-}
-
-
 void do_pulley_step()
 {
     pulley_step_pin_set();
