@@ -385,14 +385,15 @@ void unload_filament_withSensor()
 
     set_pulley_dir_pull();
 
-    float _speed = 2000;
-    const float _first_point = 1800;
-    const float _second_point = 8700;
-    int _endstop_hit = 0;
+    int _speed = 2000;
+    const int _first_point = 1800;
+
+    uint8_t _endstop_hit = 0;
 
 
     // unload until FINDA senses end of the filament
-    int _unloadSteps = 10000;
+    int _unloadSteps = BowdenLength::get() + 1100;
+    const int _second_point = _unloadSteps - 1300;
     do
     {
         do_pulley_step();
@@ -400,12 +401,16 @@ void unload_filament_withSensor()
 
         if (_unloadSteps < 1400 && _speed < 6000) _speed = _speed + 3;
         if (_unloadSteps < _first_point && _speed < 2500) _speed = _speed + 2;
-        if (_unloadSteps < _second_point && _unloadSteps > 5000 && _speed > 550) _speed = _speed - 2;
+        if (_unloadSteps < _second_point && _unloadSteps > 5000)
+        {
+            if (_speed > 550) _speed = _speed - 1;
+            if (_speed > 250) _speed = _speed - 1;
+        }
 
         delayMicroseconds(_speed);
         if (digitalRead(A1) == 0) _endstop_hit++;
 
-    } while (_endstop_hit < 100 && _unloadSteps > 0);
+    } while (_endstop_hit < 100u && _unloadSteps > 0);
 
     // move a little bit so it is not a grinded hole in filament
     for (int i = 100; i > 0; i--)
