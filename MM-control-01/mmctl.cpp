@@ -147,7 +147,7 @@ void eject_filament(int extruder)
 
     motion_set_idler_selector(extruder, selector_position);
 
-    //push filament forward
+    set_pulley_dir_push();
     do
     {
         do_pulley_step();

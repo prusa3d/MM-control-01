@@ -39,8 +39,9 @@ void motion_disengage_idler()
 
 void motion_feed_to_bondtech()
 {
-int _speed = 4500;
-const uint16_t steps = BowdenLength::get();
+    int _speed = 4500;
+    const uint16_t steps = BowdenLength::get();
+    set_pulley_dir_push();
 
     for (uint16_t i = 0; i < steps; i++)
     {
