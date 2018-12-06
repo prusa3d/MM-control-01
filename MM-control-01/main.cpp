@@ -29,9 +29,7 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
-extern "C" {
 void process_commands(FILE* inout);
-}
 
 static void led_blink(int _no)
 {
@@ -229,8 +227,6 @@ void loop()
 }
 
 
-extern "C" {
-
 void process_commands(FILE* inout)
 {
 	static char line[32];
@@ -363,6 +359,3 @@ void process_commands(FILE* inout)
 	}
 }
 
-
-
-} // extern "C"
