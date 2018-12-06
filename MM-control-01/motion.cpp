@@ -6,6 +6,7 @@
 #include "stepper.h"
 #include "permanent_storage.h"
 #include <Arduino.h>
+#include "main.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
@@ -48,6 +49,10 @@ const uint16_t steps = BowdenLength::get();
         if (i > 10 && i < 4000 && _speed > 650) _speed = _speed - 4;
         if (i > 100 && i < 4000 && _speed > 650) _speed = _speed - 1;
         if (i > 8000 && _speed < 3000) _speed = _speed + 2;
+        if ('A' == getc(uart_com))
+        {
+            return;
+        }
         delayMicroseconds(_speed);
     }
 }
