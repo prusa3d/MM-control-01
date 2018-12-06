@@ -164,27 +164,26 @@ void settings_bowden_length()
 		load_filament_withSensor();
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+		uint32_t saved_millis=millis();
+		bool button_active = false;
 		do
 		{
 
 			switch (buttonClicked())
 			{
 			case Btn::right:
-				if (bowdenLength.decrease())
-				{
+				if (bowdenLength.decrease() && (!button_active || (((millis() - saved_millis) > 1000) && button_active)))
 					move(0, 0, -bowdenLength.stepSize);
-					delay(400);
-				}
+				button_active = true;
 				break;
-
 			case Btn::left:
-				if (bowdenLength.increase())
-				{
+				if (bowdenLength.increase() && (!button_active || (((millis() - saved_millis) > 1000) && button_active))) 
 					move(0, 0, bowdenLength.stepSize);
-					delay(400);
-				}
-				break;
+				button_active = true;
+				break; 
 			default:
+				button_active = false;
+				saved_millis = millis();
 				break;
 			}
 
