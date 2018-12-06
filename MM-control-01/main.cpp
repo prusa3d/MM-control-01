@@ -18,16 +18,18 @@
 #include <avr/wdt.h>
 #include "permanent_storage.h"
 #include "version.h"
+#include "config.h"
 
 
 uint8_t tmc2130_mode = NORMAL_MODE;
-static bool enterSetup = false;
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
 #elif (UART_COM == 1)
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
+
+static bool enterSetup = false;
 
 void process_commands(FILE* inout);
 
