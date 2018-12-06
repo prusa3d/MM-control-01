@@ -3,7 +3,6 @@
 #define _SHR16_H
 
 #include <inttypes.h>
-#include "config.h"
 
 
 

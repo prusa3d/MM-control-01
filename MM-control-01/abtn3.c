@@ -2,6 +2,7 @@
 
 #include "abtn3.h"
 #include "adc.h"
+#include "config.h"
 
 
 uint8_t abtn_state = 0;

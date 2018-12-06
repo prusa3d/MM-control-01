@@ -3,7 +3,6 @@
 #define _TMC2130_H
 
 #include <inttypes.h>
-#include "config.h"
 
 #define TMC2130_SG_THR         4       // SG_THR default
 #define TMC2130_TCOOLTHRS      450     // TCOOLTHRS default

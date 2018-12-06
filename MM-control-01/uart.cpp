@@ -2,6 +2,7 @@
 
 #include "uart.h"
 #include "Arduino.h"
+#include "config.h"
 
 
 FILE _uart0io;

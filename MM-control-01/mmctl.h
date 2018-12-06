@@ -5,7 +5,6 @@
 #define _MMCTL_H
 
 #include <inttypes.h>
-#include "config.h"
 
 extern bool isPrinting;
 extern int active_extruder;

@@ -66,7 +66,6 @@ set(SOURCES
 	MM-control-01/uart.cpp
 	MM-control-01/shr16.c
 	MM-control-01/mmctl.cpp
-	MM-control-01/spi.c
 	core/abi.cpp
 	core/hooks.c
 	core/Stream.cpp

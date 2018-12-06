@@ -2,6 +2,7 @@
 
 #include "shr16.h"
 #include <avr/io.h>
+#include "config.h"
 
 
 uint16_t shr16_v;

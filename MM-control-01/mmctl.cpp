@@ -12,6 +12,7 @@
 #include "Buttons.h"
 #include "motion.h"
 #include "permanent_storage.h"
+#include "config.h"
 
 int active_extruder = 0;
 int previous_extruder = -1;
