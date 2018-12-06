@@ -39,21 +39,27 @@ void motion_disengage_idler()
 
 void motion_feed_to_bondtech()
 {
-float _speed = 4500;
+int _speed = 4500;
 const uint16_t steps = BowdenLength::get();
 
     for (uint16_t i = 0; i < steps; i++)
     {
         do_pulley_step();
+        delayMicroseconds(_speed);
 
-        if (i > 10 && i < 4000 && _speed > 650) _speed = _speed - 4;
-        if (i > 100 && i < 4000 && _speed > 650) _speed = _speed - 1;
-        if (i > 8000 && _speed < 3000) _speed = _speed + 2;
+        if (i < 4000)
+        {
+            if (_speed > 1600) _speed = _speed - 20;
+            if (_speed > 800) _speed = _speed - 10;
+            if (_speed > 400) _speed = _speed - 5;
+            if (_speed > 200) _speed = _speed - 4;
+            if (_speed > 150) _speed = _speed - 1;
+        }
+        if (i > (steps - 800) && _speed < 3000) _speed = _speed + 10;
         if ('A' == getc(uart_com))
         {
             return;
         }
-        delayMicroseconds(_speed);
     }
 }
 
