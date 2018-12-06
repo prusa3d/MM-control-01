@@ -17,7 +17,7 @@ bool feed_filament();
 void load_filament_withSensor();
 void load_filament_inPrinter();
 void unload_filament_withSensor();
-void eject_filament(int extruder);
+void eject_filament(uint8_t filament);
 void recover_after_eject();
 
 #endif //_MMCTL_H

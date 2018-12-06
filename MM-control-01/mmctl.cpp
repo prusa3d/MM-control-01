@@ -19,6 +19,8 @@ int previous_extruder = -1;
 bool isFilamentLoaded = false;
 bool isPrinting = false;
 
+static const int eject_steps = 2500;
+
 bool feed_filament()
 {
 	bool _feed = true;
@@ -119,47 +121,52 @@ void select_extruder(int new_extruder)
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 }
 
-void eject_filament(int extruder)
+//! @brief eject filament
+//! Move selector sideways and push filament forward little bit, so user can catch it,
+//! unpark idler at the end to user can pull filament out.
+//! If there is still filament detected by PINDA unload it first.
+//! If we are want to eject fil 0-2, move selector to position 4 (right),
+//! if we want to eject filament 3 - 4, move selector to position 0 (left)
+//! maybe we can also move selector to service position in the future?
+void eject_filament(uint8_t filament)
 {
-    //move selector sideways and push filament forward little bit, so user can catch it, unpark idler at the end to user can pull filament out
-    int selector_position = 0;
-    int steps = 0;
+    active_extruder = filament;
+    const uint8_t selector_position = (filament <= 2) ? 4 : 0;
 
-
-
-    //if there is still filament detected by PINDA unload it first
     if (isFilamentLoaded)  unload_filament_withSensor();
-
-    select_extruder(active_extruder); //Enforce home idler and selector.
-
-    park_idler(true);
 
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
-    //if we are want to eject fil 0-2, move selector to position 4 (right), if we want to eject filament 3 - 4, move selector to position 0 (left)
-    //maybe we can also move selector to service position in the future?
-    if (extruder <= 2) selector_position = 4;
-    else selector_position = 0;
+    motion_set_idler_selector(filament, selector_position);
 
-    motion_set_idler_selector(extruder, selector_position);
-
+    motion_engage_idler();
     set_pulley_dir_push();
-    do
+
+    for (int steps = 0; steps < eject_steps; ++steps)
     {
         do_pulley_step();
         steps++;
         delayMicroseconds(1500);
-    } while (steps < 2500);
+    }
 
-    //unpark idler so user can easily remove filament
-    park_idler(false);
+    motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 
+//! @brief restore state before eject filament
 void recover_after_eject()
 {
-    //restore state before eject filament
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
+    motion_engage_idler();
+    set_pulley_dir_pull();
+    for (int steps = 0; steps < eject_steps; ++steps)
+    {
+        do_pulley_step();
+        steps++;
+        delayMicroseconds(1500);
+    }
+    motion_disengage_idler();
+
     motion_set_idler_selector(active_extruder);
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
