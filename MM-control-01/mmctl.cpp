@@ -10,8 +10,8 @@
 #include "mmctl.h"
 #include "stepper.h"
 #include "Buttons.h"
-#include "permanent_storage.h"
 #include "motion.h"
+#include "permanent_storage.h"
 
 int active_extruder = 0;
 int previous_extruder = -1;
@@ -366,20 +366,7 @@ void load_filament_withSensor()
         // nothing
     }
 
-    {
-    float _speed = 4500;
-    const uint16_t steps = BowdenLength::get();
-
-        for (uint16_t i = 0; i < steps; i++)
-        {
-            do_pulley_step();
-
-            if (i > 10 && i < 4000 && _speed > 650) _speed = _speed - 4;
-            if (i > 100 && i < 4000 && _speed > 650) _speed = _speed - 1;
-            if (i > 8000 && _speed < 3000) _speed = _speed + 2;
-            delayMicroseconds(_speed);
-        }
-    }
+    motion_feed_to_bondtech();
 
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     isFilamentLoaded = true;  // filament loaded
