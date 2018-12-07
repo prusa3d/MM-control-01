@@ -32,9 +32,98 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
+static bool signalFilament = false;
+
 extern "C" {
 void process_commands(FILE* inout);
 }
+
+//! @brief signal filament presence
+//!
+//! non-blocking
+//! LED indication of states
+//!
+//! RG | RG | RG | RG | RG | meaning
+//! -- | -- | -- | -- | -- | ------------------------
+//! b0 | b0 | b0 | b0 | b0 | Error, filament detected, still present
+//!
+//! @n R - Red LED
+//! @n G - Green LED
+//! @n 1 - active
+//! @n 0 - inactive
+//! @n b - blinking
+static void signal_filament_present()
+{
+    shr16_set_led(0x2aa);
+    delay(300);
+    shr16_set_led(0x000);
+    delay(300);
+}
+
+//! @brief Signal filament presence
+//!
+//! Does nothing, when not enabled by signalFilament == true.
+static void filament_presence_signaler()
+{
+    if (signalFilament)
+    {
+        if (digitalRead(A1) == 1)
+        {
+            signal_filament_present();
+        }
+        else
+        {
+            isFilamentLoaded = false;
+            signalFilament = false;
+        }
+    }
+}
+
+
+
+//! @brief Check, if filament is not present in FINDA
+//!
+//! blocks, until filament is not removed and button pushed
+//!
+//! button | action
+//! ------ | ------
+//! right  | continue after error
+//!
+//! LED indication of states
+//!
+//! RG | RG | RG | RG | RG | meaning
+//! -- | -- | -- | -- | -- | ------------------------
+//! b0 | b0 | b0 | b0 | b0 | Error, filament detected, still present
+//! 0b | 0b | 0b | 0b | 0b | Error, filament detected, no longer present, continue by right button click
+//!
+//! @n R - Red LED
+//! @n G - Green LED
+//! @n 1 - active
+//! @n 0 - inactive
+//! @n b - blinking
+
+void check_filament_not_present()
+{
+    // if FINDA is sensing filament do not home
+    while (digitalRead(A1) == 1)
+    {
+        while (Btn::right != buttonClicked())
+        {
+            if (digitalRead(A1) == 1)
+            {
+                signal_filament_present();
+            }
+            else
+            {
+                shr16_set_led(0x155);
+                delay(300);
+                shr16_set_led(0x000);
+                delay(300);
+            }
+        }
+    }
+}
+
 
 //! @brief Initialization after reset
 //!
@@ -52,8 +141,6 @@ void process_commands(FILE* inout);
 //! 00 | 00 | 0b | 00 | 00 | spi initialized
 //! 00 | 0b | 00 | 00 | 00 | tmc2130 initialized
 //! 0b | 00 | 00 | 00 | 00 | A/D converter initialized
-//! b0 | b0 | b0 | b0 | b0 | Error, filament detected, still present
-//! 0b | 0b | 0b | 0b | 0b | Error, filament detected, no longer present, continue by right button click
 //!
 //! @n R - Red LED
 //! @n G - Green LED
@@ -182,6 +269,7 @@ void manual_extruder_selector()
 void loop()
 {
 	process_commands(uart_com);
+    filament_presence_signaler();
 
 	if (!isPrinting)
 	{
@@ -243,15 +331,17 @@ void process_commands(FILE* inout)
 		else if (sscanf_P(line, PSTR("L%d"), &value) > 0)
 		{
 			// Load filament
-			if ((value >= 0) && (value < EXTRUDERS) && !isFilamentLoaded)
+			if ((value >= 0) && (value < EXTRUDERS))
 			{
+			    if (isFilamentLoaded) signalFilament = true;
+			    else
+			    {
+                    select_extruder(value);
+                    feed_filament();
 
-				select_extruder(value);
-				feed_filament();
-
-				delay(200);
-				fprintf_P(inout, PSTR("ok\n"));
-
+                    delay(200);
+			    }
+                fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
 		else if (sscanf_P(line, PSTR("M%d"), &value) > 0)
