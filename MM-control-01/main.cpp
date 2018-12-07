@@ -362,8 +362,6 @@ void process_commands(FILE* inout)
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 				switch_extruder_withSensor(value);
-
-				delay(200);
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
@@ -377,8 +375,6 @@ void process_commands(FILE* inout)
 			    {
                     select_extruder(value);
                     feed_filament();
-
-                    delay(200);
 			    }
                 fprintf_P(inout, PSTR("ok\n"));
 			}
@@ -400,7 +396,6 @@ void process_commands(FILE* inout)
 		{
 			// Unload filament
 			unload_filament_withSensor();
-			delay(200);
 			fprintf_P(inout, PSTR("ok\n"));
 
 			isPrinting = false;
