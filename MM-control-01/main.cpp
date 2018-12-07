@@ -32,9 +32,54 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
+static bool signalFilament = false;
+
 extern "C" {
 void process_commands(FILE* inout);
 }
+
+//! @brief signal filament presence
+//!
+//! non-blocking
+//! LED indication of states
+//!
+//! RG | RG | RG | RG | RG | meaning
+//! -- | -- | -- | -- | -- | ------------------------
+//! b0 | b0 | b0 | b0 | b0 | Error, filament detected, still present
+//!
+//! @n R - Red LED
+//! @n G - Green LED
+//! @n 1 - active
+//! @n 0 - inactive
+//! @n b - blinking
+static void signal_filament_present()
+{
+    shr16_set_led(0x2aa);
+    delay(300);
+    shr16_set_led(0x000);
+    delay(300);
+}
+
+//! @brief Signal filament presence
+//!
+//! Does nothing, when not enabled by signalFilament == true.
+static void filament_presence_signaler()
+{
+    if (signalFilament)
+    {
+        if (digitalRead(A1) == 1)
+        {
+            signal_filament_present();
+        }
+        else
+        {
+            isFilamentLoaded = false;
+            signalFilament = false;
+        }
+    }
+}
+
+
 
 //! @brief Check, if filament is not present in FINDA
 //!
@@ -66,19 +111,19 @@ void check_filament_not_present()
         {
             if (digitalRead(A1) == 1)
             {
-                shr16_set_led(0x2aa);
+                signal_filament_present();
             }
             else
             {
                 shr16_set_led(0x155);
+                delay(300);
+                shr16_set_led(0x000);
+                delay(300);
             }
-            delay(300);
-            shr16_set_led(0x000);
-            delay(300);
         }
     }
-    isFilamentLoaded = false;
 }
+
 
 //! @brief Initialization after reset
 //!
@@ -224,6 +269,7 @@ void manual_extruder_selector()
 void loop()
 {
 	process_commands(uart_com);
+    filament_presence_signaler();
 
 	if (!isPrinting)
 	{
@@ -287,13 +333,15 @@ void process_commands(FILE* inout)
 			// Load filament
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
-			    check_filament_not_present();
-				select_extruder(value);
-				feed_filament();
+			    if (isFilamentLoaded) signalFilament = true;
+			    else
+			    {
+                    select_extruder(value);
+                    feed_filament();
 
-				delay(200);
-				fprintf_P(inout, PSTR("ok\n"));
-
+                    delay(200);
+			    }
+                fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
 		else if (sscanf_P(line, PSTR("M%d"), &value) > 0)
