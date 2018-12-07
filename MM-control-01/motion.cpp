@@ -597,23 +597,7 @@ bool home_idler(bool toLastFilament)
 bool home_selector()
 {
     // if FINDA is sensing filament do not home
-    while (digitalRead(A1) == 1)
-    {
-        while (Btn::right != buttonClicked())
-        {
-            if (digitalRead(A1) == 1)
-            {
-                shr16_set_led(0x2aa);
-            }
-            else
-            {
-                shr16_set_led(0x155);
-            }
-            delay(300);
-            shr16_set_led(0x000);
-            delay(300);
-        }
-    }
+    check_filament_not_present();
 	 
     move(0, -100,0); // move a bit in opposite direction
 
@@ -654,7 +638,6 @@ void home()
 
 	shr16_set_led(0x000);
 	
-	isFilamentLoaded = false; 
 	shr16_set_led(1 << 2 * (4-active_extruder));
 
   isHomed = true;

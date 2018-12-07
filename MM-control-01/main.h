@@ -6,6 +6,7 @@
 #include "config.h"
 
 void manual_extruder_selector();
+void check_filament_not_present();
 
 // system state
 extern int8_t sys_state;
