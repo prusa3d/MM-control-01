@@ -381,9 +381,9 @@ void process_commands(FILE* inout)
 			if (value == 0) // return ok
 				fprintf_P(inout, PSTR("ok\n"));
 			else if (value == 1) // Read version
-				fprintf_P(inout, PSTR("%dok\n"), FW_VERSION);
+				fprintf_P(inout, PSTR("%dok\n"), fw_version);
 			else if (value == 2) // Read build nr
-				fprintf_P(inout, PSTR("%dok\n"), FW_BUILDNR);
+				fprintf_P(inout, PSTR("%dok\n"), fw_buildnr);
 		}
 		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
 		{

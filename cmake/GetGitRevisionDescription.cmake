@@ -24,10 +24,10 @@
 # Uses the return code of "git diff-index --quiet HEAD --".
 # Does not regard untracked files.
 #
-#  git_commits_in_master(<var>)
+#  git_count_parent_commits(<var>)
 #
-# Returns number of commits in master branch or
-# -1 if git rev-list --count master failed or
+# Returns number of commits preceeding current commit
+# -1 if git rev-list --count HEAD failed or
 # "GIT-NOTFOUND" if git executable was not found or
 # "HEAD-HASH-NOTFOUND" if head hash was not found. I don't know if get_git_head_revision() must
 # be called internally or not, as reason of calling it is not clear for me also in git_local_changes().
@@ -175,7 +175,7 @@ function(git_local_changes _var)
 	endif()
 endfunction()
 
-function(git_commits_in_master _var)
+function(git_count_parent_commits _var)
 	if(NOT GIT_FOUND)
 		find_package(Git QUIET)
 	endif()
@@ -191,7 +191,7 @@ function(git_commits_in_master _var)
 
 	execute_process(COMMAND
 		"${GIT_EXECUTABLE}"
-		rev-list --count master
+		rev-list --count HEAD
 		WORKING_DIRECTORY
 		"${CMAKE_CURRENT_SOURCE_DIR}"
 		RESULT_VARIABLE
