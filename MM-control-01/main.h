@@ -7,6 +7,7 @@
 
 void manual_extruder_selector();
 void check_filament_not_present();
+void filament_presence_signaler();
 
 // system state
 extern int8_t sys_state;
