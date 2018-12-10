@@ -180,51 +180,46 @@ void settings_bowden_length()
 	{
 		BowdenLength bowdenLength;
 		load_filament_withSensor();
-		bool btnHold = false;
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+		uint32_t saved_millis=millis();
+		bool button_active = false;
 		do
 		{
 
 			switch (buttonClicked())
 			{
 			case Btn::right:
-				if (bowdenLength.decrease())
-				{
-				    set_pulley_dir_pull();
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+					if (bowdenLength.decrease()) {
+						set_pulley_dir_pull();
 
-				    for(auto i = bowdenLength.stepSize; i > 0; --i)
-				    {
-                        delayMicroseconds(1200);
-                        do_pulley_step();
-				    }
-					if(!btnHold)
-					{
-					    delay(500);
-					    btnHold = true;
+						for(auto i = bowdenLength.stepSize; i > 0; --i)
+						{
+						delayMicroseconds(1200);
+						do_pulley_step();
+						}
 					}
 				}
+				button_active = true;
 				break;
-
 			case Btn::left:
-				if (bowdenLength.increase())
-				{
-				    set_pulley_dir_push();
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+					if(bowdenLength.increase()) {
+						set_pulley_dir_push();
 
-                    for(auto i = bowdenLength.stepSize; i > 0; --i)
-                    {
-                        delayMicroseconds(1200);
-                        do_pulley_step();
-                    }
-                    if(!btnHold)
-                    {
-                        delay(500);
-                        btnHold = true;
-                    }
+						for(auto i = bowdenLength.stepSize; i > 0; --i)
+						{
+							delayMicroseconds(1200);
+							do_pulley_step();
+						}
+					}
 				}
-				break;
+				button_active = true;
+				break; 
 			default:
-			    btnHold = false;
+				button_active = false;
+				saved_millis = millis();
 				break;
 			}
 

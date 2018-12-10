@@ -40,7 +40,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GetGitRevisionDescription)
 
 get_git_head_revision(GIT_HEAD_REF GIT_COMMIT_HASH)
-git_commits_in_master(GIT_COMMITS_MASTER)
+git_count_parent_commits(GIT_PARENT_COMMITS)
 git_local_changes(GIT_LOCAL_CHANGES)
 
 configure_file(
