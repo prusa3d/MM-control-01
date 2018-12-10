@@ -172,13 +172,19 @@ void settings_bowden_length()
 			switch (buttonClicked())
 			{
 			case Btn::right:
-				if (bowdenLength.decrease() && (!button_active || (((millis() - saved_millis) > 1000) && button_active)))
-					move(0, 0, -bowdenLength.stepSize);
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+					if (bowdenLength.decrease()) {
+						move(0, 0, -bowdenLength.stepSize);
+					}
+				}
 				button_active = true;
 				break;
 			case Btn::left:
-				if (bowdenLength.increase() && (!button_active || (((millis() - saved_millis) > 1000) && button_active))) 
-					move(0, 0, bowdenLength.stepSize);
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+					if(bowdenLength.increase()) {
+						move(0, 0, bowdenLength.stepSize);
+					}
+				}
 				button_active = true;
 				break; 
 			default:
