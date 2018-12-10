@@ -427,7 +427,8 @@ void unload_filament_withSensor()
 	}
 	park_idler(false);
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-	isFilamentLoaded = false; // filament unloaded 
+	isFilamentLoaded = false; // filament unloaded
+	filament_presence_signaler();
 }
 
 //! @brief Do 320 pulley steps slower and 450 steps faster with decreasing motor current.

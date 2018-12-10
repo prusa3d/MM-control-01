@@ -63,7 +63,7 @@ static void signal_filament_present()
 //! @brief Signal filament presence
 //!
 //! Does nothing, when not enabled by signalFilament == true.
-static void filament_presence_signaler()
+void filament_presence_signaler()
 {
     if (signalFilament)
     {
