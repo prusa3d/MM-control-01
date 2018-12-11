@@ -79,8 +79,14 @@ bool home_idler(bool toLastFilament)
 	uint8_t filament = 0; //Not needed, just to suppress compiler warning.
 	if(toLastFilament)
 	{
-	    if(!FilamentLoaded::get(filament)) return false;
+	    if(!FilamentLoaded::get(filament))
+	        {
+	            tmc2130_init(tmc2130_mode);
+	            return false;
+	        }
 	}
+
+	tmc2130_init(HOMING_MODE);
 
 	move(-10, 0, 0); // move a bit in opposite direction
 
@@ -100,7 +106,10 @@ bool home_idler(bool toLastFilament)
 		}
 	}
 
+	tmc2130_init(tmc2130_mode);
+
 	move(idler_steps_after_homing, 0, 0); // move to initial position
+
 
 
     if (toLastFilament)
@@ -120,6 +129,8 @@ bool home_selector()
 {
     // if FINDA is sensing filament do not home
     check_filament_not_present();
+
+    tmc2130_init(HOMING_MODE);
 	 
     move(0, -100,0); // move a bit in opposite direction
 
@@ -143,6 +154,8 @@ bool home_selector()
 		}
 	}
 	
+	tmc2130_init(tmc2130_mode);
+
 	move(0, selector_steps_after_homing,0); // move to initial position
 
 	return true;

@@ -202,8 +202,6 @@ void setup()
 
 	spi_init();
 	led_blink(2);
-
-	tmc2130_init(HOMING_MODE); // trinamic, homing
 	led_blink(3);
 
 	adc_init(); // ADC
@@ -222,8 +220,8 @@ void setup()
 	home_idler(true);
 
 	//add reading previously stored mode (stealth/normal) from eeprom
-	tmc2130_init(tmc2130_mode); // trinamic, initialize all axes
 	
+
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
 }
