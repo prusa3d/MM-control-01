@@ -13,5 +13,6 @@ void motion_set_idler_selector(uint8_t idler, uint8_t selector);
 void motion_engage_idler();
 void motion_disengage_idler();
 void motion_feed_to_bondtech();
+void motion_unload_to_finda();
 
 #endif //MOTION_H_

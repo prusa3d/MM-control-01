@@ -383,34 +383,8 @@ void unload_filament_withSensor()
 
     motion_engage_idler(); // if idler is in parked position un-park him get in contact with filament
 
-    set_pulley_dir_pull();
 
-    int _speed = 2000;
-    const int _first_point = 1800;
-
-    uint8_t _endstop_hit = 0;
-
-
-    // unload until FINDA senses end of the filament
-    int _unloadSteps = BowdenLength::get() + 1100;
-    const int _second_point = _unloadSteps - 1300;
-    do
-    {
-        do_pulley_step();
-        _unloadSteps--;
-
-        if (_unloadSteps < 1400 && _speed < 6000) _speed = _speed + 3;
-        if (_unloadSteps < _first_point && _speed < 2500) _speed = _speed + 2;
-        if (_unloadSteps < _second_point && _unloadSteps > 5000)
-        {
-            if (_speed > 550) _speed = _speed - 1;
-            if (_speed > 250 && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
-        }
-
-        delayMicroseconds(_speed);
-        if (digitalRead(A1) == 0) _endstop_hit++;
-
-    } while (_endstop_hit < 100u && _unloadSteps > 0);
+    motion_unload_to_finda();
 
     // move a little bit so it is not a grinded hole in filament
     for (int i = 100; i > 0; i--)
@@ -437,7 +411,7 @@ void unload_filament_withSensor()
 
                 set_pulley_dir_pull();
                 int _steps = 4000;
-                _endstop_hit = 0;
+                uint8_t _endstop_hit = 0;
                 do
                 {
                     do_pulley_step();
@@ -522,13 +496,12 @@ void unload_filament_withSensor()
     else
     {
         // correct unloading
-        _speed = 5000;
         // unload to PTFE tube
         set_pulley_dir_pull();
         for (int i = 450; i > 0; i--)   // 570
         {
             do_pulley_step();
-            delayMicroseconds(_speed);
+            delayMicroseconds(5000);
         }
     }
     motion_disengage_idler();
