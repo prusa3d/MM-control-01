@@ -354,7 +354,7 @@ void load_filament_withSensor()
 
 
 
-        park_idler(true);
+        motion_engage_idler();
         // TODO: do not repeat same code, try to do it until succesfull load
         _loadSteps = 0;
         do
