@@ -7,6 +7,7 @@
 #include "permanent_storage.h"
 #include <Arduino.h>
 #include "main.h"
+#include "config.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
@@ -54,7 +55,7 @@ void motion_feed_to_bondtech()
             if (_speed > 800) _speed = _speed - 10;
             if (_speed > 400) _speed = _speed - 5;
             if (_speed > 200) _speed = _speed - 4;
-            if (_speed > 150) _speed = _speed - 1;
+            if ((_speed > 150) && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
         }
         if (i > (steps - 800) && _speed < 3000) _speed = _speed + 10;
         if ('A' == getc(uart_com))
