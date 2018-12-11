@@ -28,7 +28,7 @@ bool feed_filament()
 
 	int _c = 0;
 	int _delay = 0;
-	park_idler(true);
+	motion_engage_idler();
 
 	set_pulley_dir_push();
 	if(tmc2130_mode == NORMAL_MODE)	
@@ -63,7 +63,7 @@ bool feed_filament()
 
 
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-	park_idler(false);
+	motion_disengage_idler();
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 	return true;
 }
@@ -239,7 +239,7 @@ bool checkOk()
 void load_filament_withSensor()
 {
     FilamentLoaded::set(active_extruder);
-    park_idler(true); // if idler is in parked position un-park him get in contact with filament
+    motion_engage_idler();
 
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
@@ -294,7 +294,7 @@ void load_filament_withSensor()
 
 
 
-        park_idler(false);
+        motion_disengage_idler();
         do
         {
             shr16_set_led(0x000);
@@ -316,7 +316,7 @@ void load_filament_withSensor()
             {
                 case Btn::left:
                     // just move filament little bit
-                    park_idler(true);
+                    motion_engage_idler();
                     set_pulley_dir_push();
 
                     for (int i = 0; i < 200; i++)
@@ -324,19 +324,19 @@ void load_filament_withSensor()
                         do_pulley_step();
                         delayMicroseconds(5500);
                     }
-                    park_idler(false);
+                    motion_disengage_idler();
                     break;
                 case Btn::middle:
                     // check if everything is ok
-                    park_idler(true);
+                    motion_engage_idler();
                     _isOk = checkOk();
-                    park_idler(false);
+                    motion_disengage_idler();
                     break;
                 case Btn::right:
                     // continue with loading
-                    park_idler(true);
+                    motion_engage_idler();
                     _isOk = checkOk();
-                    park_idler(false);
+                    motion_disengage_idler();
 
                     if (_isOk) //pridat do podminky flag ze od tiskarny prislo continue
                     {
@@ -381,7 +381,7 @@ void unload_filament_withSensor()
     // unloads filament from extruder - filament is above Bondtech gears
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
-    park_idler(true); // if idler is in parked position un-park him get in contact with filament
+    motion_engage_idler(); // if idler is in parked position un-park him get in contact with filament
 
     set_pulley_dir_pull();
 
@@ -459,7 +459,7 @@ void unload_filament_withSensor()
         bool _continue = false;
         bool _isOk = false;
 
-        park_idler(false);
+        motion_disengage_idler();
         do
         {
             shr16_set_led(0x000);
@@ -482,7 +482,7 @@ void unload_filament_withSensor()
             {
             case Btn::left:
                 // just move filament little bit
-                park_idler(true);
+                motion_engage_idler();
                 set_pulley_dir_pull();
 
                 for (int i = 0; i < 200; i++)
@@ -490,19 +490,19 @@ void unload_filament_withSensor()
                     do_pulley_step();
                     delayMicroseconds(5500);
                 }
-                park_idler(false);
+                motion_disengage_idler();
                 break;
             case Btn::middle:
                 // check if everything is ok
-                park_idler(true);
+                motion_engage_idler();
                 _isOk = checkOk();
-                park_idler(false);
+                motion_disengage_idler();
                 break;
             case Btn::right:
                 // continue with unloading
-                park_idler(true);
+                motion_engage_idler();
                 _isOk = checkOk();
-                park_idler(false);
+                motion_disengage_idler();
 
                 if (_isOk)
                 {
@@ -517,7 +517,7 @@ void unload_filament_withSensor()
         } while (!_continue);
 
         shr16_set_led(1 << 2 * (4 - previous_extruder));
-        park_idler(true);
+        motion_engage_idler();
     }
     else
     {
@@ -531,7 +531,7 @@ void unload_filament_withSensor()
             delayMicroseconds(_speed);
         }
     }
-    park_idler(false);
+    motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     isFilamentLoaded = false; // filament unloaded
     filament_presence_signaler();
@@ -558,7 +558,7 @@ void load_filament_inPrinter()
     uint8_t current_holding_normal[3] = CURRENT_HOLDING_NORMAL;
     uint8_t current_holding_stealth[3] = CURRENT_HOLDING_STEALTH;
 
-    park_idler(true); // if idler is in parked position un-park him get in contact with filament
+    motion_engage_idler();
     set_pulley_dir_push();
 
     //PLA
@@ -588,6 +588,6 @@ void load_filament_inPrinter()
         delayMicroseconds(2200);
     }
 
-    park_idler(false);
+    motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
