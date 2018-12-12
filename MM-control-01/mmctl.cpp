@@ -510,7 +510,10 @@ void unload_filament_withSensor()
     filament_presence_signaler();
 }
 
-//! @brief Do 320 pulley steps slower and 450 steps faster with decreasing motor current.
+//! @brief Do 38.20 mm pulley push
+//!
+//! Load filament after confirmed by printer into the Bontech pulley gears so they can grab them.
+//! Stop when 'A' received
 //!
 //! @n d = 6.3 mm        pulley diameter
 //! @n c = pi * d        pulley circumference
@@ -518,49 +521,33 @@ void unload_filament_withSensor()
 //! @n mres = 2          microstep resolution (uint8_t __res(AX_PUL))
 //! @n SPR = FSPR * mres steps per revolution
 //! @n T1 = 2600 us      step period first segment
-//! @n T2 = 2200 us      step period second segment
 //! @n v1 = (1 / T1) / SPR * c = 19.02 mm/s  speed first segment
-//! @n s1 =   320    / SPR * c = 15.80 mm    distance first segment
-//! @n v2 = (1 / T2) / SPR * c = 22.48 mm/s  speed second segment
-//! @n s2 =   450    / SPR * c = 22.26 mm    distance second segment
+//! @n s1 =   770    / SPR * c = 38.20 mm    distance first segment
 void load_filament_inPrinter()
 {
-    // loads filament after confirmed by printer into the Bontech pulley gears so they can grab them
-    uint8_t current_running_normal[3] = CURRENT_RUNNING_NORMAL;
-    uint8_t current_running_stealth[3] = CURRENT_RUNNING_STEALTH;
-    uint8_t current_holding_normal[3] = CURRENT_HOLDING_NORMAL;
-    uint8_t current_holding_stealth[3] = CURRENT_HOLDING_STEALTH;
 
     motion_engage_idler();
     set_pulley_dir_push();
 
-    //PLA
+    const unsigned long fist_segment_delay = 2600;
+
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
-    for (int i = 0; i <= 320; i++)
+
+    unsigned long delay = fist_segment_delay;
+
+    for (int i = 0; i < 770; i++)
     {
-        if (i == 150)
+        delayMicroseconds(delay);
+        unsigned long now = micros();
+
+        if ('A' == getc(uart_com))
         {
-            if(tmc2130_mode == NORMAL_MODE)
-                tmc2130_init_axis_current_normal(AX_PUL, current_holding_normal[AX_PUL], current_running_normal[AX_PUL] - (current_running_normal[AX_PUL] / 4) );
-            else
-                tmc2130_init_axis_current_stealth(AX_PUL, current_holding_stealth[AX_PUL], current_running_stealth[AX_PUL] - (current_running_stealth[AX_PUL] / 4) );
+            break;
         }
         do_pulley_step();
-        delayMicroseconds(2600);
+        delay = fist_segment_delay - (micros() - now);
     }
 
-    //PLA
-    if(tmc2130_mode == NORMAL_MODE)
-        tmc2130_init_axis_current_normal(AX_PUL, current_holding_normal[AX_PUL], current_running_normal[AX_PUL]/4);
-    else
-        tmc2130_init_axis_current_stealth(AX_PUL, current_holding_stealth[AX_PUL], current_running_stealth[AX_PUL]/4);
-
-    for (int i = 0; i <= 450; i++)
-    {
-        do_pulley_step();
-        delayMicroseconds(2200);
-    }
-
-    motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+    motion_disengage_idler();
 }
