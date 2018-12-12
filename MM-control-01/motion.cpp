@@ -8,33 +8,69 @@
 #include <Arduino.h>
 #include "main.h"
 #include "config.h"
+#include "tmc2130.h"
+#include "shr16.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
+static bool s_idler_engaged = true;
+
+static void rehome()
+{
+    s_idler = 0;
+    s_selector = 0;
+    shr16_set_ena(0);
+    delay(10);
+    shr16_set_ena(7);
+    tmc2130_init(tmc2130_mode);
+    home(true);
+    if (!s_idler_engaged) motion_disengage_idler();
+}
 
 void motion_set_idler_selector(uint8_t idler_selector)
 {
     motion_set_idler_selector(idler_selector, idler_selector);
 }
 
+//! @brief move idler and selector to desired location
+//!
+//! In case of drive error re-home and try to recover 3 times.
+//! If the drive error is permanent call unrecoverable_error();
+//!
+//! @par idler idler
+//! @par selector selector
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
     home();
-    int idler_steps = get_idler_steps(s_idler, idler);
-    int selector_steps = get_selector_steps(s_selector, selector);
+    const uint8_t tries = 2;
+    for (uint8_t i = 0; i <= tries; ++i)
+    {
+        int idler_steps = get_idler_steps(s_idler, idler);
+        int selector_steps = get_selector_steps(s_selector, selector);
 
-    move_proportional(idler_steps, selector_steps);
-    s_idler = idler;
-    s_selector = selector;
+        move_proportional(idler_steps, selector_steps);
+        s_idler = idler;
+        s_selector = selector;
+
+        if (!tmc2130_read_gstat()) break;
+        else
+        {
+            drive_error();
+            rehome();
+        }
+        if (tries == i) unrecoverable_error();
+    }
 }
 
 void motion_engage_idler()
 {
+    s_idler_engaged = true;
     park_idler(true);
 }
 
 void motion_disengage_idler()
 {
+    s_idler_engaged = false;
     park_idler(false);
 }
 

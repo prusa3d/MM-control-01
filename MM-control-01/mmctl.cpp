@@ -522,7 +522,7 @@ void unload_filament_withSensor()
 //! @n SPR = FSPR * mres steps per revolution
 //! @n T1 = 2600 us      step period first segment
 //! @n v1 = (1 / T1) / SPR * c = 19.02 mm/s  speed first segment
-//! @n s1 =   770    / SPR * c = 38.20 mm    distance first segment
+//! @n s1 =   770    / SPR * c = 38.10 mm    distance first segment
 void load_filament_inPrinter()
 {
 

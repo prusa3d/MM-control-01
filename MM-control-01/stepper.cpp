@@ -162,9 +162,9 @@ bool home_selector()
 }
 
 //! @brief Home both idler and selector if already not done
-void home()
+void home(bool rehome)
 {
-    if (!s_isHomed)
+    if (!s_isHomed || rehome)
     {
         home_idler();
 
@@ -224,7 +224,6 @@ void move_proportional(int _idler, int _selector)
 		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
 
 	}
-	if (tmc2130_read_gstat()) unrecoverable_error();
 }
 
 void move(int _idler, int _selector, int _pulley)

@@ -9,7 +9,7 @@
 
 extern int8_t filament_type[EXTRUDERS];
 
-void home();
+void home(bool rehome = false);
 bool home_idler(bool toLastFilament = false);
 bool isHomed();
 

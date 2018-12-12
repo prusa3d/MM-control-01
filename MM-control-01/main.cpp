@@ -132,6 +132,18 @@ void check_filament_not_present()
     }
 }
 
+void drive_error()
+{
+    for(uint8_t i = 0; i < 3; ++i)
+    {
+        shr16_set_led(0x3ff);
+        delay(300);
+        shr16_set_led(0x000);
+        delay(300);
+    }
+
+}
+
 //! @brief Unrecoverable hardware fault
 //!
 //! Stay in infinite loop and blink.
@@ -151,10 +163,7 @@ void unrecoverable_error()
 {
     while (1)
     {
-        shr16_set_led(0x3ff);
-        delay(300);
-        shr16_set_led(0x000);
-        delay(300);
+        drive_error();
     }
 }
 
