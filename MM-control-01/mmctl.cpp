@@ -82,10 +82,9 @@ void switch_extruder_withSensor(int new_extruder)
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
-	previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
-    if (isFilamentLoaded && ((previous_extruder != active_extruder) || !isHomed()))
+    if (isFilamentLoaded)
     {
         unload_filament_withSensor();
     }

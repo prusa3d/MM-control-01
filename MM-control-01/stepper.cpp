@@ -321,7 +321,6 @@ void set_pulley_dir_pull()
 //!  * true engage
 void park_idler(bool _unpark)
 {
-
     if (_unpark && isIdlerParked) // get idler in contact with filament
     {
         move_proportional(idler_parking_steps, 0);
@@ -332,10 +331,4 @@ void park_idler(bool _unpark)
         move_proportional(idler_parking_steps*-1, 0);
         isIdlerParked = true;
     }
-
-}
-
-bool isHomed()
-{
-    return s_isHomed;
 }
