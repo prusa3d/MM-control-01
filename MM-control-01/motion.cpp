@@ -96,6 +96,8 @@ void motion_feed_to_bondtech()
         if (i > (steps - 800) && _speed < 3000) _speed = _speed + 10;
         if ('A' == getc(uart_com))
         {
+            tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+            motion_disengage_idler();
             return;
         }
     }
