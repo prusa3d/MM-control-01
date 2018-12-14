@@ -55,7 +55,6 @@ void do_pulley_step()
 	asm("nop");
 	pulley_step_pin_reset();
 	asm("nop");
-	if (tmc2130_read_gstat()) unrecoverable_error();
 }
 
 

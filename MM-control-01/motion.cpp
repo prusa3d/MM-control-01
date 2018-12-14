@@ -25,7 +25,19 @@ static void rehome()
     shr16_set_ena(7);
     tmc2130_init(tmc2130_mode);
     home(true);
-    if (!s_idler_engaged) motion_disengage_idler();
+    if (s_idler_engaged) park_idler(true);
+}
+
+static void rehome_idler()
+{
+    shr16_set_ena(0);
+    delay(10);
+    shr16_set_ena(7);
+    tmc2130_init(tmc2130_mode);
+    home_idler();
+    int idler_steps = get_idler_steps(0, s_idler);
+    move_proportional(idler_steps, 0);
+    if (s_idler_engaged) park_idler(true);
 }
 
 void motion_set_idler_selector(uint8_t idler_selector)
@@ -56,10 +68,25 @@ void motion_set_idler_selector(uint8_t idler, uint8_t selector)
         if (!tmc2130_read_gstat()) break;
         else
         {
+            if (tries == i) unrecoverable_error();
             drive_error();
             rehome();
         }
-        if (tries == i) unrecoverable_error();
+    }
+}
+
+static void check_idler_drive_error()
+{
+    const uint8_t tries = 2;
+    for (uint8_t i = 0; i <= tries; ++i)
+    {
+        if (!tmc2130_read_gstat()) break;
+        else
+        {
+            if (tries == i) unrecoverable_error();
+            drive_error();
+            rehome_idler();
+        }
     }
 }
 
@@ -67,48 +94,18 @@ void motion_engage_idler()
 {
     s_idler_engaged = true;
     park_idler(true);
+    check_idler_drive_error();
 }
 
 void motion_disengage_idler()
 {
     s_idler_engaged = false;
     park_idler(false);
-}
-
-void motion_feed_to_bondtech()
-{
-    int _speed = 4500;
-    const uint16_t steps = BowdenLength::get();
-    set_pulley_dir_push();
-    unsigned long delay = 4500;
-
-    for (uint16_t i = 0; i < steps; i++)
-    {
-        delayMicroseconds(delay);
-        unsigned long now = micros();
-
-        if (i < 4000)
-        {
-            if (_speed > 2600) _speed = _speed - 6;
-            if (_speed > 1300) _speed = _speed - 3;
-            if (_speed > 650) _speed = _speed - 2;
-            if (_speed > 250 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) _speed = _speed - 1;
-        }
-        if (i > (steps - 800) && _speed < 2600) _speed = _speed + 10;
-        if ('A' == getc(uart_com))
-        {
-            s_has_door_sensor = true;
-            tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-            motion_disengage_idler();
-            return;
-        }
-        do_pulley_step();
-        delay = _speed - (micros() - now);
-    }
+    check_idler_drive_error();
 }
 
 //! @brief unload until FINDA senses end of the filament
-void motion_unload_to_finda()
+static void unload_to_finda()
 {
     int _speed = 2000;
     const int _first_point = 1800;
@@ -137,6 +134,77 @@ void motion_unload_to_finda()
         if (digitalRead(A1) == 0) _endstop_hit++;
 
     }
+}
+
+void motion_feed_to_bondtech()
+{
+    int _speed = 4500;
+    const uint16_t steps = BowdenLength::get();
+
+    const uint8_t tries = 2;
+    for (uint8_t tr = 0; tr <= tries; ++tr)
+    {
+        set_pulley_dir_push();
+        unsigned long delay = 4500;
+
+        for (uint16_t i = 0; i < steps; i++)
+        {
+            delayMicroseconds(delay);
+            unsigned long now = micros();
+
+            if (i < 4000)
+            {
+                if (_speed > 2600) _speed = _speed - 6;
+                if (_speed > 1300) _speed = _speed - 3;
+                if (_speed > 650) _speed = _speed - 2;
+                if (_speed > 250 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) _speed = _speed - 1;
+            }
+            if (i > (steps - 800) && _speed < 2600) _speed = _speed + 10;
+            if ('A' == getc(uart_com))
+            {
+                s_has_door_sensor = true;
+                tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+                motion_disengage_idler();
+                return;
+            }
+            do_pulley_step();
+            delay = _speed - (micros() - now);
+        }
+
+        if (!tmc2130_read_gstat()) break;
+        else
+        {
+            if (tries == tr) unrecoverable_error();
+            drive_error();
+            rehome_idler();
+            unload_to_finda();
+        }
+    }
+}
+
+
+
+
+//! @brief unload to FINDA
+//!
+//! Check for drive error and try to recover 3 times.
+void motion_unload_to_finda()
+{
+    const uint8_t tries = 2;
+    for (uint8_t tr = 0; tr <= tries; ++tr)
+    {
+        unload_to_finda();
+        if (tmc2130_read_gstat() && digitalRead(A1) == 1)
+        {
+            if (tries == tr) unrecoverable_error();
+            rehome_idler();
+        }
+        else
+        {
+            break;
+        }
+    }
+
 }
 
 void motion_door_sensor_detected()
