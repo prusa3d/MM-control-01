@@ -13,7 +13,6 @@
 #include "tmc2130.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
-static bool s_isHomed = false;
 static bool isIdlerParked = false;
 
 static const int selector_steps_after_homing = -3700;
@@ -71,19 +70,11 @@ void do_pulley_step()
 //!
 //! @retval true Succeeded
 //! @retval false Failed
-bool home_idler(bool toLastFilament)
+bool home_idler()
 {
 	int _c = 0;
 	int _l = 0;
 	uint8_t filament = 0; //Not needed, just to suppress compiler warning.
-	if(toLastFilament)
-	{
-	    if(!FilamentLoaded::get(filament))
-	        {
-	            tmc2130_init(tmc2130_mode);
-	            return false;
-	        }
-	}
 
 	tmc2130_init(HOMING_MODE);
 
@@ -108,14 +99,6 @@ bool home_idler(bool toLastFilament)
 	tmc2130_init(tmc2130_mode);
 
 	move(idler_steps_after_homing, 0, 0); // move to initial position
-
-
-
-    if (toLastFilament)
-    {
-        int idlerSteps = get_idler_steps(0,filament);
-        move_proportional(idlerSteps, 0);
-    }
 
     isIdlerParked = false;
 
@@ -161,22 +144,17 @@ bool home_selector()
 }
 
 //! @brief Home both idler and selector if already not done
-void home(bool rehome)
+void home()
 {
-    if (!s_isHomed || rehome)
-    {
-        home_idler();
+    home_idler();
 
-        home_selector();
+    home_selector();
 
-        shr16_set_led(0x155);
+    shr16_set_led(0x155);
 
-        shr16_set_led(0x000);
+    shr16_set_led(0x000);
 
-        shr16_set_led(1 << 2 * (4-active_extruder));
-
-        s_isHomed = true;
-    }
+    shr16_set_led(1 << 2 * (4-active_extruder));
 }
  
 

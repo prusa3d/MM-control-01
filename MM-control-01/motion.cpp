@@ -13,6 +13,7 @@
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
+static bool s_selector_homed = false;
 static bool s_idler_engaged = true;
 static bool s_has_door_sensor = false;
 
@@ -24,7 +25,7 @@ static void rehome()
     delay(10);
     shr16_set_ena(7);
     tmc2130_init(tmc2130_mode);
-    home(true);
+    home();
     if (s_idler_engaged) park_idler(true);
 }
 
@@ -54,7 +55,13 @@ void motion_set_idler_selector(uint8_t idler_selector)
 //! @par selector selector
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
-    home();
+    if (!s_selector_homed)
+    {
+            home();
+            s_selector = 0;
+            s_idler = 0;
+            s_selector_homed = true;
+    }
     const uint8_t tries = 2;
     for (uint8_t i = 0; i <= tries; ++i)
     {
@@ -210,4 +217,12 @@ void motion_unload_to_finda()
 void motion_door_sensor_detected()
 {
     s_has_door_sensor = true;
+}
+
+void motion_set_idler(uint8_t idler)
+{
+    home_idler();
+    int idler_steps = get_idler_steps(0, idler);
+    move_proportional(idler_steps, 0);
+    s_idler = idler;
 }

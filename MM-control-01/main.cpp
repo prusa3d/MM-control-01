@@ -19,6 +19,7 @@
 #include "permanent_storage.h"
 #include "version.h"
 #include "config.h"
+#include "motion.h"
 
 
 uint8_t tmc2130_mode = NORMAL_MODE;
@@ -225,11 +226,11 @@ void setup()
         enterSetup = true;
     }
 
-	
-	home_idler(true);
-
-	//add reading previously stored mode (stealth/normal) from eeprom
-	
+    uint8_t filament;
+    if(FilamentLoaded::get(filament))
+    {
+        motion_set_idler(filament);
+    }
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
@@ -326,7 +327,7 @@ void loop()
                 delay(500);
                 if (Btn::middle == buttonClicked())
                 {
-                    home();
+                    motion_set_idler_selector(active_extruder);
                     feed_filament();
                 }
             }
