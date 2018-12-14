@@ -541,6 +541,7 @@ void load_filament_inPrinter()
 
         if ('A' == getc(uart_com))
         {
+            motion_door_sensor_detected();
             break;
         }
         do_pulley_step();

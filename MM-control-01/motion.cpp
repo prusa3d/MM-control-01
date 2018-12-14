@@ -14,6 +14,7 @@
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
 static bool s_idler_engaged = true;
+static bool s_has_door_sensor = false;
 
 static void rehome()
 {
@@ -79,27 +80,30 @@ void motion_feed_to_bondtech()
     int _speed = 4500;
     const uint16_t steps = BowdenLength::get();
     set_pulley_dir_push();
+    unsigned long delay = 4500;
 
     for (uint16_t i = 0; i < steps; i++)
     {
-        do_pulley_step();
-        delayMicroseconds(_speed);
+        delayMicroseconds(delay);
+        unsigned long now = micros();
 
         if (i < 4000)
         {
-            if (_speed > 1600) _speed = _speed - 20;
-            if (_speed > 800) _speed = _speed - 10;
-            if (_speed > 400) _speed = _speed - 5;
-            if (_speed > 200) _speed = _speed - 4;
-            if ((_speed > 150) && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
+            if (_speed > 2600) _speed = _speed - 6;
+            if (_speed > 1300) _speed = _speed - 3;
+            if (_speed > 650) _speed = _speed - 2;
+            if (_speed > 250 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) _speed = _speed - 1;
         }
-        if (i > (steps - 800) && _speed < 3000) _speed = _speed + 10;
+        if (i > (steps - 800) && _speed < 2600) _speed = _speed + 10;
         if ('A' == getc(uart_com))
         {
+            s_has_door_sensor = true;
             tmc2130_disable_axis(AX_PUL, tmc2130_mode);
             motion_disengage_idler();
             return;
         }
+        do_pulley_step();
+        delay = _speed - (micros() - now);
     }
 }
 
@@ -133,4 +137,9 @@ void motion_unload_to_finda()
         if (digitalRead(A1) == 0) _endstop_hit++;
 
     }
+}
+
+void motion_door_sensor_detected()
+{
+    s_has_door_sensor = true;
 }

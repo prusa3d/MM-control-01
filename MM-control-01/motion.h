@@ -14,5 +14,7 @@ void motion_engage_idler();
 void motion_disengage_idler();
 void motion_feed_to_bondtech();
 void motion_unload_to_finda();
+void motion_door_sensor_detected();
+
 
 #endif //MOTION_H_
