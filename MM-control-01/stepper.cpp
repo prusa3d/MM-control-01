@@ -74,7 +74,6 @@ bool home_idler()
 {
 	int _c = 0;
 	int _l = 0;
-	uint8_t filament = 0; //Not needed, just to suppress compiler warning.
 
 	tmc2130_init(HOMING_MODE);
 
