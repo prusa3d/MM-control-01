@@ -78,5 +78,16 @@ private:
     static void getNext(uint8_t &status);
 };
 
+class DriveError
+{
+public:
+    static uint16_t get();
+    static void increment();
+private:
+    static uint8_t getL();
+    static void setL(uint8_t lowByte);
+    static uint8_t getH();
+    static void setH(uint8_t highByte);
+};
 
 #endif /* PERMANENT_STORAGE_H_ */
