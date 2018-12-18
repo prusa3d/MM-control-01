@@ -204,6 +204,7 @@ void motion_unload_to_finda()
         if (tmc2130_read_gstat() && digitalRead(A1) == 1)
         {
             if (tries == tr) unrecoverable_error();
+            drive_error();
             rehome_idler();
         }
         else

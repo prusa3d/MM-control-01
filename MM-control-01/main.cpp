@@ -133,16 +133,21 @@ void check_filament_not_present()
     }
 }
 
+static void signal_drive_error()
+{
+    shr16_set_led(0x3ff);
+    delay(300);
+    shr16_set_led(0x000);
+    delay(300);
+}
+
 void drive_error()
 {
     for(uint8_t i = 0; i < 3; ++i)
     {
-        shr16_set_led(0x3ff);
-        delay(300);
-        shr16_set_led(0x000);
-        delay(300);
+        signal_drive_error();
     }
-
+    DriveError::increment();
 }
 
 //! @brief Unrecoverable hardware fault
@@ -164,7 +169,7 @@ void unrecoverable_error()
 {
     while (1)
     {
-        drive_error();
+        signal_drive_error();
     }
 }
 
