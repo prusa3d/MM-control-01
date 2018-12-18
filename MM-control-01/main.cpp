@@ -335,7 +335,10 @@ void loop()
     }
 }
 
-
+//! @brief receive and process commands from serial line
+//! @par inout FILE* struct connected to serial line to be used
+//!
+//! All commands have syntax in form of one letter integer number.
 void process_commands(FILE* inout)
 {
 	static char line[32];
@@ -363,18 +366,18 @@ void process_commands(FILE* inout)
 		//line received
 		//printf_P(PSTR("line received: '%s' %d\n"), line, count);
 		count = 0;
+        //! T<nr.> change to filament <nr.>
 		if (sscanf_P(line, PSTR("T%d"), &value) > 0)
 		{
-			//T-code scanned
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 				switch_extruder_withSensor(value);
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
+        //! L<nr.> Load filament <nr.>
 		else if (sscanf_P(line, PSTR("L%d"), &value) > 0)
 		{
-			// Load filament
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 			    if (isFilamentLoaded) signalFilament = true;
@@ -388,7 +391,8 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("M%d"), &value) > 0)
 		{
-			// M0: set to normal mode; M1: set to stealth mode
+			//! M0 set to normal mode
+			//!@n M1 set to stealth mode
 			switch (value) {
 				case 0: tmc2130_mode = NORMAL_MODE; break;
 				case 1: tmc2130_mode = STEALTH_MODE; break;
@@ -399,9 +403,10 @@ void process_commands(FILE* inout)
 			tmc2130_init(tmc2130_mode);
 			fprintf_P(inout, PSTR("ok\n"));
 		}
+		//! U<nr.> Unload filament. <nr.> is ignored but mandatory.
 		else if (sscanf_P(line, PSTR("U%d"), &value) > 0)
 		{
-			// Unload filament
+
 			unload_filament_withSensor();
 			fprintf_P(inout, PSTR("ok\n"));
 
@@ -409,25 +414,26 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("X%d"), &value) > 0)
 		{
-			if (value == 0) // MMU reset
+			if (value == 0) //! X0 MMU reset
 				wdt_enable(WDTO_15MS);
 		}
 		else if (sscanf_P(line, PSTR("P%d"), &value) > 0)
 		{
-			if (value == 0) // Read finda
+			if (value == 0) //! P0 Read finda
 				fprintf_P(inout, PSTR("%dok\n"), digitalRead(A1));
 		}
 		else if (sscanf_P(line, PSTR("S%d"), &value) > 0)
 		{
-			if (value == 0) // return ok
+			if (value == 0) //! S0 return ok
 				fprintf_P(inout, PSTR("ok\n"));
-			else if (value == 1) // Read version
+			else if (value == 1) //! S1 Read version
 				fprintf_P(inout, PSTR("%dok\n"), fw_version);
-			else if (value == 2) // Read build nr
+			else if (value == 2) //! S2 Read build nr.
 				fprintf_P(inout, PSTR("%dok\n"), fw_buildnr);
-			else if (value == 3) // Read drive errors
+			else if (value == 3) //! S3 Read drive errors
 			    fprintf_P(inout, PSTR("%dok\n"), DriveError::get());
 		}
+		//! F<nr.> <type> filament type. <nr.> filament number, <type> 0, 1 or 2. Does nothing.
 		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
 		{
 			if (((value >= 0) && (value < EXTRUDERS)) &&
@@ -439,7 +445,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("C%d"), &value) > 0)
 		{
-			if (value == 0) //C0 continue loading current filament (used after T-code), maybe add different code for each extruder (the same way as T-codes) in the future?
+			if (value == 0) //! C0 continue loading current filament (used after T-code).
 			{
 				load_filament_inPrinter();
 				fprintf_P(inout, PSTR("ok\n"));
@@ -447,7 +453,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("E%d"), &value) > 0)
 		{
-			if ((value >= 0) && (value < EXTRUDERS)) //Ex: eject filament
+			if ((value >= 0) && (value < EXTRUDERS)) //! E<nr.> eject filament
 			{
 				eject_filament(value);
 				fprintf_P(inout, PSTR("ok\n"));
@@ -455,7 +461,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("R%d"), &value) > 0)
 		{
-			if (value == 0) //R0: recover after eject filament
+			if (value == 0) //! R0 recover after eject filament
 			{
 				recover_after_eject();
 				fprintf_P(inout, PSTR("ok\n"));
