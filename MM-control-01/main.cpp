@@ -425,6 +425,8 @@ void process_commands(FILE* inout)
 				fprintf_P(inout, PSTR("%dok\n"), fw_version);
 			else if (value == 2) // Read build nr
 				fprintf_P(inout, PSTR("%dok\n"), fw_buildnr);
+			else if (value == 3) // Read drive errors
+			    fprintf_P(inout, PSTR("%dok\n"), DriveError::get());
 		}
 		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
 		{
