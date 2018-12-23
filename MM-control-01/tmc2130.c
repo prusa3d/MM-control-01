@@ -127,9 +127,9 @@ inline uint16_t __tcoolthrs(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return TMC2130_TCOOLTHRS_0;
-	case 1: return TMC2130_TCOOLTHRS_1;
-	case 2: return TMC2130_TCOOLTHRS_2;
+	case AX_PUL: return TMC2130_TCOOLTHRS_0;
+	case AX_SEL: return TMC2130_TCOOLTHRS_1;
+	case AX_IDL: return TMC2130_TCOOLTHRS_2;
 	}
 	return TMC2130_TCOOLTHRS;
 }
@@ -138,9 +138,9 @@ inline int8_t __sg_thr(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return TMC2130_SG_THR_0;
-	case 1: return TMC2130_SG_THR_1;
-	case 2: return TMC2130_SG_THR_2;
+	case AX_PUL: return TMC2130_SG_THR_0;
+	case AX_SEL: return TMC2130_SG_THR_1;
+	case AX_IDL: return TMC2130_SG_THR_2;
 	}
 	return TMC2130_SG_THR;
 }
@@ -149,9 +149,9 @@ inline int8_t __res(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return tmc2130_usteps2mres((uint16_t)2);
-	case 1: return tmc2130_usteps2mres((uint16_t)2);
-	case 2: return tmc2130_usteps2mres((uint16_t)16);
+	case AX_PUL: return tmc2130_usteps2mres((uint16_t)2);
+	case AX_SEL: return tmc2130_usteps2mres((uint16_t)2);
+	case AX_IDL: return tmc2130_usteps2mres((uint16_t)16);
 	}
 	return 16;
 }

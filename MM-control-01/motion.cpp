@@ -427,7 +427,8 @@ void unload_filament_withSensor()
 	}
 	park_idler(false);
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-	isFilamentLoaded = false; // filament unloaded 
+	isFilamentLoaded = false; // filament unloaded
+	filament_presence_signaler();
 }
 
 //! @brief Do 320 pulley steps slower and 450 steps faster with decreasing motor current.
@@ -597,23 +598,7 @@ bool home_idler(bool toLastFilament)
 bool home_selector()
 {
     // if FINDA is sensing filament do not home
-    while (digitalRead(A1) == 1)
-    {
-        while (Btn::right != buttonClicked())
-        {
-            if (digitalRead(A1) == 1)
-            {
-                shr16_set_led(0x2aa);
-            }
-            else
-            {
-                shr16_set_led(0x155);
-            }
-            delay(300);
-            shr16_set_led(0x000);
-            delay(300);
-        }
-    }
+    check_filament_not_present();
 	 
     move(0, -100,0); // move a bit in opposite direction
 
@@ -654,7 +639,6 @@ void home()
 
 	shr16_set_led(0x000);
 	
-	isFilamentLoaded = false; 
 	shr16_set_led(1 << 2 * (4-active_extruder));
 
   isHomed = true;

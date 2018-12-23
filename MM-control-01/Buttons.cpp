@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //! @file
 
 #include "Buttons.h"
@@ -32,11 +33,10 @@ void settings_select_filament()
 			delay(500);
 			if (Btn::middle == buttonClicked())
 			{
-				if (active_extruder < 5) 
-					settings_bowden_length();
+				if (!isHomed) { home(); }
+				if (active_extruder < 5) settings_bowden_length();
 				else
 				{
-					select_extruder(4);
 					select_extruder(0);
 					return;
 				}
@@ -185,30 +185,36 @@ void settings_bowden_length()
 		load_filament_withSensor();
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+		uint32_t saved_millis=millis();
+		bool button_active = false;
 		do
 		{
 
 			switch (buttonClicked())
 			{
 			case Btn::right:
-				if (bowdenLength.decrease())
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
 				{
 					move(0, 0, -bowdenLength.stepSize);
 					delay(400);
 					fprintf_P(uart0io,PSTR("Dec: %d\r\n"),bowdenLength.m_length);
 				}
+				button_active = true;
 				break;
 
 			case Btn::left:
-				if (bowdenLength.increase())
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
 				{
 					move(0, 0, bowdenLength.stepSize);
 					delay(400);
 					fprintf_P(uart0io,PSTR("Inc: %d\r\n"),bowdenLength.m_length);
 				}
+				button_active = true;
 				break;
 
 			default:
+				button_active = false;
+				saved_millis = millis();
 				break;
 			}
 
@@ -241,4 +247,3 @@ Btn buttonClicked()
 
 	return Btn::none;
 }
-
