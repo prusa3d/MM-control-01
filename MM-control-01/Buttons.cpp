@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //! @file
 
 #include "Buttons.h"
@@ -193,7 +192,7 @@ void settings_bowden_length()
 			switch (buttonClicked())
 			{
 			case Btn::right:
-				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active))
 				{
 					move(0, 0, -bowdenLength.stepSize);
 					delay(400);
@@ -203,7 +202,7 @@ void settings_bowden_length()
 				break;
 
 			case Btn::left:
-				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
+				if (!button_active || (((millis() - saved_millis) > 1000) && button_active))
 				{
 					move(0, 0, bowdenLength.stepSize);
 					delay(400);
@@ -225,25 +224,19 @@ void settings_bowden_length()
 			shr16_set_led(2 << 2 * 1);
 			delay(50);
 
-
 		} while (buttonClicked() != Btn::middle);
-		
 		fprintf_P(uart0io,PSTR("Len: %d\r\n"),bowdenLength.m_length);
-
 		unload_filament_withSensor();
 	}
 }
-
 //! @brief Is button pushed?
 //!
 //! @return button pushed
 Btn buttonClicked()
 {
 	int raw = analogRead(ButtonPin);
-
 	if (raw < 50) return Btn::right;
 	if (raw > 80 && raw < 100) return Btn::middle;
 	if (raw > 160 && raw < 180) return Btn::left;
-
 	return Btn::none;
 }

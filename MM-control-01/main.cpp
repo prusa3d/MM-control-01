@@ -271,11 +271,8 @@ void manual_extruder_selector()
 void loop()
 {
 	process_commands(uart_com);
-<<<<<<< HEAD
 	process_commands(uart0io);
-=======
     filament_presence_signaler();
->>>>>>> 468aeec76f09dad0d53dfc13702fd74943033b3d
 
 	if (!isPrinting)
 	{

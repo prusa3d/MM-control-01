@@ -28,8 +28,8 @@ inline bool operator& (Btn a, Btn b)
 {
 	return static_cast<uint8_t>(a) & static_cast<uint8_t>(b);
 }
-void settings_select_filament();
+
 void setupMenu();
 Btn buttonClicked();
-
+void settings_select_filament();
 #endif //_BUTTONS_h
