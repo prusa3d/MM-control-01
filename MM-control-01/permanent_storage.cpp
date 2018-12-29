@@ -100,8 +100,10 @@ uint16_t BowdenLength::getPrevious()
 //!
 //! Returns stored value
 //! @return stored bowden length for specified extruder
-uint16_t BowdenLength::getForExtruder(int filament)
+uint16_t BowdenLength::getForExtruder(int extruder)
 {
+	uint8_t filament = extruder;
+	
 	if (validFilament(filament))
 	{
 		uint16_t bowdenLength = eeprom_read_word(&(eepromBase->eepromBowdenLen[filament]));
