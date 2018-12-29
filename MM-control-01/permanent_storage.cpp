@@ -100,7 +100,7 @@ uint16_t BowdenLength::getPrevious()
 //!
 //! Returns stored value
 //! @return stored bowden length for specified extruder
-uint16_t BowdenLength::getForExtruder(uint8_t filament)
+uint16_t BowdenLength::getForExtruder(int filament)
 {
 	if (validFilament(filament))
 	{
