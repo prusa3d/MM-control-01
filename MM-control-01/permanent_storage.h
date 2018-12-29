@@ -18,6 +18,8 @@ class BowdenLength
 {
 public:
 	static uint16_t get();
+	static uint16_t getPrevious();
+	static uint16_t getForExtruder(uint8_t filament);
 	static const uint8_t stepSize = 10u; //!< increase()/decrease() bowden length step size
 	BowdenLength();
 	bool increase();

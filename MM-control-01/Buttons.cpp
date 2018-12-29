@@ -203,6 +203,8 @@ void settings_bowden_length()
 
 		} while (buttonClicked() != Btn::middle);
 
+		//because this depends on the correct setting of the PREVIOUS filament loaded, set it correctly...
+		previous_extruder = active_extruder;
 		unload_filament_withSensor();
 	}
 }

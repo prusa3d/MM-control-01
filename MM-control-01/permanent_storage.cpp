@@ -81,7 +81,27 @@ static bool validBowdenLen (const uint16_t BowdenLength)
 //! @return stored bowden length
 uint16_t BowdenLength::get()
 {
-	uint8_t filament = active_extruder;
+	return BowdenLength::getForExtruder(active_extruder);
+}
+
+
+
+//! @brief Get bowden length for previous filament
+//!
+//! Returns stored value
+//! @return stored bowden length for previous extruder
+uint16_t BowdenLength::getPrevious()
+{
+	return BowdenLength::getForExtruder(previous_extruder);
+}
+
+
+//! @brief Get bowden length for extruder as passed by argument
+//!
+//! Returns stored value
+//! @return stored bowden length for specified extruder
+uint16_t BowdenLength::getForExtruder(uint8_t filament)
+{
 	if (validFilament(filament))
 	{
 		uint16_t bowdenLength = eeprom_read_word(&(eepromBase->eepromBowdenLen[filament]));
@@ -99,8 +119,6 @@ uint16_t BowdenLength::get()
 
 	return eepromBowdenLenDefault;
 }
-
-
 //! @brief Construct BowdenLength object which allows bowden length manipulation
 //!
 //! To be created on stack, new value is permanently stored when object goes out of scope.
