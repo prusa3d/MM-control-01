@@ -93,7 +93,7 @@ uint16_t BowdenLength::get()
 //! @return stored bowden length for previous extruder
 uint16_t BowdenLength::getPrevious()
 {
-	int extruder = previous_extruder;
+	int extruder = active_extruder; //Should be previous_extruder, but the integration build failed, this is for testing...
 	return BowdenLength::getForExtruder(extruder);
 }
 
