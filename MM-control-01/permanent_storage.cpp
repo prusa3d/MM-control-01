@@ -81,7 +81,8 @@ static bool validBowdenLen (const uint16_t BowdenLength)
 //! @return stored bowden length
 uint16_t BowdenLength::get()
 {
-	return BowdenLength::getForExtruder(active_extruder);
+	int extruder = active_extruder;
+	return BowdenLength::getForExtruder(extruder);
 }
 
 
@@ -92,7 +93,8 @@ uint16_t BowdenLength::get()
 //! @return stored bowden length for previous extruder
 uint16_t BowdenLength::getPrevious()
 {
-	return BowdenLength::getForExtruder(previous_extruder);
+	int extruder = previous_extruder;
+	return BowdenLength::getForExtruder(extruder);
 }
 
 
