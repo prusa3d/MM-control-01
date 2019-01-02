@@ -9,6 +9,11 @@
 #include <cstddef>
 
 int active_extruder = -1;
+// previous_extruder is in the MM-control-01\mmctl.h defined as external int.
+// Because in a pull request is is now correctly used in there, previous_extruder 
+// also must be defined in this test code.
+// It is declared - like active_extruder at this place, in the same scope. 
+int previous_extruder = 0;
 static unsigned long writes = 0;
 static int corrupt = -1;
 
