@@ -93,7 +93,11 @@ uint16_t BowdenLength::get()
 //! @return stored bowden length for previous extruder
 uint16_t BowdenLength::getPrevious()
 {
-	int extruder = active_extruder; //Should be previous_extruder, but the integration build failed, this is for testing...
+	// The following use of "previous_extruder" is OK, as it is defined as a global variable in mmctl.cpp, just like "active_extruder".
+	// However.... The Travis build fails at this point, because in the "tests" folder, using in the build of test.sh it is not defined (only active_extruder is in there).
+	// To me this seems a problem of the build scripts that Travis build is now executing...
+	// For now I added a declaration in this "..Tests/mmctrl.h" as well...
+	int extruder = previous_extruder;
 	return BowdenLength::getForExtruder(extruder);
 }
 

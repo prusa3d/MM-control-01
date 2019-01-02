@@ -10,6 +10,9 @@
 
 extern int active_extruder;
 
+// added to use in the main branch as well and to prevent Travis build problems.
+// Probably not relevant for this tests folder....
+extern int previous_extruder;
 
 
 #endif /* MMCTL_H_ */
