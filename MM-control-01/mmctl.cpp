@@ -348,13 +348,8 @@ void load_filament_withSensor()
 
         } while ( !_continue );
 
-
-
-
-
-
         motion_engage_idler();
-        // TODO: do not repeat same code, try to do it until succesfull load
+        set_pulley_dir_push();
         _loadSteps = 0;
         do
         {
