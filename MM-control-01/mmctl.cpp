@@ -127,7 +127,7 @@ void select_extruder(int new_extruder)
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
-	int previous_extruder = active_extruder;
+	previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
 	if (previous_extruder != active_extruder)
