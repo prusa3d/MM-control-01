@@ -191,6 +191,7 @@ void setup()
 	{
 		setupMenu();
 	}
+	pinMode(A1, INPUT);
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
 }
