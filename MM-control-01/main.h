@@ -4,6 +4,7 @@
 
 #include <inttypes.h>
 #include "config.h"
+#include "fastio.h"
 
 void manual_extruder_selector();
 void check_filament_not_present();
