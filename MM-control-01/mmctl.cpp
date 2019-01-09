@@ -43,7 +43,7 @@ bool feed_filament()
 		if (_c > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
 		if (_c > 100) { shr16_set_led(0x000); _c = 0; _delay++; };
 
-		if (digitalRead(A1) == 1) { _loaded = true; _feed = false; };
+		if (READ(PIN_A1) == 1) { _loaded = true; _feed = false; };
 		if (buttonClicked() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
 		delayMicroseconds(4000);
 	} while (_feed);
@@ -127,7 +127,7 @@ void select_extruder(int new_extruder)
 
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
-	int previous_extruder = active_extruder;
+	previous_extruder = active_extruder;
 	active_extruder = new_extruder;
 
 	if (previous_extruder != active_extruder)

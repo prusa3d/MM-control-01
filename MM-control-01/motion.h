@@ -34,4 +34,3 @@ void recover_after_eject();
 
 
 #endif
-

@@ -67,7 +67,7 @@ void filament_presence_signaler()
 {
     if (signalFilament)
     {
-        if (digitalRead(A1) == 1)
+        if (READ(PIN_A1) == 1)
         {
             signal_filament_present();
         }
@@ -105,11 +105,11 @@ void filament_presence_signaler()
 void check_filament_not_present()
 {
     // if FINDA is sensing filament do not home
-    while (digitalRead(A1) == 1)
+    while (READ(PIN_A1) == 1)
     {
         while (Btn::right != buttonClicked())
         {
-            if (digitalRead(A1) == 1)
+            if (READ(PIN_A1) == 1)
             {
                 signal_filament_present();
             }
@@ -191,7 +191,8 @@ void setup()
 	{
 		setupMenu();
 	}
-	if (digitalRead(A1) == 1) isFilamentLoaded = true;
+	SET_INPUT(PIN_A1);
+	if (READ(PIN_A1) == 1) isFilamentLoaded = true;
 
 }
 
@@ -374,7 +375,7 @@ void process_commands(FILE* inout)
 		else if (sscanf_P(line, PSTR("P%d"), &value) > 0)
 		{
 			if (value == 0) // Read finda
-				fprintf_P(inout, PSTR("%dok\n"), digitalRead(A1));
+				fprintf_P(inout, PSTR("%dok\n"), READ(PIN_A1));
 		}
 		else if (sscanf_P(line, PSTR("S%d"), &value) > 0)
 		{
