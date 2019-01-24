@@ -3,7 +3,6 @@
 #define _ABTN3_H
 
 #include <inttypes.h>
-#include "config.h"
 
 
 #if defined(__cplusplus)

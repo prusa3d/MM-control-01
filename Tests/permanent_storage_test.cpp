@@ -722,6 +722,26 @@ TEST_CASE( "Init EEPROM.", "[permanent_storage]" )
     writes = 0;
 }
 
+TEST_CASE( "Increment, get and saturate drive errors.", "[permanent_storage]" )
+{
+    CHECK(DriveError::get() == 0);
+    for(long i = 1; i <= 65535; ++i)
+    {
+        DriveError::increment();
+        CHECK(i == DriveError::get());
+    }
+    CHECK(writes == (65535 + 255));
+
+    DriveError::increment();
+    CHECK(65535 == DriveError::get());
+    DriveError::increment();
+    CHECK(65535 == DriveError::get());
+
+    CHECK(writes == (65535 + 255));
+    eepromEraseAll();
+    writes = 0;
+}
+
 TEST_CASE( "Set and get filament.", "[permanent_storage]" )
 {
     uint8_t filament = 0xff;

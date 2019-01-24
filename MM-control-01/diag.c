@@ -8,6 +8,7 @@
 #include "abtn3.h"
 #include "tmc2130.h"
 #include "main.h"
+#include "config.h"
 
 
 int8_t cmd_uart_bridge(FILE* inout)

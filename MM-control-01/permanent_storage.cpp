@@ -20,6 +20,8 @@ typedef struct __attribute__ ((packed))
 	uint16_t eepromBowdenLen[5];    //!< Bowden length for each filament
 	uint8_t eepromFilamentStatus[3];//!< Majority vote status of eepromFilament wear leveling
 	uint8_t eepromFilament[800];    //!< Top nibble status, bottom nibble last filament loaded
+	uint8_t eepromDriveErrorCountH;
+	uint8_t eepromDriveErrorCountL[2];
 }eeprom_t;
 static_assert(sizeof(eeprom_t) - 2 <= E2END, "eeprom_t doesn't fit into EEPROM available.");
 //! @brief EEPROM layout version
@@ -333,3 +335,42 @@ void FilamentLoaded::getNext(uint8_t& status)
     }
 }
 
+uint16_t DriveError::get()
+{
+    return ((static_cast<uint16_t>(getH()) << 8) + getL());
+}
+
+void DriveError::increment()
+{
+    uint16_t errors = get();
+    if (errors < 0xffff)
+    {
+        ++errors;
+        setL(errors);
+        setH(errors >> 8);
+    }
+}
+
+uint8_t DriveError::getL()
+{
+    uint8_t first = eeprom_read_byte(&(eepromBase->eepromDriveErrorCountL[0]));
+    uint8_t second = eeprom_read_byte(&(eepromBase->eepromDriveErrorCountL[1]));
+
+    if (0xff == first && 0 == second) return 1;
+    return (first > second) ? ++first : ++second;
+}
+
+void DriveError::setL(uint8_t lowByte)
+{
+    eeprom_update_byte(&(eepromBase->eepromDriveErrorCountL[lowByte%2]), lowByte - 1);
+}
+
+uint8_t DriveError::getH()
+{
+    return (eeprom_read_byte(&(eepromBase->eepromDriveErrorCountH)) + 1);
+}
+
+void DriveError::setH(uint8_t highByte)
+{
+    eeprom_update_byte(&(eepromBase->eepromDriveErrorCountH), highByte - 1);
+}

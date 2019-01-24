@@ -13,17 +13,15 @@
 #include "tmc2130.h"
 #include "abtn3.h"
 #include "mmctl.h"
-#include "motion.h"
+#include "stepper.h"
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"
 #include "version.h"
+#include "config.h"
+#include "motion.h"
 
 
-int8_t sys_state = 0;
-uint8_t sys_signals = 0;
-int _loop = 0;
-int _c = 0;
 uint8_t tmc2130_mode = NORMAL_MODE;
 
 #if (UART_COM == 0)
@@ -32,10 +30,22 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
+static bool enterSetup = false;
 static bool signalFilament = false;
 
-extern "C" {
 void process_commands(FILE* inout);
+
+static void led_blink(int _no)
+{
+    shr16_set_led(1 << 2 * _no);
+    delay(40);
+    shr16_set_led(0x000);
+    delay(20);
+    shr16_set_led(1 << 2 * _no);
+    delay(40);
+
+    shr16_set_led(0x000);
+    delay(10);
 }
 
 //! @brief signal filament presence
@@ -104,7 +114,6 @@ void filament_presence_signaler()
 
 void check_filament_not_present()
 {
-    // if FINDA is sensing filament do not home
     while (digitalRead(A1) == 1)
     {
         while (Btn::right != buttonClicked())
@@ -124,6 +133,45 @@ void check_filament_not_present()
     }
 }
 
+static void signal_drive_error()
+{
+    shr16_set_led(0x3ff);
+    delay(300);
+    shr16_set_led(0x000);
+    delay(300);
+}
+
+void drive_error()
+{
+    for(uint8_t i = 0; i < 3; ++i)
+    {
+        signal_drive_error();
+    }
+    DriveError::increment();
+}
+
+//! @brief Unrecoverable hardware fault
+//!
+//! Stay in infinite loop and blink.
+//!
+//! LED indication of states
+//!
+//! RG | RG | RG | RG | RG
+//! -- | -- | -- | -- | --
+//! bb | bb | bb | bb | bb
+//!
+//! @n R - Red LED
+//! @n G - Green LED
+//! @n 1 - active
+//! @n 0 - inactive
+//! @n b - blinking
+void unrecoverable_error()
+{
+    while (1)
+    {
+        signal_drive_error();
+    }
+}
 
 //! @brief Initialization after reset
 //!
@@ -169,8 +217,6 @@ void setup()
 
 	spi_init();
 	led_blink(2);
-
-	tmc2130_init(HOMING_MODE); // trinamic, homing
 	led_blink(3);
 
 	adc_init(); // ADC
@@ -179,18 +225,18 @@ void setup()
 	shr16_set_ena(7);
 	shr16_set_led(0x000);
 
-	init_Pulley();
-	
-	home_idler(true);
+    // check if to goto the settings menu
+    if (buttonClicked() == Btn::middle)
+    {
+        enterSetup = true;
+    }
 
-	//add reading previously stored mode (stealth/normal) from eeprom
-	tmc2130_init(tmc2130_mode); // trinamic, initialize all axes
-	
-	// check if to goto the settings menu
-	if (buttonClicked() == Btn::middle)
-	{
-		setupMenu();
-	}
+    uint8_t filament;
+    if(FilamentLoaded::get(filament))
+    {
+        motion_set_idler(filament);
+    }
+
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
 }
@@ -268,28 +314,36 @@ void manual_extruder_selector()
 //! @copydoc manual_extruder_selector()
 void loop()
 {
-	process_commands(uart_com);
+    process_commands(uart_com);
     filament_presence_signaler();
 
-	if (!isPrinting)
-	{
-		manual_extruder_selector();
-		if(Btn::middle == buttonClicked() && active_extruder < 5)
-		{
-			shr16_set_led(2 << 2 * (4 - active_extruder));
-			delay(500);
-			if (Btn::middle == buttonClicked())
-			{
-			    if (!isHomed) { home(); }
-				feed_filament();
-			}
-		}
-	}
+    if (!isPrinting)
+    {
+        if (enterSetup)
+        {
+            enterSetup = setupMenu();
+        }
+        else
+        {
+            manual_extruder_selector();
+            if(Btn::middle == buttonClicked() && active_extruder < 5)
+            {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
+                delay(500);
+                if (Btn::middle == buttonClicked())
+                {
+                    motion_set_idler_selector(active_extruder);
+                    feed_filament();
+                }
+            }
+        }
+    }
 }
 
-
-extern "C" {
-
+//! @brief receive and process commands from serial line
+//! @par inout FILE* struct connected to serial line to be used
+//!
+//! All commands have syntax in form of one letter integer number.
 void process_commands(FILE* inout)
 {
 	static char line[32];
@@ -317,20 +371,18 @@ void process_commands(FILE* inout)
 		//line received
 		//printf_P(PSTR("line received: '%s' %d\n"), line, count);
 		count = 0;
+        //! T<nr.> change to filament <nr.>
 		if (sscanf_P(line, PSTR("T%d"), &value) > 0)
 		{
-			//T-code scanned
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 				switch_extruder_withSensor(value);
-
-				delay(200);
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
+        //! L<nr.> Load filament <nr.>
 		else if (sscanf_P(line, PSTR("L%d"), &value) > 0)
 		{
-			// Load filament
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 			    if (isFilamentLoaded) signalFilament = true;
@@ -338,15 +390,14 @@ void process_commands(FILE* inout)
 			    {
                     select_extruder(value);
                     feed_filament();
-
-                    delay(200);
 			    }
                 fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
 		else if (sscanf_P(line, PSTR("M%d"), &value) > 0)
 		{
-			// M0: set to normal mode; M1: set to stealth mode
+			//! M0 set to normal mode
+			//!@n M1 set to stealth mode
 			switch (value) {
 				case 0: tmc2130_mode = NORMAL_MODE; break;
 				case 1: tmc2130_mode = STEALTH_MODE; break;
@@ -357,34 +408,37 @@ void process_commands(FILE* inout)
 			tmc2130_init(tmc2130_mode);
 			fprintf_P(inout, PSTR("ok\n"));
 		}
+		//! U<nr.> Unload filament. <nr.> is ignored but mandatory.
 		else if (sscanf_P(line, PSTR("U%d"), &value) > 0)
 		{
-			// Unload filament
+
 			unload_filament_withSensor();
-			delay(200);
 			fprintf_P(inout, PSTR("ok\n"));
 
 			isPrinting = false;
 		}
 		else if (sscanf_P(line, PSTR("X%d"), &value) > 0)
 		{
-			if (value == 0) // MMU reset
+			if (value == 0) //! X0 MMU reset
 				wdt_enable(WDTO_15MS);
 		}
 		else if (sscanf_P(line, PSTR("P%d"), &value) > 0)
 		{
-			if (value == 0) // Read finda
+			if (value == 0) //! P0 Read finda
 				fprintf_P(inout, PSTR("%dok\n"), digitalRead(A1));
 		}
 		else if (sscanf_P(line, PSTR("S%d"), &value) > 0)
 		{
-			if (value == 0) // return ok
+			if (value == 0) //! S0 return ok
 				fprintf_P(inout, PSTR("ok\n"));
-			else if (value == 1) // Read version
+			else if (value == 1) //! S1 Read version
 				fprintf_P(inout, PSTR("%dok\n"), fw_version);
-			else if (value == 2) // Read build nr
+			else if (value == 2) //! S2 Read build nr.
 				fprintf_P(inout, PSTR("%dok\n"), fw_buildnr);
+			else if (value == 3) //! S3 Read drive errors
+			    fprintf_P(inout, PSTR("%dok\n"), DriveError::get());
 		}
+		//! F<nr.> <type> filament type. <nr.> filament number, <type> 0, 1 or 2. Does nothing.
 		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
 		{
 			if (((value >= 0) && (value < EXTRUDERS)) &&
@@ -396,7 +450,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("C%d"), &value) > 0)
 		{
-			if (value == 0) //C0 continue loading current filament (used after T-code), maybe add different code for each extruder (the same way as T-codes) in the future?
+			if (value == 0) //! C0 continue loading current filament (used after T-code).
 			{
 				load_filament_inPrinter();
 				fprintf_P(inout, PSTR("ok\n"));
@@ -404,7 +458,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("E%d"), &value) > 0)
 		{
-			if ((value >= 0) && (value < EXTRUDERS)) //Ex: eject filament
+			if ((value >= 0) && (value < EXTRUDERS)) //! E<nr.> eject filament
 			{
 				eject_filament(value);
 				fprintf_P(inout, PSTR("ok\n"));
@@ -412,7 +466,7 @@ void process_commands(FILE* inout)
 		}
 		else if (sscanf_P(line, PSTR("R%d"), &value) > 0)
 		{
-			if (value == 0) //R0: recover after eject filament
+			if (value == 0) //! R0 recover after eject filament
 			{
 				recover_after_eject();
 				fprintf_P(inout, PSTR("ok\n"));
@@ -424,6 +478,3 @@ void process_commands(FILE* inout)
 	}
 }
 
-
-
-} // extern "C"
