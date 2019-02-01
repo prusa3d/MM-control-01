@@ -377,8 +377,20 @@ void unload_filament_withSensor()
 
     motion_engage_idler(); // if idler is in parked position un-park him get in contact with filament
 
+    if (digitalRead(A1))
+    {
+        motion_unload_to_finda();
+    }
+    else
+    {
+        if (checkOk())
+        {
+            motion_disengage_idler();
+            return;
+        }
+    }
 
-    motion_unload_to_finda();
+
 
     // move a little bit so it is not a grinded hole in filament
     for (int i = 100; i > 0; i--)
