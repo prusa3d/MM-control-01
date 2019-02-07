@@ -340,7 +340,17 @@ uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval)
 	return stat;
 }
 
-//! @brief Read global error flags for all axes
+//! @brief Read global error flags for all axis
+//!
+//! Error is detected if any of following flags is set.
+//!  * reset
+//!    * IC has been reset since the last read access to GSTAT.
+//!      All registers have been cleared to reset values.
+//!  * drv_err
+//!    * Overtemperature or short circuit. Driver  has  been  shut  down.
+//!  * uv_cp
+//!    * Undervoltage on the charge pump. The driver is disabled in this case.
+//!
 //! @retval 0 no error
 //! @retval >0 error, bit flag set for each axis
 uint8_t tmc2130_read_gstat()
@@ -350,7 +360,7 @@ uint8_t tmc2130_read_gstat()
     {
         uint32_t result;
         tmc2130_rd(axis, TMC2130_REG_GSTAT, &result);
-        if (result && 0x6) retval += (1 << axis);
+        if (result & 0x7) retval += (1 << axis);
     }
     return retval;
 }
