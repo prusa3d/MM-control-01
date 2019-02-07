@@ -236,6 +236,7 @@ void setup()
     {
         motion_set_idler(filament);
     }
+    tmc2130_read_gstat(); //consume reset after power up
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
