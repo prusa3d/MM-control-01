@@ -18,5 +18,6 @@ void load_filament_inPrinter();
 void unload_filament_withSensor();
 void eject_filament(uint8_t filament);
 void recover_after_eject();
+void mmctl_checkOk();
 
 #endif //_MMCTL_H

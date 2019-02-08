@@ -167,7 +167,7 @@ void recover_after_eject()
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 
-bool checkOk()
+static bool checkOk()
 {
     bool _ret = false;
     int _steps = 0;
@@ -232,6 +232,13 @@ bool checkOk()
     return _ret;
 }
 
+void mmctl_checkOk()
+{
+    motion_engage_idler();
+    checkOk();
+    motion_disengage_idler();
+}
+
 void load_filament_withSensor()
 {
     FilamentLoaded::set(active_extruder);
@@ -293,20 +300,20 @@ void load_filament_withSensor()
         motion_disengage_idler();
         do
         {
-            shr16_set_led(0x000);
-            delay(800);
             if (!_isOk)
             {
-                shr16_set_led(2 << 2 * (4 - active_extruder));
+                signal_load_failure();
             }
             else
             {
+                shr16_set_led(0x000);
+                delay(800);
                 shr16_set_led(1 << 2 * (4 - active_extruder));
                 delay(100);
                 shr16_set_led(2 << 2 * (4 - active_extruder));
                 delay(100);
+                delay(800);
             }
-            delay(800);
 
             switch (buttonClicked())
             {

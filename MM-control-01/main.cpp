@@ -39,6 +39,7 @@ enum class S
     Setup,
     Printing,
     SignalFilament,
+    Wait,
 };
 }
 
@@ -59,7 +60,9 @@ enum class S
 //!   Any --> Printing : T<nr> || Eject
 //!   Any --> Idle : Unload || RecoverEject
 //!   Any --> SignalFilament : Load && filamentLoaded
+//!   Any --> Wait : W0
 //!   Setup --> Idle
+//!   Wait --> Idle : RightButton
 //! }
 //! @enduml
 static S state;
@@ -99,6 +102,14 @@ static void signal_filament_present()
     delay(300);
     shr16_set_led(0x000);
     delay(300);
+}
+
+void signal_load_failure()
+{
+    shr16_set_led(0x000);
+    delay(800);
+    shr16_set_led(2 << 2 * (4 - active_extruder));
+    delay(800);
 }
 
 //! @brief Signal filament presence
@@ -336,7 +347,7 @@ void manual_extruder_selector()
 
 //! @brief main loop
 //!
-//! It is possible to manually select filament and feed it when not printing.
+//! It is possible to manually select filament and feed it when S::Idle.
 //!
 //! button | action
 //! ------ | ------
@@ -368,6 +379,21 @@ void loop()
                 motion_set_idler_selector(active_extruder);
                 feed_filament();
             }
+        }
+        break;
+    case S::Wait:
+        signal_load_failure();
+        switch(buttonClicked())
+        {
+        case Btn::middle:
+            mmctl_checkOk();
+            break;
+        case Btn::right:
+            state = S::Idle;
+            fprintf_P(uart_com, PSTR("ok\n"));
+            break;
+        default:
+            break;
         }
         break;
     }
@@ -508,6 +534,13 @@ void process_commands(FILE* inout)
 				state = S::Idle;
 			}
 		}
+        else if (sscanf_P(line, PSTR("W%d"), &value) > 0)
+        {
+            if (value == 0) //! W0 Wait for user click
+            {
+                state = S::Wait;
+            }
+        }
 	}
 	else
 	{ //nothing received
