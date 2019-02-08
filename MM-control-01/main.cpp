@@ -30,8 +30,20 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
-static bool enterSetup = false;
-static bool signalFilament = false;
+namespace
+{
+//! @brief State
+enum class S
+{
+    Idle,
+    Setup,
+    Printing,
+    SignalFilament,
+};
+}
+
+//! @brief Main MMU state
+static S state;
 
 static void process_commands(FILE* inout);
 
@@ -75,7 +87,7 @@ static void signal_filament_present()
 //! Does nothing, when not enabled by signalFilament == true.
 void filament_presence_signaler()
 {
-    if (signalFilament)
+    if (S::SignalFilament == state)
     {
         if (digitalRead(A1) == 1)
         {
@@ -84,7 +96,7 @@ void filament_presence_signaler()
         else
         {
             isFilamentLoaded = false;
-            signalFilament = false;
+            state = S::Idle;
         }
     }
 }
@@ -228,7 +240,7 @@ void setup()
     // check if to goto the settings menu
     if (buttonClicked() == Btn::middle)
     {
-        enterSetup = true;
+        state = S::Setup;
     }
 
     uint8_t filament;
@@ -316,13 +328,13 @@ void manual_extruder_selector()
 void loop()
 {
     process_commands(uart_com);
-    filament_presence_signaler();
+    if (S::SignalFilament == state) filament_presence_signaler();
 
-    if (!isPrinting)
+    if (S::Printing != state)
     {
-        if (enterSetup)
+        if (S::Setup == state)
         {
-            enterSetup = setupMenu();
+            if (!setupMenu()) state = S::Idle;
         }
         else
         {
@@ -377,6 +389,7 @@ void process_commands(FILE* inout)
 		{
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
+			    state = S::Printing;
 				switch_extruder_withSensor(value);
 				fprintf_P(inout, PSTR("ok\n"));
 			}
@@ -386,7 +399,7 @@ void process_commands(FILE* inout)
 		{
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
-			    if (isFilamentLoaded) signalFilament = true;
+			    if (isFilamentLoaded) state = S::SignalFilament;
 			    else
 			    {
                     select_extruder(value);
@@ -416,7 +429,7 @@ void process_commands(FILE* inout)
 			unload_filament_withSensor();
 			fprintf_P(inout, PSTR("ok\n"));
 
-			isPrinting = false;
+			state = S::Printing;
 		}
 		else if (sscanf_P(line, PSTR("X%d"), &value) > 0)
 		{

@@ -17,7 +17,6 @@
 int active_extruder = 0;
 int previous_extruder = -1;
 bool isFilamentLoaded = false;
-bool isPrinting = false;
 
 static const int eject_steps = 2500;
 
@@ -78,8 +77,6 @@ bool feed_filament()
 //! @par new_extruder Filament to be selected
 void switch_extruder_withSensor(int new_extruder)
 {
-	isPrinting = true;
-
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
 	active_extruder = new_extruder;
