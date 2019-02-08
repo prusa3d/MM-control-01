@@ -429,7 +429,7 @@ void process_commands(FILE* inout)
 			unload_filament_withSensor();
 			fprintf_P(inout, PSTR("ok\n"));
 
-			state = S::Printing;
+			state = S::Idle;
 		}
 		else if (sscanf_P(line, PSTR("X%d"), &value) > 0)
 		{
