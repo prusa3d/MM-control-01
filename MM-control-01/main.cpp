@@ -33,7 +33,7 @@ FILE* uart_com = uart1io;
 static bool enterSetup = false;
 static bool signalFilament = false;
 
-void process_commands(FILE* inout);
+static void process_commands(FILE* inout);
 
 static void led_blink(int _no)
 {
