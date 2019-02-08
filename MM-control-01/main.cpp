@@ -56,8 +56,8 @@ enum class S
 //!
 //!   [*] --> Idle : !MiddleButton
 //!   [*] --> Setup : MiddleButton
-//!   Any --> Printing : T<nr>
-//!   Any --> Idle : Unload
+//!   Any --> Printing : T<nr> || Eject
+//!   Any --> Idle : Unload || RecoverEject
 //!   Any --> SignalFilament : Load && filamentLoaded
 //!   Setup --> Idle
 //! }
@@ -496,6 +496,7 @@ void process_commands(FILE* inout)
 			{
 				eject_filament(value);
 				fprintf_P(inout, PSTR("ok\n"));
+				state = S::Printing;
 			}
 		}
 		else if (sscanf_P(line, PSTR("R%d"), &value) > 0)
@@ -504,6 +505,7 @@ void process_commands(FILE* inout)
 			{
 				recover_after_eject();
 				fprintf_P(inout, PSTR("ok\n"));
+				state = S::Idle;
 			}
 		}
 	}
