@@ -84,7 +84,7 @@ static void signal_filament_present()
 
 //! @brief Signal filament presence
 //!
-//! Does nothing, when not enabled by signalFilament == true.
+//! Does nothing, when not in S::SignalFilament state.
 void filament_presence_signaler()
 {
     if (S::SignalFilament == state)
@@ -328,7 +328,7 @@ void manual_extruder_selector()
 void loop()
 {
     process_commands(uart_com);
-    if (S::SignalFilament == state) filament_presence_signaler();
+    filament_presence_signaler();
 
     if (S::Printing != state)
     {

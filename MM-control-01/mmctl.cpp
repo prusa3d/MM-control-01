@@ -510,7 +510,6 @@ void unload_filament_withSensor()
     motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     isFilamentLoaded = false; // filament unloaded
-    filament_presence_signaler();
 }
 
 //! @brief Do 38.20 mm pulley push
