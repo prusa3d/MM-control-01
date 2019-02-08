@@ -43,6 +43,25 @@ enum class S
 }
 
 //! @brief Main MMU state
+//!
+//! @startuml
+//!
+//! title MMU Main State Diagram
+//!
+//! state Any {
+//!   state Idle : Manual extruder selector
+//!   state Setup
+//!   state Printing
+//!   state SignalFilament
+//!
+//!   [*] --> Idle : !MiddleButton
+//!   [*] --> Setup : MiddleButton
+//!   Any --> Printing : T<nr>
+//!   Any --> Idle : Unload
+//!   Any --> SignalFilament : Load && filamentLoaded
+//!   Setup --> Idle
+//! }
+//! @enduml
 static S state;
 
 static void process_commands(FILE* inout);
@@ -84,20 +103,19 @@ static void signal_filament_present()
 
 //! @brief Signal filament presence
 //!
-//! Does nothing, when not in S::SignalFilament state.
-void filament_presence_signaler()
+//! @retval true still present
+//! @retval false not present any more
+bool filament_presence_signaler()
 {
-    if (S::SignalFilament == state)
+    if (digitalRead(A1) == 1)
     {
-        if (digitalRead(A1) == 1)
-        {
-            signal_filament_present();
-        }
-        else
-        {
-            isFilamentLoaded = false;
-            state = S::Idle;
-        }
+        signal_filament_present();
+        return true;
+    }
+    else
+    {
+        isFilamentLoaded = false;
+        return false;
     }
 }
 
@@ -328,28 +346,30 @@ void manual_extruder_selector()
 void loop()
 {
     process_commands(uart_com);
-    filament_presence_signaler();
 
-    if (S::Printing != state)
+    switch (state)
     {
-        if (S::Setup == state)
+    case S::Setup:
+        if (!setupMenu()) state = S::Idle;
+        break;
+    case S::Printing:
+        break;
+    case S::SignalFilament:
+        if (!filament_presence_signaler()) state = S::Idle;
+        break;
+    case S::Idle:
+        manual_extruder_selector();
+        if(Btn::middle == buttonClicked() && active_extruder < 5)
         {
-            if (!setupMenu()) state = S::Idle;
-        }
-        else
-        {
-            manual_extruder_selector();
-            if(Btn::middle == buttonClicked() && active_extruder < 5)
+            shr16_set_led(2 << 2 * (4 - active_extruder));
+            delay(500);
+            if (Btn::middle == buttonClicked())
             {
-                shr16_set_led(2 << 2 * (4 - active_extruder));
-                delay(500);
-                if (Btn::middle == buttonClicked())
-                {
-                    motion_set_idler_selector(active_extruder);
-                    feed_filament();
-                }
+                motion_set_idler_selector(active_extruder);
+                feed_filament();
             }
         }
+        break;
     }
 }
 
