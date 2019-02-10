@@ -15,7 +15,7 @@
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 static bool isIdlerParked = false;
 
-static const int selector_steps_after_homing = -3700;
+static const int selector_steps_after_homing = -3770; // move selector 70 steps further for correct alignment
 static const int idler_steps_after_homing = -130;
 
 static const int selector_steps = 2790/4;
@@ -112,7 +112,7 @@ bool home_selector()
     check_filament_not_present();
 
     tmc2130_init(HOMING_MODE);
-	 
+
     move(0, -100,0); // move a bit in opposite direction
 
 	int _c = 0;
@@ -134,7 +134,7 @@ bool home_selector()
 			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
 		}
 	}
-	
+
 	tmc2130_init(tmc2130_mode);
 
 	move(0, selector_steps_after_homing,0); // move to initial position
@@ -155,7 +155,7 @@ void home()
 
     shr16_set_led(1 << 2 * (4-active_extruder));
 }
- 
+
 
 void move_proportional(int _idler, int _selector)
 {
@@ -176,9 +176,9 @@ void move_proportional(int _idler, int _selector)
 			if (_idler > 0) { idler_step_pin_set(); }
 		}
 		if (_selector > 0) { selector_step_pin_set(); }
-		
+
 		asm("nop");
-		
+
 		if (_idler_pos >= 1)
 		{
 			if (_idler > 0) { idler_step_pin_reset(); _idler--;  }
@@ -207,10 +207,10 @@ void move(int _idler, int _selector, int _pulley)
 	int _acc = 50;
 
 	// gets steps to be done and set direction
-	_idler = set_idler_direction(_idler); 
+	_idler = set_idler_direction(_idler);
 	_selector = set_selector_direction(_selector);
 	_pulley = set_pulley_direction(_pulley);
-	
+
 
 	do
 	{
@@ -248,7 +248,7 @@ int set_idler_direction(int _steps)
 		_steps = _steps * -1;
 		set_idler_dir_down();
 	}
-	else 
+	else
 	{
 		set_idler_dir_up();
 	}
