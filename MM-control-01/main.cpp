@@ -231,12 +231,13 @@ void setup()
         enterSetup = true;
     }
 
+    tmc2130_init(HOMING_MODE);
+    tmc2130_read_gstat(); //consume reset after power up
     uint8_t filament;
     if(FilamentLoaded::get(filament))
     {
         motion_set_idler(filament);
     }
-    tmc2130_read_gstat(); //consume reset after power up
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
