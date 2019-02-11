@@ -11,6 +11,7 @@
 #include "permanent_storage.h"
 #include "pins.h"
 #include "tmc2130.h"
+#include "version.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 static bool isIdlerParked = false;
@@ -75,7 +76,11 @@ bool home_idler()
 	int _c = 0;
 	int _l = 0;
 
+#ifdef FW_12V
+    tmc2130_init(HOMING_STEALTH_MODE);
+#else
 	tmc2130_init(HOMING_MODE);
+#endif
 
 	move(-10, 0, 0); // move a bit in opposite direction
 
@@ -111,7 +116,11 @@ bool home_selector()
     // if FINDA is sensing filament do not home
     check_filament_not_present();
 
+#ifdef FW_12V
+    tmc2130_init(HOMING_STEALTH_MODE);
+#else
     tmc2130_init(HOMING_MODE);
+#endif
 	 
     move(0, -100,0); // move a bit in opposite direction
 

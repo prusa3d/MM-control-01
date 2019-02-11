@@ -22,7 +22,7 @@
 #include "motion.h"
 
 
-uint8_t tmc2130_mode = NORMAL_MODE;
+uint8_t tmc2130_mode = STEALTH_MODE;
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
@@ -217,11 +217,10 @@ void setup()
 
 	spi_init();
 	led_blink(2);
-	led_blink(3);
-
 #ifdef FW_12V
-    tmc2130_init(HOMING_STEALTH_MODE); // trinamic, homing, mk25
+ //   tmc2130_init(HOMING_STEALTH_MODE); // trinamic, homing, mk25
 #endif
+	led_blink(3);
 
 	adc_init(); // ADC
 	led_blink(4);

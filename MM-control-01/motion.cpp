@@ -10,6 +10,7 @@
 #include "config.h"
 #include "tmc2130.h"
 #include "shr16.h"
+#include "version.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
