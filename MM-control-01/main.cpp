@@ -217,9 +217,6 @@ void setup()
 
 	spi_init();
 	led_blink(2);
-#ifdef FW_12V
- //   tmc2130_init(HOMING_STEALTH_MODE); // trinamic, homing, mk25
-#endif
 	led_blink(3);
 
 	adc_init(); // ADC
