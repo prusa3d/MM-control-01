@@ -64,16 +64,22 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dirty.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="permanent_storage.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="timeout.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="version.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stepper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pins.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +98,6 @@
     <ClCompile Include="shr16.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="spi.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tmc2130.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="permanent_storage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

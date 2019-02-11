@@ -106,12 +106,14 @@
     </ClInclude>
     <ClInclude Include="motion.h" />
     <ClInclude Include="permanent_storage.h" />
+    <ClInclude Include="pins.h" />
     <ClInclude Include="shr16.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="spi.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="stepper.h" />
     <ClInclude Include="timeout.h" />
     <ClInclude Include="tmc2130.h">
       <FileType>CppCode</FileType>
@@ -134,7 +136,7 @@
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="permanent_storage.cpp" />
     <ClCompile Include="shr16.c" />
-    <ClCompile Include="spi.c" />
+    <ClCompile Include="stepper.cpp" />
     <ClCompile Include="tmc2130.c" />
     <ClCompile Include="uart.cpp" />
   </ItemGroup>

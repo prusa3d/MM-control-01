@@ -5,6 +5,8 @@
 #include "spi.h"
 #include <stdio.h>
 #include <avr/pgmspace.h>
+#include "pins.h"
+#include "config.h"
 
 #define TMC2130_CS_0 //signal d5  - PC6
 #define TMC2130_CS_1 //signal d6  - PD7
@@ -127,9 +129,9 @@ inline uint16_t __tcoolthrs(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return TMC2130_TCOOLTHRS_0;
-	case 1: return TMC2130_TCOOLTHRS_1;
-	case 2: return TMC2130_TCOOLTHRS_2;
+	case AX_PUL: return TMC2130_TCOOLTHRS_0;
+	case AX_SEL: return TMC2130_TCOOLTHRS_1;
+	case AX_IDL: return TMC2130_TCOOLTHRS_2;
 	}
 	return TMC2130_TCOOLTHRS;
 }
@@ -138,9 +140,9 @@ inline int8_t __sg_thr(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return TMC2130_SG_THR_0;
-	case 1: return TMC2130_SG_THR_1;
-	case 2: return TMC2130_SG_THR_2;
+	case AX_PUL: return TMC2130_SG_THR_0;
+	case AX_SEL: return TMC2130_SG_THR_1;
+	case AX_IDL: return TMC2130_SG_THR_2;
 	}
 	return TMC2130_SG_THR;
 }
@@ -149,9 +151,9 @@ inline int8_t __res(uint8_t axis)
 {
 	switch (axis)
 	{
-	case 0: return tmc2130_usteps2mres((uint16_t)2);
-	case 1: return tmc2130_usteps2mres((uint16_t)2);
-	case 2: return tmc2130_usteps2mres((uint16_t)16);
+	case AX_PUL: return tmc2130_usteps2mres((uint16_t)2);
+	case AX_SEL: return tmc2130_usteps2mres((uint16_t)2);
+	case AX_IDL: return tmc2130_usteps2mres((uint16_t)16);
 	}
 	return 16;
 }
@@ -178,12 +180,11 @@ int8_t tmc2130_init_axis(uint8_t axis, uint8_t mode)
 	uint8_t current_running_stealth[3] = CURRENT_RUNNING_STEALTH;
 	uint8_t current_holding_normal[3] = CURRENT_HOLDING_NORMAL;
 	uint8_t current_holding_stealth[3] = CURRENT_HOLDING_STEALTH;
-	uint8_t current_homing_normal[3] = CURRENT_HOMING_NORMAL;
-	uint8_t current_homing_stealth[3] = CURRENT_HOMING_STEALTH;
+	uint8_t current_homing[3] = CURRENT_HOMING;
 
 	switch (mode) {
-		case HOMING_NORMAL_MODE: ret = tmc2130_init_axis_current_normal(axis, current_holding_normal[axis], current_homing_normal[axis]); break; //drivers in normal mode, homing normal currents
-		case HOMING_STEALTH_MODE: ret = tmc2130_init_axis_current_stealth(axis, current_holding_stealth[axis], current_homing_stealth[axis]); break; //drivers in stealth mode, homing stealth currents
+		case HOMING_MODE: ret = tmc2130_init_axis_current_normal(axis, current_holding_normal[axis], current_homing[axis]); break; //drivers in normal mode, homing currents
+        case HOMING_STEALTH_MODE: ret = tmc2130_init_axis_current_stealth(axis, current_holding_stealth[axis], current_homing[axis]); break; //drivers in stealth mode, homing stealth currents
 		case NORMAL_MODE: ret = tmc2130_init_axis_current_normal(axis, current_holding_normal[axis], current_running_normal[axis]); break; //drivers in normal mode
 		case STEALTH_MODE: ret = tmc2130_init_axis_current_stealth(axis, current_holding_stealth[axis], current_running_stealth[axis]); break; //drivers in stealth mode
 		default: break;
@@ -244,12 +245,12 @@ int8_t tmc2130_init(uint8_t mode)
 	PORTD |= 0x80; //PD7 CSN U6
 	PORTB |= 0x80; //PB7 CSN U7
 
-	DDRD |= 0x10;
-	DDRB |= 0x10;
-	DDRD |= 0x40;
-	PORTD &= ~0x10;	//PD4
-	PORTB &= ~0x10; //PB4
-	PORTD &= ~0x40; //PD6
+	selector_step_pin_init();
+	pulley_step_pin_init();
+	idler_step_pin_init();
+	selector_step_pin_reset(); //PD4
+	pulley_step_pin_reset();   //PB4
+	idler_step_pin_reset();    //PD6
 
 	int8_t ret = 0;
 	
@@ -340,3 +341,27 @@ uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval)
 	return stat;
 }
 
+//! @brief Read global error flags for all axis
+//!
+//! Error is detected if any of following flags is set.
+//!  * reset
+//!    * IC has been reset since the last read access to GSTAT.
+//!      All registers have been cleared to reset values.
+//!  * drv_err
+//!    * Overtemperature or short circuit. Driver  has  been  shut  down.
+//!  * uv_cp
+//!    * Undervoltage on the charge pump. The driver is disabled in this case.
+//!
+//! @retval 0 no error
+//! @retval >0 error, bit flag set for each axis
+uint8_t tmc2130_read_gstat()
+{
+    uint8_t retval = 0;
+    for (uint8_t axis = AX_PUL; axis <= AX_IDL ; ++ axis)
+    {
+        uint32_t result;
+        tmc2130_rd(axis, TMC2130_REG_GSTAT, &result);
+        if (result & 0x7) retval += (1 << axis);
+    }
+    return retval;
+}
