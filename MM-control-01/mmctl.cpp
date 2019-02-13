@@ -234,9 +234,11 @@ static bool checkOk()
 
 void mmctl_checkOk()
 {
+    tmc2130_init_axis(AX_PUL, tmc2130_mode);
     motion_engage_idler();
     checkOk();
     motion_disengage_idler();
+    tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 
 void load_filament_withSensor()
