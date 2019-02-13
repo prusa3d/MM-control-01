@@ -232,13 +232,19 @@ static bool checkOk()
     return _ret;
 }
 
-void mmctl_checkOk()
+//! @brief Can FINDA detect filament tip
+//!
+//! Move filament back and forth to align it by FINDA.
+//! @retval true success
+//! @retval false failure
+bool mmctl_IsOk()
 {
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
     motion_engage_idler();
-    checkOk();
+    const bool retval = checkOk();
     motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+    return retval;
 }
 
 void load_filament_withSensor()
@@ -308,13 +314,7 @@ void load_filament_withSensor()
             }
             else
             {
-                shr16_set_led(0x000);
-                delay(800);
-                shr16_set_led(1 << 2 * (4 - active_extruder));
-                delay(100);
-                shr16_set_led(2 << 2 * (4 - active_extruder));
-                delay(100);
-                delay(800);
+                signal_ok_after_load_failure();
             }
 
             switch (buttonClicked())

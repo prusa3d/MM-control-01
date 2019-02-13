@@ -40,6 +40,7 @@ enum class S
     Printing,
     SignalFilament,
     Wait,
+    WaitOk,
 };
 }
 
@@ -63,6 +64,9 @@ enum class S
 //!   Any --> Wait : W0
 //!   Setup --> Idle
 //!   Wait --> Idle : RightButton
+//!   WaitOk --> Idle : RightButton
+//!   Wait --> WaitOk : MiddleButton && mmctl_IsOk
+//!   WaitOk --> Wait : MiddleButton && !mmctl_IsOk
 //! }
 //! @enduml
 static S state;
@@ -109,6 +113,17 @@ void signal_load_failure()
     shr16_set_led(0x000);
     delay(800);
     shr16_set_led(2 << 2 * (4 - active_extruder));
+    delay(800);
+}
+
+void signal_ok_after_load_failure()
+{
+    shr16_set_led(0x000);
+    delay(800);
+    shr16_set_led(1 << 2 * (4 - active_extruder));
+    delay(100);
+    shr16_set_led(2 << 2 * (4 - active_extruder));
+    delay(100);
     delay(800);
 }
 
@@ -386,7 +401,22 @@ void loop()
         switch(buttonClicked())
         {
         case Btn::middle:
-            mmctl_checkOk();
+            if (mmctl_IsOk()) state = S::WaitOk;
+            break;
+        case Btn::right:
+            state = S::Idle;
+            fprintf_P(uart_com, PSTR("ok\n"));
+            break;
+        default:
+            break;
+        }
+        break;
+    case S::WaitOk:
+        signal_ok_after_load_failure();
+        switch(buttonClicked())
+        {
+        case Btn::middle:
+            if (!mmctl_IsOk()) state = S::Wait;
             break;
         case Btn::right:
             state = S::Idle;
