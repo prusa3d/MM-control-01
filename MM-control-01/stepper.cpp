@@ -95,9 +95,11 @@ bool home_idler()
 		}
 	}
 
+	move(idler_steps_after_homing, 0, 0); // move to initial position
+
 	tmc2130_init(tmc2130_mode);
 
-	move(idler_steps_after_homing, 0, 0); // move to initial position
+	delay(500);
 
     isIdlerParked = false;
 
@@ -134,10 +136,12 @@ bool home_selector()
 			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
 		}
 	}
-	
-	tmc2130_init(tmc2130_mode);
 
 	move(0, selector_steps_after_homing,0); // move to initial position
+
+    tmc2130_init(tmc2130_mode);
+
+	delay(500);
 
 	return true;
 }
