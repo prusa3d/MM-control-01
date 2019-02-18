@@ -383,7 +383,7 @@ void process_commands(FILE* inout)
 			}
 		}
         //! L<nr.> Load filament <nr.>
-		else if (sscanf_P(line, PSTR("L%d"), &value) > 0)
+		else if (sscanf_P(line, PSTR("K%d"), &value) > 0) //debug only, do not commit this line
 		{
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
@@ -474,6 +474,14 @@ void process_commands(FILE* inout)
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
+        else if (sscanf_P(line, PSTR("L%d"), &value) > 0) //debug only, do not commit this line
+        {
+            if ((value >= 0) && (value < EXTRUDERS)) //! K<nr.> cut filament
+            {
+                mmctl_cut_filament(value);
+                fprintf_P(inout, PSTR("ok\n"));
+            }
+        }
 	}
 	else
 	{ //nothing received
