@@ -30,10 +30,48 @@ FILE* uart_com = uart0io;
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
 
-static bool enterSetup = false;
-static bool signalFilament = false;
+namespace
+{
+//! @brief State
+enum class S
+{
+    Idle,
+    Setup,
+    Printing,
+    SignalFilament,
+    Wait,
+    WaitOk,
+};
+}
 
-void process_commands(FILE* inout);
+//! @brief Main MMU state
+//!
+//! @startuml
+//!
+//! title MMU Main State Diagram
+//!
+//! state Any {
+//!   state Idle : Manual extruder selector
+//!   state Setup
+//!   state Printing
+//!   state SignalFilament
+//!
+//!   [*] --> Idle : !MiddleButton
+//!   [*] --> Setup : MiddleButton
+//!   Any --> Printing : T<nr> || Eject
+//!   Any --> Idle : Unload || RecoverEject
+//!   Any --> SignalFilament : Load && filamentLoaded
+//!   Any --> Wait : W0
+//!   Setup --> Idle
+//!   Wait --> Idle : RightButton
+//!   WaitOk --> Idle : RightButton
+//!   Wait --> WaitOk : MiddleButton && mmctl_IsOk
+//!   WaitOk --> Wait : MiddleButton && !mmctl_IsOk
+//! }
+//! @enduml
+static S state;
+
+static void process_commands(FILE* inout);
 
 static void led_blink(int _no)
 {
@@ -70,22 +108,40 @@ static void signal_filament_present()
     delay(300);
 }
 
+void signal_load_failure()
+{
+    shr16_set_led(0x000);
+    delay(800);
+    shr16_set_led(2 << 2 * (4 - active_extruder));
+    delay(800);
+}
+
+void signal_ok_after_load_failure()
+{
+    shr16_set_led(0x000);
+    delay(800);
+    shr16_set_led(1 << 2 * (4 - active_extruder));
+    delay(100);
+    shr16_set_led(2 << 2 * (4 - active_extruder));
+    delay(100);
+    delay(800);
+}
+
 //! @brief Signal filament presence
 //!
-//! Does nothing, when not enabled by signalFilament == true.
-void filament_presence_signaler()
+//! @retval true still present
+//! @retval false not present any more
+bool filament_presence_signaler()
 {
-    if (signalFilament)
+    if (digitalRead(A1) == 1)
     {
-        if (digitalRead(A1) == 1)
-        {
-            signal_filament_present();
-        }
-        else
-        {
-            isFilamentLoaded = false;
-            signalFilament = false;
-        }
+        signal_filament_present();
+        return true;
+    }
+    else
+    {
+        isFilamentLoaded = false;
+        return false;
     }
 }
 
@@ -228,7 +284,7 @@ void setup()
     // check if to goto the settings menu
     if (buttonClicked() == Btn::middle)
     {
-        enterSetup = true;
+        state = S::Setup;
     }
 
     tmc2130_init(HOMING_MODE);
@@ -307,7 +363,7 @@ void manual_extruder_selector()
 
 //! @brief main loop
 //!
-//! It is possible to manually select filament and feed it when not printing.
+//! It is possible to manually select filament and feed it when S::Idle.
 //!
 //! button | action
 //! ------ | ------
@@ -317,28 +373,60 @@ void manual_extruder_selector()
 void loop()
 {
     process_commands(uart_com);
-    filament_presence_signaler();
 
-    if (!isPrinting)
+    switch (state)
     {
-        if (enterSetup)
+    case S::Setup:
+        if (!setupMenu()) state = S::Idle;
+        break;
+    case S::Printing:
+        break;
+    case S::SignalFilament:
+        if (!filament_presence_signaler()) state = S::Idle;
+        break;
+    case S::Idle:
+        manual_extruder_selector();
+        if(Btn::middle == buttonClicked() && active_extruder < 5)
         {
-            enterSetup = setupMenu();
-        }
-        else
-        {
-            manual_extruder_selector();
-            if(Btn::middle == buttonClicked() && active_extruder < 5)
+            shr16_set_led(2 << 2 * (4 - active_extruder));
+            delay(500);
+            if (Btn::middle == buttonClicked())
             {
-                shr16_set_led(2 << 2 * (4 - active_extruder));
-                delay(500);
-                if (Btn::middle == buttonClicked())
-                {
-                    motion_set_idler_selector(active_extruder);
-                    feed_filament();
-                }
+                motion_set_idler_selector(active_extruder);
+                feed_filament();
             }
         }
+        break;
+    case S::Wait:
+        signal_load_failure();
+        switch(buttonClicked())
+        {
+        case Btn::middle:
+            if (mmctl_IsOk()) state = S::WaitOk;
+            break;
+        case Btn::right:
+            state = S::Idle;
+            fprintf_P(uart_com, PSTR("ok\n"));
+            break;
+        default:
+            break;
+        }
+        break;
+    case S::WaitOk:
+        signal_ok_after_load_failure();
+        switch(buttonClicked())
+        {
+        case Btn::middle:
+            if (!mmctl_IsOk()) state = S::Wait;
+            break;
+        case Btn::right:
+            state = S::Idle;
+            fprintf_P(uart_com, PSTR("ok\n"));
+            break;
+        default:
+            break;
+        }
+        break;
     }
 }
 
@@ -378,6 +466,7 @@ void process_commands(FILE* inout)
 		{
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
+			    state = S::Printing;
 				switch_extruder_withSensor(value);
 				fprintf_P(inout, PSTR("ok\n"));
 			}
@@ -387,7 +476,7 @@ void process_commands(FILE* inout)
 		{
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
-			    if (isFilamentLoaded) signalFilament = true;
+			    if (isFilamentLoaded) state = S::SignalFilament;
 			    else
 			    {
                     select_extruder(value);
@@ -417,7 +506,7 @@ void process_commands(FILE* inout)
 			unload_filament_withSensor();
 			fprintf_P(inout, PSTR("ok\n"));
 
-			isPrinting = false;
+			state = S::Idle;
 		}
 		else if (sscanf_P(line, PSTR("X%d"), &value) > 0)
 		{
@@ -464,6 +553,7 @@ void process_commands(FILE* inout)
 			{
 				eject_filament(value);
 				fprintf_P(inout, PSTR("ok\n"));
+				state = S::Printing;
 			}
 		}
 		else if (sscanf_P(line, PSTR("R%d"), &value) > 0)
@@ -472,8 +562,16 @@ void process_commands(FILE* inout)
 			{
 				recover_after_eject();
 				fprintf_P(inout, PSTR("ok\n"));
+				state = S::Idle;
 			}
 		}
+        else if (sscanf_P(line, PSTR("W%d"), &value) > 0)
+        {
+            if (value == 0) //! W0 Wait for user click
+            {
+                state = S::Wait;
+            }
+        }
 	}
 	else
 	{ //nothing received

@@ -6,7 +6,6 @@
 
 #include <inttypes.h>
 
-extern bool isPrinting;
 extern int active_extruder;
 extern int previous_extruder;
 extern bool isFilamentLoaded;
@@ -19,5 +18,6 @@ void load_filament_inPrinter();
 void unload_filament_withSensor();
 void eject_filament(uint8_t filament);
 void recover_after_eject();
+bool mmctl_IsOk();
 
 #endif //_MMCTL_H
