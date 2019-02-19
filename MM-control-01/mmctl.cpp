@@ -17,7 +17,6 @@
 int active_extruder = 0;
 int previous_extruder = -1;
 bool isFilamentLoaded = false;
-bool isPrinting = false;
 
 static const int eject_steps = 2500;
 
@@ -78,8 +77,6 @@ bool feed_filament()
 //! @par new_extruder Filament to be selected
 void switch_extruder_withSensor(int new_extruder)
 {
-	isPrinting = true;
-
 	shr16_set_led(2 << 2 * (4 - active_extruder));
 
 	active_extruder = new_extruder;
@@ -170,7 +167,7 @@ void recover_after_eject()
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 }
 
-bool checkOk()
+static bool checkOk()
 {
     bool _ret = false;
     int _steps = 0;
@@ -235,6 +232,21 @@ bool checkOk()
     return _ret;
 }
 
+//! @brief Can FINDA detect filament tip
+//!
+//! Move filament back and forth to align it by FINDA.
+//! @retval true success
+//! @retval false failure
+bool mmctl_IsOk()
+{
+    tmc2130_init_axis(AX_PUL, tmc2130_mode);
+    motion_engage_idler();
+    const bool retval = checkOk();
+    motion_disengage_idler();
+    tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+    return retval;
+}
+
 void load_filament_withSensor()
 {
     FilamentLoaded::set(active_extruder);
@@ -296,20 +308,14 @@ void load_filament_withSensor()
         motion_disengage_idler();
         do
         {
-            shr16_set_led(0x000);
-            delay(800);
             if (!_isOk)
             {
-                shr16_set_led(2 << 2 * (4 - active_extruder));
+                signal_load_failure();
             }
             else
             {
-                shr16_set_led(1 << 2 * (4 - active_extruder));
-                delay(100);
-                shr16_set_led(2 << 2 * (4 - active_extruder));
-                delay(100);
+                signal_ok_after_load_failure();
             }
-            delay(800);
 
             switch (buttonClicked())
             {
@@ -513,7 +519,6 @@ void unload_filament_withSensor()
     motion_disengage_idler();
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     isFilamentLoaded = false; // filament unloaded
-    filament_presence_signaler();
 }
 
 //! @brief Do 38.20 mm pulley push

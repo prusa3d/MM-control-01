@@ -16,7 +16,7 @@
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 static bool isIdlerParked = false;
 
-static const int selector_steps_after_homing = -3770;
+static const int selector_steps_after_homing = -3700;
 static const int idler_steps_after_homing = -130;
 
 static const int selector_steps = 2790/4;
@@ -100,11 +100,11 @@ bool home_idler()
 		}
 	}
 
-    move(idler_steps_after_homing, 0, 0); // move to initial position
+	move(idler_steps_after_homing, 0, 0); // move to initial position
 
 	tmc2130_init(tmc2130_mode);
 
-    delay(500);
+	delay(500);
 
     isIdlerParked = false;
 
@@ -146,11 +146,11 @@ bool home_selector()
 		}
 	}
 
-    move(0, selector_steps_after_homing, 0); // move to initial position
+	move(0, selector_steps_after_homing,0); // move to initial position
 
-	tmc2130_init(tmc2130_mode);
+    tmc2130_init(tmc2130_mode);
 
-    delay(500);
+	delay(500);
 
 	return true;
 }
