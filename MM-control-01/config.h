@@ -84,9 +84,8 @@
 
 //mode
 #define HOMING_MODE 0
-#define HOMING_STEALTH_MODE 1
-#define NORMAL_MODE 2
-#define STEALTH_MODE 3
+#define NORMAL_MODE 1
+#define STEALTH_MODE 2
 
 //ADC configuration
 #define ADC_CHAN_MSK      0b0000000000100000 //used AD channels bit mask (ADC5)

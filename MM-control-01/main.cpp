@@ -22,7 +22,7 @@
 #include "motion.h"
 
 
-uint8_t tmc2130_mode = STEALTH_MODE;
+uint8_t tmc2130_mode = NORMAL_MODE;
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
@@ -287,7 +287,7 @@ void setup()
         state = S::Setup;
     }
 
-    tmc2130_init(HOMING_STEALTH_MODE);
+    tmc2130_init(HOMING_MODE);
     tmc2130_read_gstat(); //consume reset after power up
     uint8_t filament;
     if(FilamentLoaded::get(filament))

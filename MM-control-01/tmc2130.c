@@ -184,7 +184,6 @@ int8_t tmc2130_init_axis(uint8_t axis, uint8_t mode)
 
 	switch (mode) {
 		case HOMING_MODE: ret = tmc2130_init_axis_current_normal(axis, current_holding_normal[axis], current_homing[axis]); break; //drivers in normal mode, homing currents
-        case HOMING_STEALTH_MODE: ret = tmc2130_init_axis_current_stealth(axis, current_holding_stealth[axis], current_homing[axis]); break; //drivers in stealth mode, homing stealth currents
 		case NORMAL_MODE: ret = tmc2130_init_axis_current_normal(axis, current_holding_normal[axis], current_running_normal[axis]); break; //drivers in normal mode
 		case STEALTH_MODE: ret = tmc2130_init_axis_current_stealth(axis, current_holding_stealth[axis], current_running_stealth[axis]); break; //drivers in stealth mode
 		default: break;
