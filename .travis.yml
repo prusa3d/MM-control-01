@@ -12,8 +12,9 @@ script:
 deploy:
   provider: releases
   api_key: $ACCESS_TOKEN
-  file: ../MM-control-01-build/MM-control-01.hex
-  file: MM-control-01_with_bootloader.hex
+  file:
+    - ../MM-control-01-build/MM-control-01.hex
+    - MM-control-01_with_bootloader.hex
   skip_cleanup: true
   on:
     tags: true
