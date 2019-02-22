@@ -7,7 +7,6 @@
 #include <inttypes.h>
 
 extern int active_extruder;
-extern int previous_extruder;
 extern bool isFilamentLoaded;
 
 void switch_extruder_withSensor(int new_extruder);
