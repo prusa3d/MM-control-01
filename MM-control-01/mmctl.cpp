@@ -19,7 +19,7 @@ int previous_extruder = -1;
 bool isFilamentLoaded = false;
 
 static const int eject_steps = 2500;
-static const int cut_steps_pre = 600;
+static const int cut_steps_pre = 700;
 static const int cut_steps_post = 150;
 
 void feed_filament()
