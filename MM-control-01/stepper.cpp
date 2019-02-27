@@ -115,14 +115,12 @@ bool home_selector()
 
     tmc2130_init(HOMING_MODE);
 
-    move(0, -100,0); // move a bit in opposite direction
-
 	int _c = 0;
 	int _l = 2;
 
 	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
 	{
-		move(0, (c*20) * -1,0);
+		move(0, c * -18, 0);
 		delay(50);
 		for (int i = 0; i < 4000; i++)
 		{
