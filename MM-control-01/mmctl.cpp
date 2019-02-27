@@ -125,6 +125,7 @@ void mmctl_cut_filament(uint8_t filament)
 
     if (isFilamentLoaded)  unload_filament_withSensor();
 
+    feed_filament();
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
     motion_set_idler_selector(filament, filament + 1);
