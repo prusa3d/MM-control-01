@@ -120,7 +120,7 @@ bool home_selector()
 	int _c = 0;
 	int _l = 2;
 
-	for (int c = 5; c > 0; c--)   // not really functional, let's do it rather more times to be sure
+	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
 	{
 		move(0, (c*20) * -1,0);
 		delay(50);
