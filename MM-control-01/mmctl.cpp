@@ -15,7 +15,6 @@
 #include "config.h"
 
 int active_extruder = 0;
-int previous_extruder = -1;
 bool isFilamentLoaded = false;
 
 static const int eject_steps = 2500;
@@ -502,7 +501,7 @@ void unload_filament_withSensor()
 
         } while (!_continue);
 
-        shr16_set_led(1 << 2 * (4 - previous_extruder));
+        shr16_set_led(1 << 2 * (4 - active_extruder));
         motion_engage_idler();
     }
     else
