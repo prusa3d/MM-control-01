@@ -572,6 +572,14 @@ void process_commands(FILE* inout)
                 state = S::Wait;
             }
         }
+        else if (sscanf_P(line, PSTR("K%d"), &value) > 0)
+        {
+            if ((value >= 0) && (value < EXTRUDERS)) //! K<nr.> cut filament
+            {
+                mmctl_cut_filament(value);
+                fprintf_P(inout, PSTR("ok\n"));
+            }
+        }
 	}
 	else
 	{ //nothing received

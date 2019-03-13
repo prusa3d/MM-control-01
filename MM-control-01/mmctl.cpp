@@ -15,12 +15,13 @@
 #include "config.h"
 
 int active_extruder = 0;
-int previous_extruder = -1;
 bool isFilamentLoaded = false;
 
 static const int eject_steps = 2500;
+static const int cut_steps_pre = 700;
+static const int cut_steps_post = 150;
 
-bool feed_filament()
+void feed_filament()
 {
 	bool _feed = true;
 	bool _loaded = false;
@@ -64,7 +65,6 @@ bool feed_filament()
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 	motion_disengage_idler();
 	shr16_set_led(1 << 2 * (4 - active_extruder));
-	return true;
 }
 
 //! @brief Change filament
@@ -116,6 +116,42 @@ void select_extruder(int new_extruder)
 	shr16_set_led(0x000);
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 }
+//! @brief cut filament
+//! @par filament filament 0 to 4
+void mmctl_cut_filament(uint8_t filament)
+{
+    active_extruder = filament;
+
+    if (isFilamentLoaded)  unload_filament_withSensor();
+
+    feed_filament();
+    tmc2130_init_axis(AX_PUL, tmc2130_mode);
+
+    motion_set_idler_selector(filament, filament + 1);
+
+    motion_engage_idler();
+    set_pulley_dir_push();
+
+    for (int steps = 0; steps < cut_steps_pre; ++steps)
+    {
+        do_pulley_step();
+        steps++;
+        delayMicroseconds(1500);
+    }
+    motion_set_idler_selector(filament, 0);
+    set_pulley_dir_pull();
+
+    for (int steps = 0; steps < cut_steps_post; ++steps)
+    {
+        do_pulley_step();
+        steps++;
+        delayMicroseconds(1500);
+    }
+    motion_set_idler_selector(filament, 5);
+    motion_set_idler_selector(filament, 0);
+    motion_set_idler_selector(filament, filament);
+    feed_filament();
+}
 
 //! @brief eject filament
 //! Move selector sideways and push filament forward little bit, so user can catch it,
@@ -124,6 +160,7 @@ void select_extruder(int new_extruder)
 //! If we are want to eject fil 0-2, move selector to position 4 (right),
 //! if we want to eject filament 3 - 4, move selector to position 0 (left)
 //! maybe we can also move selector to service position in the future?
+//! @par filament filament 0 to 4
 void eject_filament(uint8_t filament)
 {
     active_extruder = filament;
@@ -502,7 +539,7 @@ void unload_filament_withSensor()
 
         } while (!_continue);
 
-        shr16_set_led(1 << 2 * (4 - previous_extruder));
+        shr16_set_led(1 << 2 * (4 - active_extruder));
         motion_engage_idler();
     }
     else
