@@ -8,7 +8,7 @@
 #include "permanent_storage.h"
 #include "main.h"
 
-const int ButtonPin = A2;
+
 
 void settings_bowden_length();
 
@@ -210,14 +210,8 @@ void settings_bowden_length()
 //! @brief Is button pushed?
 //!
 //! @return button pushed
-Btn buttonClicked()
-{
-	int raw = analogRead(ButtonPin);
+// moved to shr16
+/*
 
-	if (raw < 50) return Btn::right;
-	if (raw > 80 && raw < 100) return Btn::middle;
-	if (raw > 160 && raw < 180) return Btn::left;
-
-	return Btn::none;
-}
+*/
 

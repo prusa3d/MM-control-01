@@ -1,0 +1,442 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.CPP</ToolchainName>
+    <ProjectGuid>dce6c7e3-ee26-4d79-826b-08594b9ad897</ProjectGuid>
+    <avrdevice>ATmega32U4</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>CPP</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>MM-control-01</AssemblyName>
+    <Name>MM-control-01</Name>
+    <RootNamespace>MM-control-01</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <ResetRule>0</ResetRule>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <EraseKey />
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.38.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
+    <avrtoolserialnumber>J41800090319</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9587</avrdeviceexpectedsignature>
+    <com_atmel_avrdbg_tool_atmelice>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.atmelice</ToolType>
+      <ToolNumber>J41800090319</ToolNumber>
+      <ToolName>Atmel-ICE</ToolName>
+    </com_atmel_avrdbg_tool_atmelice>
+    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterfaceclock>125000</avrtoolinterfaceclock>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+        <avrgcc.common.Device>-mmcu=atmega32u4 -B "%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\gcc\dev\atmega32u4"</avrgcc.common.Device>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=16000000</Value>
+            <Value>ARDUINO=10805</Value>
+            <Value>ARDUINO_AVR_prusa_mm_control</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2c99</Value>
+            <Value>USB_PID=0x0004</Value>
+            <Value>USB_MANUFACTURER="\"Unknown\""</Value>
+            <Value>USB_PRODUCT="\"Original Prusa i3 MK3 Multi Material 2.0 upgrade\""</Value>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../Arudino</Value>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -flto -fno-fat-lto-objects</avrgcc.compiler.miscellaneous.OtherFlags>
+        <avrgcc.compiler.miscellaneous.Verbose>True</avrgcc.compiler.miscellaneous.Verbose>
+        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=16000000</Value>
+            <Value>ARDUINO=10805</Value>
+            <Value>ARDUINO_AVR_prusa_mm_control</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2c99</Value>
+            <Value>USB_PID=0x0004</Value>
+            <Value>USB_MANUFACTURER="\"Unknown\""</Value>
+            <Value>USB_PRODUCT="\"Original Prusa i3 MK3 Multi Material 2.0 upgrade\""</Value>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcccpp.compiler.symbols.DefSymbols>
+        <avrgcccpp.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../Arudino</Value>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcccpp.compiler.directories.IncludePaths>
+        <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=c++17 -fno-exceptions -fno-threadsafe-statics -flto -fno-fat-lto-objects</avrgcccpp.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.compiler.miscellaneous.Verbose>True</avrgcccpp.compiler.miscellaneous.Verbose>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+        <avrgcccpp.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcccpp.assembler.general.IncludePaths>
+      </AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+        <avrgcc.common.Device>-mmcu=atmega32u4 -B "%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\gcc\dev\atmega32u4"</avrgcc.common.Device>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=16000000</Value>
+            <Value>ARDUINO=10805</Value>
+            <Value>ARDUINO_AVR_prusa_mm_control</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2c99</Value>
+            <Value>USB_PID=0x0004</Value>
+            <Value>USB_MANUFACTURER="\"Unknown\""</Value>
+            <Value>USB_PRODUCT="\"Original Prusa i3 MK3 Multi Material 2.0 upgrade\""</Value>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../Arudino</Value>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -flto -fno-fat-lto-objects</avrgcc.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=16000000</Value>
+            <Value>ARDUINO=10805</Value>
+            <Value>ARDUINO_AVR_prusa_mm_control</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2c99</Value>
+            <Value>USB_PID=0x0004</Value>
+            <Value>USB_MANUFACTURER="\"Unknown\""</Value>
+            <Value>USB_PRODUCT="\"Original Prusa i3 MK3 Multi Material 2.0 upgrade\""</Value>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcccpp.compiler.symbols.DefSymbols>
+        <avrgcccpp.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../Arudino</Value>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcccpp.compiler.directories.IncludePaths>
+        <avrgcccpp.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=c++17 -fno-exceptions -fno-threadsafe-statics -flto -fno-fat-lto-objects</avrgcccpp.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.compiler.miscellaneous.Verbose>True</avrgcccpp.compiler.miscellaneous.Verbose>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+        <avrgcccpp.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcccpp.assembler.general.IncludePaths>
+        <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
+      </AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="abtn3.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="abtn3.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\abi.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Arduino.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\binary.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\CDC.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\ErriezTM1637.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\ErriezTM1637.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial0.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial1.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial2.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial3.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\HardwareSerial_private.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\hooks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\IPAddress.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\IPAddress.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\main.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\new.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\new.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\pins_arduino.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\PluggableUSB.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\PluggableUSB.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Print.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Print.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Printable.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Stream.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Stream.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\Tone.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\USBAPI.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\USBCore.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\USBCore.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\USBDesc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\WCharacter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\WInterrupts.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring_analog.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring_digital.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring_private.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring_pulse.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\wiring_shift.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\WMath.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\WString.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Arudino\WString.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Buttons.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Buttons.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="config.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="diag.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="diag.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="mmctl.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="mmctl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="motion.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="motion.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="permanent_storage.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="permanent_storage.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="shr16.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="shr16.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timeout.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tmc2130.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tmc2130.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="uart.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="version.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Arudino" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
