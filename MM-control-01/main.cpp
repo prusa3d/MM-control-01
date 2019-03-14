@@ -149,14 +149,17 @@ void check_filament_not_present()
 //! @n b - blinking
 void setup()
 {
-    permanentStorageInit();
+		uart0_init(); //uart0
+		uart1_init(); //uart1
+		Serial1.println("This works, me think");
+   // permanentStorageInit();
 	shr16_init(); // shift register
 	led_blink(0);
 
-	uart0_init(); //uart0
-	uart1_init(); //uart1
+	//uart0_init(); //uart0
+	//uart1_init(); //uart1
 	led_blink(1);
-
+	
 #if (UART_STD == 0)
 	stdin = uart0io; // stdin = uart0
 	stdout = uart0io; // stdout = uart0

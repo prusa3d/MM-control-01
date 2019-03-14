@@ -572,7 +572,7 @@ bool home_idler(bool toLastFilament)
 		{
 			move(1, 0,0);
 			delayMicroseconds(100);
-			tmc2130_read_sg(0);
+			tmc2130_read_sg(0); // ... why?
 
 			_c++;
 			if (i == 1000) { _l++; }
@@ -637,7 +637,7 @@ void home()
 	
 	shr16_set_led(0x155);
 
-	shr16_set_led(0x000);
+	shr16_set_led(0x000); // what does this do?
 	
 	shr16_set_led(1 << 2 * (4-active_extruder));
 

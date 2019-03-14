@@ -7,10 +7,6 @@
 #include "config.h"
 
 
-#if defined(__cplusplus)
-extern "C" {
-#endif //defined(__cplusplus)
-
 
 #ifdef _DIAG
 
@@ -21,8 +17,6 @@ extern int8_t cmd_diag_tmc(FILE* inout, uint8_t axis);
 #endif //_DIAG
 
 
-#if defined(__cplusplus)
-}
-#endif //defined(__cplusplus)
+
 #endif //_DIAG_H
 
