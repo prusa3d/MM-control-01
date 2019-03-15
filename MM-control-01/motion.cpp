@@ -134,7 +134,7 @@ static void unload_to_finda()
         if (_unloadSteps < _second_point && _unloadSteps > 5000)
         {
             if (_speed > 550) _speed = _speed - 1;
-            if (_speed > 250 && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
+            if (_speed > 330 && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
         }
 
         delayMicroseconds(_speed);
