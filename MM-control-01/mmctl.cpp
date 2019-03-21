@@ -45,7 +45,7 @@ void feed_filament()
 		if (_c > 100) { shr16_set_led(0x000); _c = 0; _delay++; };
 
 		if (digitalRead(A1) == 1) { _loaded = true; _feed = false; };
-		if (buttonClicked() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
+		if (buttonPressed() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
 		delayMicroseconds(4000);
 	} while (_feed);
 
@@ -354,7 +354,7 @@ void load_filament_withSensor()
                 signal_ok_after_load_failure();
             }
 
-            switch (buttonClicked())
+            switch (buttonPressed())
             {
                 case Btn::left:
                     // just move filament little bit
@@ -501,7 +501,7 @@ void unload_filament_withSensor()
             delay(100);
 
 
-            switch (buttonClicked())
+            switch (buttonPressed())
             {
             case Btn::left:
                 // just move filament little bit

@@ -172,7 +172,7 @@ void check_filament_not_present()
 {
     while (digitalRead(A1) == 1)
     {
-        while (Btn::right != buttonClicked())
+        while (Btn::right != buttonPressed())
         {
             if (digitalRead(A1) == 1)
             {
@@ -282,7 +282,7 @@ void setup()
 	shr16_set_led(0x000);
 
     // check if to goto the settings menu
-    if (buttonClicked() == Btn::middle)
+    if (buttonPressed() == Btn::middle)
     {
         state = S::Setup;
     }
@@ -330,11 +330,11 @@ void manual_extruder_selector()
 {
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 
-	if ((Btn::left|Btn::right) & buttonClicked())
+	if ((Btn::left|Btn::right) & buttonPressed())
 	{
 		delay(500);
 
-		switch (buttonClicked())
+		switch (buttonPressed())
 		{
 		case Btn::right:
 			if (active_extruder < 5)
@@ -386,11 +386,11 @@ void loop()
         break;
     case S::Idle:
         manual_extruder_selector();
-        if(Btn::middle == buttonClicked() && active_extruder < 5)
+        if(Btn::middle == buttonPressed() && active_extruder < 5)
         {
             shr16_set_led(2 << 2 * (4 - active_extruder));
             delay(500);
-            if (Btn::middle == buttonClicked())
+            if (Btn::middle == buttonPressed())
             {
                 motion_set_idler_selector(active_extruder);
                 feed_filament();
@@ -399,7 +399,7 @@ void loop()
         break;
     case S::Wait:
         signal_load_failure();
-        switch(buttonClicked())
+        switch(buttonPressed())
         {
         case Btn::middle:
             if (mmctl_IsOk()) state = S::WaitOk;
@@ -414,7 +414,7 @@ void loop()
         break;
     case S::WaitOk:
         signal_ok_after_load_failure();
-        switch(buttonClicked())
+        switch(buttonPressed())
         {
         case Btn::middle:
             if (!mmctl_IsOk()) state = S::Wait;

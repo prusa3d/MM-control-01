@@ -26,11 +26,11 @@ bool settings_select_filament()
 {
     manual_extruder_selector();
 
-    if(Btn::middle == buttonClicked())
+    if(Btn::middle == buttonPressed())
     {
         shr16_set_led(2 << 2 * (4 - active_extruder));
         delay(500);
-        if (Btn::middle == buttonClicked())
+        if (Btn::middle == buttonPressed())
         {
             motion_set_idler_selector(active_extruder);
             if (active_extruder < 5) settings_bowden_length();
@@ -98,7 +98,7 @@ bool setupMenu()
         shr16_set_led(2 << 2 * _menu);
         delay(1);
 
-        switch (buttonClicked())
+        switch (buttonPressed())
         {
         case Btn::right:
             if (_menu > 0) { _menu--; delay(800); }
@@ -188,7 +188,7 @@ void settings_bowden_length()
 		do
 		{
 
-			switch (buttonClicked())
+			switch (buttonPressed())
 			{
 			case Btn::right:
 				if (!button_active || (((millis() - saved_millis) > 1000) && button_active)) {
@@ -232,7 +232,7 @@ void settings_bowden_length()
 			delay(50);
 
 
-		} while (buttonClicked() != Btn::middle);
+		} while (buttonPressed() != Btn::middle);
 
 		unload_filament_withSensor();
 	}
@@ -241,7 +241,7 @@ void settings_bowden_length()
 //! @brief Is button pushed?
 //!
 //! @return button pushed
-Btn buttonClicked()
+Btn buttonPressed()
 {
 	int raw = analogRead(ButtonPin);
 
