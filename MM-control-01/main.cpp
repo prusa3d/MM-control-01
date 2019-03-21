@@ -399,7 +399,7 @@ void loop()
         break;
     case S::Wait:
         signal_load_failure();
-        switch(buttonPressed())
+        switch(buttonClicked())
         {
         case Btn::middle:
             if (mmctl_IsOk()) state = S::WaitOk;
@@ -414,7 +414,7 @@ void loop()
         break;
     case S::WaitOk:
         signal_ok_after_load_failure();
-        switch(buttonPressed())
+        switch(buttonClicked())
         {
         case Btn::middle:
             if (!mmctl_IsOk()) state = S::Wait;

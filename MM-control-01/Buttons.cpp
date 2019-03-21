@@ -238,9 +238,9 @@ void settings_bowden_length()
 	}
 }
 
-//! @brief Is button pushed?
+//! @brief Is button pressed?
 //!
-//! @return button pushed
+//! @return button pressed
 Btn buttonPressed()
 {
 	int raw = analogRead(ButtonPin);
@@ -252,3 +252,16 @@ Btn buttonPressed()
 	return Btn::none;
 }
 
+//! @brief Was button clicked?
+//!
+//! If is buttonPressed, waits until it is released.
+//! @return button clicked
+Btn buttonClicked()
+{
+    Btn retVal = buttonPressed();
+    if (retVal != Btn::none)
+    {
+        while (buttonPressed() != Btn::none);
+    }
+    return retVal;
+}
