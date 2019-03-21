@@ -114,7 +114,7 @@ void motion_disengage_idler()
 //! @brief unload until FINDA senses end of the filament
 static void unload_to_finda()
 {
-    int _speed = 2000;
+    int delay = 2000; //microstep period in microseconds
     const int _first_point = 1800;
 
     uint8_t _endstop_hit = 0;
@@ -129,15 +129,15 @@ static void unload_to_finda()
         do_pulley_step();
         _unloadSteps--;
 
-        if (_unloadSteps < 1400 && _speed < 6000) _speed = _speed + 3;
-        if (_unloadSteps < _first_point && _speed < 2500) _speed = _speed + 2;
+        if (_unloadSteps < 1400 && delay < 6000) delay += 3;
+        if (_unloadSteps < _first_point && delay < 2500) delay += 2;
         if (_unloadSteps < _second_point && _unloadSteps > 5000)
         {
-            if (_speed > 550) _speed = _speed - 1;
-            if (_speed > 330 && (NORMAL_MODE == tmc2130_mode)) _speed = _speed - 1;
+            if (delay > 550) delay -= 1;
+            if (delay > 330 && (NORMAL_MODE == tmc2130_mode)) delay -= 1;
         }
 
-        delayMicroseconds(_speed);
+        delayMicroseconds(delay);
         if (digitalRead(A1) == 0) _endstop_hit++;
 
     }
@@ -145,7 +145,7 @@ static void unload_to_finda()
 
 void motion_feed_to_bondtech()
 {
-    int _speed = 4500;
+    int stepPeriod = 4500; //microstep period in microseconds
     const uint16_t steps = BowdenLength::get();
 
     const uint8_t tries = 2;
@@ -161,12 +161,12 @@ void motion_feed_to_bondtech()
 
             if (i < 4000)
             {
-                if (_speed > 2600) _speed = _speed - 4;
-                if (_speed > 1300) _speed = _speed - 2;
-                if (_speed > 650) _speed = _speed - 1;
-                if (_speed > 350 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) _speed = _speed - 1;
+                if (stepPeriod > 2600) stepPeriod -= 4;
+                if (stepPeriod > 1300) stepPeriod -= 2;
+                if (stepPeriod > 650) stepPeriod -= 1;
+                if (stepPeriod > 350 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) stepPeriod -= 1;
             }
-            if (i > (steps - 800) && _speed < 2600) _speed = _speed + 10;
+            if (i > (steps - 800) && stepPeriod < 2600) stepPeriod += 10;
             if ('A' == getc(uart_com))
             {
                 s_has_door_sensor = true;
@@ -175,7 +175,7 @@ void motion_feed_to_bondtech()
                 return;
             }
             do_pulley_step();
-            delay = _speed - (micros() - now);
+            delay = stepPeriod - (micros() - now);
         }
 
         if (!tmc2130_read_gstat()) break;
