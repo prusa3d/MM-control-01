@@ -5,38 +5,6 @@
 #include "mmctl.h"
 
 
-
-=======
-//! @brief EEPROM data layout
-//!
-//! Do not remove, reorder or change size of existing fields.
-//! Otherwise values stored with previous version of firmware would be broken.
-//! It is possible to add fields in the end of this struct, ensure that erased EEPROM is handled well.
-//! Last byte in EEPROM is reserved for layoutVersion. If some field is repurposed, layoutVersion
-//! needs to be changed to force EEPROM erase.
-typedef struct __attribute__ ((packed))
-{
-	uint8_t eepromLengthCorrection; //!< legacy bowden length correction
-	uint16_t eepromBowdenLen[5];    //!< Bowden length for each filament
-	uint8_t eepromFilamentStatus[3];//!< Majority vote status of eepromFilament wear leveling
-	uint8_t eepromFilament[800];    //!< Top nibble status, bottom nibble last filament loaded
-	uint8_t eepromDriveErrorCountH;
-	uint8_t eepromDriveErrorCountL[2];
-}eeprom_t;
-static_assert(sizeof(eeprom_t) - 2 <= E2END, "eeprom_t doesn't fit into EEPROM available.");
-//! @brief EEPROM layout version
-static const uint8_t layoutVersion = 0xff;
-
-//d = 6.3 mm        pulley diameter
-//c = pi * d        pulley circumference
-//FSPR = 200        full steps per revolution (stepper motor constant) (1.8 deg/step)
-//mres = 2          pulley microstep resolution (uint8_t __res(AX_PUL))
-//mres = 2          selector microstep resolution (uint8_t __res(AX_SEL))
-//mres = 16         idler microstep resolution (uint8_t __res(AX_IDL))
-//1 pulley ustep = (d*pi)/(mres*FSPR) = 49.48 um
-
-
-
 void permanentStorageInit()
 {
     if (eeprom_read_byte((uint8_t*)E2END) != layoutVersion) eepromEraseAll();

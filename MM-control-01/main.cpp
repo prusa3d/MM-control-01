@@ -283,23 +283,19 @@ void setup()
 	shr16_set_led(0x000);
 
 
-	init_Pulley();
+	// check if to goto the settings menu
+	if (buttonClicked() == Btn::middle)
+	{
+	  state = S::Setup;
+	}
 
-	home_idler(true);
-
-  // check if to goto the settings menu
-  if (buttonClicked() == Btn::middle)
-  {
-      state = S::Setup;
-  }
-
-  tmc2130_init(HOMING_MODE);
-  tmc2130_read_gstat(); //consume reset after power up
-  uint8_t filament;
-  if(FilamentLoaded::get(filament))
-  {
-      motion_set_idler(filament);
-  }
+	tmc2130_init(HOMING_MODE);
+	tmc2130_read_gstat(); //consume reset after power up
+	uint8_t filament;
+	if(FilamentLoaded::get(filament))
+	{
+	  motion_set_idler(filament);
+	}
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
@@ -687,7 +683,12 @@ void process_commands(FILE* inout)
 		{
 			if (pbowdenLength != 0 && pbowdenLength->increase() && isFilamentLoaded)
 			{
-				move(0, 0, pbowdenLength->stepSize);
+				set_pulley_dir_push();
+				for(auto i = pbowdenLength->stepSize; i > 0; --i)
+				{
+					delayMicroseconds(1200);
+					do_pulley_step();
+				}
 				delay(400);
 				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
 			}
@@ -699,7 +700,13 @@ void process_commands(FILE* inout)
 		{
 			if (pbowdenLength != 0 && pbowdenLength->decrease() && isFilamentLoaded)
 			{
-				move(0, 0, -pbowdenLength->stepSize);
+				set_pulley_dir_pull();
+
+				for(auto i = pbowdenLength->stepSize; i > 0; --i)
+				{
+					delayMicroseconds(1200);
+					do_pulley_step();
+				}
 				delay(400);
 				fprintf_P(uart0io,PSTR("Dec: %d\r\n"),pbowdenLength->m_length);
 			}
