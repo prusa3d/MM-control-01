@@ -13,7 +13,7 @@ if [ ! -f "MM-build-env-Linux64-$BUILD_ENV.zip" ]; then
 fi
 
 if [ ! -d "../../MM-build-env-$BUILD_ENV" ]; then
-    unzip MM-build-env-Linux64-$BUILD_ENV.zip -d ../../MM-build-env-$BUILD_ENV || exit 4
+    unzip -q MM-build-env-Linux64-$BUILD_ENV.zip -d ../../MM-build-env-$BUILD_ENV || exit 4
 fi
 
 cd ../../MM-build-env-$BUILD_ENV || exit 5

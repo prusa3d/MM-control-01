@@ -12,14 +12,7 @@
 /.vs/MM-control-01/v14/.suo
 /main.cpp~RFdf1346e.TMP
 /__vm/.MM-control-01.vsarduino.h
-<<<<<<< HEAD
-Doc
-.pioenvs
-.piolibdeps
-.vscode/.browse.c_cpp.db*
-.vscode/c_cpp_properties.json
-.vscode/launch.json
-=======
 Doc
 /build-env
->>>>>>> bc59706cac5a93a12332a46f4ec1df93b3c0fc9e
+/MM-control-01/*.hex
+/MM-control-01/version.h

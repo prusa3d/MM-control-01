@@ -4,7 +4,6 @@
 
 #include <inttypes.h>
 #include <stdio.h>
-#include "config.h"
 
 
 #if defined(__cplusplus)

@@ -5,6 +5,8 @@
 #include "spi.h"
 #include <stdio.h>
 #include <avr/pgmspace.h>
+#include "pins.h"
+#include "config.h"
 
 #define TMC2130_CS_0 //signal d5  - PC6
 #define TMC2130_CS_1 //signal d6  - PD7
@@ -242,12 +244,12 @@ int8_t tmc2130_init(uint8_t mode)
 	PORTD |= 0x80; //PD7 CSN U6
 	PORTB |= 0x80; //PB7 CSN U7
 
-	DDRD |= 0x10;
-	DDRB |= 0x10;
-	DDRD |= 0x40;
-	PORTD &= ~0x10;	//PD4
-	PORTB &= ~0x10; //PB4
-	PORTD &= ~0x40; //PD6
+	selector_step_pin_init();
+	pulley_step_pin_init();
+	idler_step_pin_init();
+	selector_step_pin_reset(); //PD4
+	pulley_step_pin_reset();   //PB4
+	idler_step_pin_reset();    //PD6
 
 	int8_t ret = 0;
 	
@@ -337,3 +339,28 @@ uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval)
 	if (rval != 0) *rval = val32;
 	return stat;
 }
+//! @brief Read global error flags for all axis
+//!
+//! Error is detected if any of following flags is set.
+//!  * reset
+//!    * IC has been reset since the last read access to GSTAT.
+//!      All registers have been cleared to reset values.
+//!  * drv_err
+//!    * Overtemperature or short circuit. Driver  has  been  shut  down.
+//!  * uv_cp
+//!    * Undervoltage on the charge pump. The driver is disabled in this case.
+//!
+//! @retval 0 no error
+//! @retval >0 error, bit flag set for each axis
+uint8_t tmc2130_read_gstat()
+{
+    uint8_t retval = 0;
+    for (uint8_t axis = AX_PUL; axis <= AX_IDL ; ++ axis)
+    {
+        uint32_t result;
+        tmc2130_rd(axis, TMC2130_REG_GSTAT, &result);
+        if (result & 0x7) retval += (1 << axis);
+    }
+    return retval;
+}
+
