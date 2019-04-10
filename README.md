@@ -1,6 +1,6 @@
 # MM-control-01
 MMU 3-axis stepper control
-[![Build Status](https://travis-ci.org/NotaRobotexe/MM-control-01.svg?branch=master)](https://travis-ci.org/NotaRobotexe/MM-control-01)
+  [![Build Status](https://travis-ci.org/NotaRobotexe/MM-control-01.svg?branch=master)](https://travis-ci.org/NotaRobotexe/MM-control-01)
 ## Table of contents
 
 <!--ts-->
