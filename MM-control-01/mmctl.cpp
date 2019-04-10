@@ -92,7 +92,8 @@ void switch_extruder_withSensor(int new_extruder)
 
     if (!isFilamentLoaded)
     {
-            load_filament_withSensor();
+        mmctl_cut_filament(active_extruder);
+        load_filament_withSensor();
     }
 
 	shr16_set_led(0x000);
