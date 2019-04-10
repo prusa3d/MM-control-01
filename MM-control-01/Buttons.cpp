@@ -243,12 +243,16 @@ void settings_bowden_length()
 //! @return button pushed
 Btn buttonClicked()
 {
-	int raw = analogRead(ButtonPin);
-
-	if (raw < 50) return Btn::right;
-	if (raw > 80 && raw < 100) return Btn::middle;
-	if (raw > 160 && raw < 180) return Btn::left;
-
-	return Btn::none;
+    uint8_t trys = 2;
+    Btn button = Btn::none;
+  loop:
+    uint16_t z = 0;
+    for (int i=0; i < 4; i++) z += analogRead(ButtonPin);
+    z = z / 4;
+    if      (z < 260 && z > 200) button = Btn::left;
+    else if (z < 160 && z > 100) button = Btn::middle;
+    else if (z <  60) button = Btn::right;
+    trys--;
+    if ((trys > 0) && (button == Btn::none)) { delay(10); goto loop; } // debouce then re-read
+    return Btn::none;
 }
-
