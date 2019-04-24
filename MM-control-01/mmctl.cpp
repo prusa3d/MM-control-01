@@ -21,6 +21,10 @@ static const int eject_steps = 2500;
 static const int cut_steps_pre = 700;
 static const int cut_steps_post = 150;
 
+//! @brief Feed filament to the extruder
+//!
+//! Continuously feed filament until FINDA is not switched ON
+//! There is no timeout!
 void feed_filament()
 {
 	bool _feed = true;
@@ -60,11 +64,115 @@ void feed_filament()
 		}
 	}
 
-
-
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 	motion_disengage_idler();
 	shr16_set_led(1 << 2 * (4 - active_extruder));
+}
+
+//! @brief Try to feed filament to the extruder
+//!
+//! Feed filament for specific time or until FINDA is not switched ON
+//! @par timeout_ms Time in millisecond for how long will be fillament fed
+//! @retval true Selector is aligned on FINDA, FINDA was switched ON
+//! @retval false Selector is not probably aligned on FINDA ,FINDA was not switched ON 
+bool try_feed_filament(int timeout_ms)
+{
+	bool _loaded = false;
+	int steps = 0;
+    
+    motion_engage_idler();
+
+	set_pulley_dir_push();
+	if(tmc2130_mode == NORMAL_MODE)	
+		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
+	else
+		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
+    
+    while(steps < timeout_ms && _loaded == false){
+        do_pulley_step();
+		
+		if (steps > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
+		if (steps > 100) { shr16_set_led(0x000); };
+
+		if (digitalRead(A1) == 1) { _loaded = true; };
+		delayMicroseconds(1000);
+        steps++;
+    }
+
+	if (_loaded){
+		//unload to PTFE tube
+		set_pulley_dir_pull();
+		for (int i = 0; i < steps; i++){
+			do_pulley_step();
+			delayMicroseconds(1000);
+		}
+
+        tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+        motion_disengage_idler();
+        shr16_set_led(1 << 2 * (4 - active_extruder));
+        return true;
+	}
+    else{
+        motion_disengage_idler();
+    }
+    return false;    
+}
+
+//! @brief Try to resolve non-loaded filamnt to selector
+//!
+//! button | action
+//! ------ | ------
+//! middle | Try to rehome selector and align filament to FINDA if it success, blinking will stop
+//! right  | If no red LED is blinking, resume print, else same as middle button 
+//!
+//! This state is indicated by following LED pattern:
+//!
+//! RG | RG | RG | RG | RG
+//! -- | -- | -- | -- | --
+//! b0 | b0 | b0 | b0 | b0
+//!
+//! @n R - Red LED
+//! @n G - Green LED
+//! @n 0 - inactive
+//! @n b - blinking
+//!
+void resolve_failed_loading(){
+    bool resolved = false;
+    bool exit = false;
+    while(exit == false){
+        switch (buttonClicked())
+        {
+            case Btn::middle:
+                motion_set_idler_selector(active_extruder, 6);
+                motion_set_idler_selector(active_extruder, 0);
+                motion_set_idler_selector(active_extruder);
+                if(try_feed_filament(1000)){resolved = true;}
+            break;
+
+            case Btn::right:
+                if(resolved){
+                    motion_set_idler_selector(active_extruder);
+                    motion_engage_idler();                    
+                    exit = true;
+                }
+                else{
+                    motion_set_idler_selector(active_extruder, 6);
+                    motion_set_idler_selector(active_extruder, 0);
+                    motion_set_idler_selector(active_extruder);
+                    if(try_feed_filament(1000)){resolved = true;}
+                }
+            break;
+
+            default:
+                if(resolved == false){
+                    shr16_set_led(0x2aa);
+                    delay(500);
+                    shr16_set_led(0x000);
+                    delay(500);
+                }
+            break;
+        }
+    }
 }
 
 //! @brief Change filament
@@ -92,7 +200,6 @@ void switch_extruder_withSensor(int new_extruder)
 
     if (!isFilamentLoaded)
     {
-        mmctl_cut_filament(active_extruder);
         load_filament_withSensor();
     }
 
