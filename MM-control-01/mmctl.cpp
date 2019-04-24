@@ -554,8 +554,8 @@ void unload_filament_withSensor()
             delayMicroseconds(5000);
         }
     }
-    tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     motion_disengage_idler();
+    tmc2130_disable_axis(AX_PUL, tmc2130_mode);
     isFilamentLoaded = false; // filament unloaded
 }
 
