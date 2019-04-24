@@ -408,8 +408,9 @@ void load_filament_withSensor()
     }
 
     motion_feed_to_bondtech();
-    motion_disengage_idler();
+
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+    motion_disengage_idler();
     isFilamentLoaded = true;  // filament loaded
 }
 
