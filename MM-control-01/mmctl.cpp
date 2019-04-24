@@ -232,7 +232,7 @@ void mmctl_cut_filament(uint8_t filament)
 
     if (isFilamentLoaded)  unload_filament_withSensor();
 
-    feed_filament();
+    if(!try_feed_filament(1000)){resolve_failed_loading();}
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
     motion_set_idler_selector(filament, filament + 1);
@@ -258,7 +258,7 @@ void mmctl_cut_filament(uint8_t filament)
     motion_set_idler_selector(filament, 5);
     motion_set_idler_selector(filament, 0);
     motion_set_idler_selector(filament, filament);
-    feed_filament();
+    if(!try_feed_filament(1000)){resolve_failed_loading();}
 }
 
 //! @brief eject filament
