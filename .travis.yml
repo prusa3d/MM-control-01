@@ -11,7 +11,7 @@ script:
   - wget https://github.com/prusa3d/caterina/releases/download/V4/Caterina-prusa_mm_control.hex
   - srec_cat ../MM-control-01-build/MM-control-01.hex.tmp -Intel Caterina-prusa_mm_control.hex -Intel -Output MM-control-01_with_bootloader.hex -Intel
   - mv Doxyfile MM-control-01/Doxyfile && cd MM-control-01
-  - doxygen
+  - doxygen && cd ..
 deploy:
   provider: releases
   api_key: $ACCESS_TOKEN
