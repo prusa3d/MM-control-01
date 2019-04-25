@@ -1,5 +1,4 @@
-//! @file
-//! @brief main configuration file
+// main configuration file
 
 #ifndef CONFIG_H_
 #define CONFIG_H_

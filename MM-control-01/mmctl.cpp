@@ -1,4 +1,6 @@
-//mmctl.cpp - multimaterial switcher control
+//! @file
+//! @brief High level multimaterial switcher control
+
 #include "main.h"
 #include <Arduino.h>
 #include <stdio.h>
