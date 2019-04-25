@@ -9,7 +9,7 @@ fi
 cd build-env || exit 2
 
 if [ ! -f "MM-build-env-Linux64-$BUILD_ENV.zip" ]; then
-    wget https://github.com/prusa3d/MM-build-env/releases/download/$BUILD_ENV/MM-build-env-Linux64-$BUILD_ENV.zip || exit 3
+    wget --progress=dot:giga https://github.com/prusa3d/MM-build-env/releases/download/$BUILD_ENV/MM-build-env-Linux64-$BUILD_ENV.zip || exit 3
 fi
 
 if [ ! -d "../../MM-build-env-$BUILD_ENV" ]; then
