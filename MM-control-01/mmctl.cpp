@@ -125,17 +125,6 @@ bool try_feed_filament(int timeout_ms)
 //! middle | Try to rehome selector and align filament to FINDA if it success, blinking will stop
 //! right  | If no red LED is blinking, resume print, else same as middle button 
 //!
-//! This state is indicated by following LED pattern:
-//!
-//! RG | RG | RG | RG | RG
-//! -- | -- | -- | -- | --
-//! b0 | b0 | b0 | b0 | b0
-//!
-//! @n R - Red LED
-//! @n G - Green LED
-//! @n 0 - inactive
-//! @n b - blinking
-//!
 void resolve_failed_loading(){
     bool resolved = false;
     bool exit = false;
