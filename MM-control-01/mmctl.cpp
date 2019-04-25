@@ -88,7 +88,7 @@ bool try_feed_filament(int timeout_ms)
 	else
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
     
-    while(steps < timeout_ms && _loaded == false){
+    while((!_loaded) && (steps < timeout_ms)){
         do_pulley_step();
 		
 		if (steps > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
@@ -139,37 +139,35 @@ bool try_feed_filament(int timeout_ms)
 void resolve_failed_loading(){
     bool resolved = false;
     bool exit = false;
-    while(exit == false){
+    while(!exit){
         switch (buttonClicked())
         {
             case Btn::middle:
-                motion_set_idler_selector(active_extruder, 6);
-                motion_set_idler_selector(active_extruder, 0);
+                rehome();
                 motion_set_idler_selector(active_extruder);
                 if(try_feed_filament(1000)){resolved = true;}
             break;
 
             case Btn::right:
+                if(!resolved){
+                    rehome();
+                    motion_set_idler_selector(active_extruder);
+                    if(try_feed_filament(1000)){resolved = true;}
+                }
+                
                 if(resolved){
                     motion_set_idler_selector(active_extruder);
                     motion_engage_idler();                    
                     exit = true;
                 }
-                else{
-                    motion_set_idler_selector(active_extruder, 6);
-                    motion_set_idler_selector(active_extruder, 0);
-                    motion_set_idler_selector(active_extruder);
-                    if(try_feed_filament(1000)){resolved = true;}
-                }
             break;
 
             default:
-                if(resolved == false){
-                    shr16_set_led(0x2aa);
-                    delay(500);
-                    shr16_set_led(0x000);
-                    delay(500);
-                }
+                if(resolved){
+                    signal_ok_after_load_failure();}
+                else{
+                    signal_load_failure();}
+                
             break;
         }
     }
