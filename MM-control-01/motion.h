@@ -1,7 +1,7 @@
-//! @file
-//! @brief Selector idler and pulley control
-//!
-//! Medium level motion control. Drive errors should be handled in this layer.
+// @file
+// @brief Selector idler and pulley control
+//
+// Medium level motion control. Drive errors should be handled in this layer.
 
 #ifndef MOTION_H_
 #define MOTION_H_
