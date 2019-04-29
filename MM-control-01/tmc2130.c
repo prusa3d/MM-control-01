@@ -204,7 +204,7 @@ int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_
 	//stealth mode
 	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) return -1;
 	tmc2130_wr(axis, TMC2130_REG_TPOWERDOWN, 0x00000000);
-	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)TMC2130_SG_THR) << 16));
+	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((int32_t)TMC2130_SG_THR) << 16));
 	tmc2130_wr(axis, TMC2130_REG_TCOOLTHRS, 0);
 	tmc2130_wr(axis, TMC2130_REG_GCONF, 0x00000004);
 	tmc2130_wr_PWMCONF(axis, 4 * current_r, 2, 2, 1, 0, 0);
@@ -217,7 +217,7 @@ int8_t tmc2130_init_axis_current_normal(uint8_t axis, uint8_t current_h, uint8_t
 	//normal mode
 	if (tmc2130_setup_chopper(axis, (uint32_t)__res(axis), current_h, current_r)) return -1;
 	tmc2130_wr(axis, TMC2130_REG_TPOWERDOWN, 0x00000000);
-	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)__sg_thr(axis)) << 16));
+	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((int32_t)__sg_thr(axis)) << 16));
 	tmc2130_wr(axis, TMC2130_REG_TCOOLTHRS, __tcoolthrs(axis));
 	tmc2130_wr(axis, TMC2130_REG_GCONF, 0x00003180);
 	return 0;
