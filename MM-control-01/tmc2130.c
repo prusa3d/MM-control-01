@@ -339,7 +339,6 @@ uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval)
 	if (rval != 0) *rval = val32;
 	return stat;
 }
-
 //! @brief Read global error flags for all axis
 //!
 //! Error is detected if any of following flags is set.
@@ -364,3 +363,4 @@ uint8_t tmc2130_read_gstat()
     }
     return retval;
 }
+

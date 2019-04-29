@@ -8,6 +8,7 @@
 #include "permanent_storage.h"
 #include "main.h"
 #include "motion.h"
+#include "uart.h"
 
 const int ButtonPin = A2;
 
@@ -20,8 +21,6 @@ void settings_bowden_length();
 //! Park position (one behind last filament) can be also selected.
 //! Activating calibration in park position exits selector.
 //!
-//! @retval true exit
-//! @retval false to be called again
 bool settings_select_filament()
 {
     manual_extruder_selector();
@@ -63,11 +62,9 @@ bool settings_select_filament()
 //! @n 1 - active
 //! @n 0 - inactive
 //!
-//! @retval true continue
-//! @retval false exit
 bool setupMenu()
 {
-    static bool onEnter = true;
+	static bool onEnter = true;
     if (onEnter)
     {
         shr16_set_led(0x000);
@@ -154,6 +151,7 @@ bool setupMenu()
     return true;
 }
 
+
 //! @brief Set bowden length
 //!
 //! button | action
@@ -181,7 +179,9 @@ void settings_bowden_length()
 	{
 		BowdenLength bowdenLength;
 		load_filament_withSensor();
-
+		fprintf_P(uart0io,PSTR("Selected #: %d\r\n"),bowdenLength.m_filament);
+		fprintf_P(uart0io,PSTR("Current Len: %d\r\n"),bowdenLength.m_length);
+		
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
 		uint32_t saved_millis=millis();
 		bool button_active = false;
@@ -200,6 +200,8 @@ void settings_bowden_length()
 						delayMicroseconds(1200);
 						do_pulley_step();
 						}
+						fprintf_P(uart0io,PSTR("Dec: %d\r\n"),bowdenLength.m_length);
+
 					}
 				}
 				button_active = true;
@@ -214,6 +216,8 @@ void settings_bowden_length()
 							delayMicroseconds(1200);
 							do_pulley_step();
 						}
+						fprintf_P(uart0io,PSTR("Inc: %d\r\n"),bowdenLength.m_length);
+
 					}
 				}
 				button_active = true;
@@ -233,22 +237,20 @@ void settings_bowden_length()
 
 
 		} while (buttonClicked() != Btn::middle);
+		fprintf_P(uart0io,PSTR("Len: %d\r\n"),bowdenLength.m_length);
 
 		unload_filament_withSensor();
 	}
 }
-
 //! @brief Is button pushed?
 //!
 //! @return button pushed
 Btn buttonClicked()
 {
 	int raw = analogRead(ButtonPin);
-
 	if (raw < 50) return Btn::right;
 	if (raw > 80 && raw < 100) return Btn::middle;
 	if (raw > 160 && raw < 180) return Btn::left;
-
 	return Btn::none;
 }
 

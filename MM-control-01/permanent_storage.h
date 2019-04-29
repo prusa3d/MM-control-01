@@ -5,8 +5,46 @@
 #define PERMANENT_STORAGE_H_
 
 #include <stdint.h>
+#include <avr/eeprom.h>
+#define ARR_SIZE(ARRAY) (sizeof(ARRAY)/sizeof(ARRAY[0]))
+
+//! @brief EEPROM data layout
+//!
+//! Do not remove, reorder or change size of existing fields.
+//! Otherwise values stored with previous version of firmware would be broken.
+//! It is possible to add fields in the end of this struct, ensure that erased EEPROM is handled well.
+//! Last byte in EEPROM is reserved for layoutVersion. If some field is repurposed, layoutVersion
+//! needs to be changed to force EEPROM erase.
+typedef struct __attribute__ ((packed))
+{
+	uint8_t eepromLengthCorrection; //!< legacy bowden length correction
+	uint16_t eepromBowdenLen[5];    //!< Bowden length for each filament
+	uint8_t eepromFilamentStatus[3];//!< Majority vote status of eepromFilament wear leveling
+	uint8_t eepromFilament[800];    //!< Top nibble status, bottom nibble last filament loaded
+	uint8_t eepromDriveErrorCountH;
+	uint8_t eepromDriveErrorCountL[2];
+}eeprom_t;
+static_assert(sizeof(eeprom_t) - 2 <= E2END, "eeprom_t doesn't fit into EEPROM available.");
+//! @brief EEPROM layout version
+static const uint8_t layoutVersion = 0xff;
+
+//d = 6.3 mm        pulley diameter
+//c = pi * d        pulley circumference
+//FSPR = 200        full steps per revolution (stepper motor constant) (1.8 deg/step)
+//mres = 2          pulley microstep resolution (uint8_t __res(AX_PUL))
+//mres = 2          selector microstep resolution (uint8_t __res(AX_SEL))
+//mres = 16         idler microstep resolution (uint8_t __res(AX_IDL))
+//1 pulley ustep = (d*pi)/(mres*FSPR) = 49.48 um
+
+static eeprom_t * const eepromBase = reinterpret_cast<eeprom_t*>(0); //!< First EEPROM address
+static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
+static const uint16_t eepromLengthCorrectionBase = 7900u; //!< legacy bowden length correction base (~391mm)
+static const uint16_t eepromBowdenLenDefault = 8900u; //!< Default bowden length (~427 mm)
+static const uint16_t eepromBowdenLenMinimum = 6900u; //!< Minimum bowden length (~341 mm)
+static const uint16_t eepromBowdenLenMaximum = 16000u; //!< Maximum bowden length (~792 mm)
 
 void permanentStorageInit();
+bool validFilament(uint8_t filament);
 
 void eepromEraseAll();
 
@@ -23,7 +61,7 @@ public:
 	bool increase();
 	bool decrease();
 	~BowdenLength();
-private:
+
 	uint8_t m_filament; //!< Selected filament
 	uint16_t m_length;  //!< Selected filament bowden length
 };

@@ -17,6 +17,7 @@
 #include "Buttons.h"
 #include <avr/wdt.h>
 #include "permanent_storage.h"
+#include "uart.h"
 #include "version.h"
 #include "config.h"
 #include "motion.h"
@@ -25,7 +26,7 @@
 uint8_t tmc2130_mode = NORMAL_MODE;
 
 #if (UART_COM == 0)
-FILE* uart_com = uart0io;
+FILE* uart_com = uart0io;//USB
 #elif (UART_COM == 1)
 FILE* uart_com = uart1io;
 #endif //(UART_COM == 0)
@@ -281,19 +282,20 @@ void setup()
 	shr16_set_ena(7);
 	shr16_set_led(0x000);
 
-    // check if to goto the settings menu
-    if (buttonClicked() == Btn::middle)
-    {
-        state = S::Setup;
-    }
 
-    tmc2130_init(HOMING_MODE);
-    tmc2130_read_gstat(); //consume reset after power up
-    uint8_t filament;
-    if(FilamentLoaded::get(filament))
-    {
-        motion_set_idler(filament);
-    }
+	// check if to goto the settings menu
+	if (buttonClicked() == Btn::middle)
+	{
+	  state = S::Setup;
+	}
+
+	tmc2130_init(HOMING_MODE);
+	tmc2130_read_gstat(); //consume reset after power up
+	uint8_t filament;
+	if(FilamentLoaded::get(filament))
+	{
+	  motion_set_idler(filament);
+	}
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
 
@@ -370,9 +372,14 @@ void manual_extruder_selector()
 //! middle | feed filament
 //!
 //! @copydoc manual_extruder_selector()
+
 void loop()
 {
-    process_commands(uart_com);
+
+	process_commands(uart_com);
+	process_commands(uart0io);
+  filament_presence_signaler();
+
 
     switch (state)
     {
@@ -436,8 +443,29 @@ void loop()
 //! All commands have syntax in form of one letter integer number.
 void process_commands(FILE* inout)
 {
-	static char line[32];
-	static int count = 0;
+	//static char line[32];
+	//static int count = 0;
+	static 	BowdenLength *pbowdenLength = 0;
+
+	static char line_usb[32];
+	static int count_usb = 0;
+
+	static char line_hw[32];
+	static int count_hw = 0;
+
+	char* line;
+	int count = 0;
+	if(inout == uart0io)
+	{
+		line = line_usb;
+		count = count_usb;
+	}
+	else
+	{
+		line = line_hw;
+		count = count_hw;
+	}
+	
 	int c = -1;
 	if (count < 32)
 	{
@@ -446,6 +474,8 @@ void process_commands(FILE* inout)
 			if (c == '\r') c = 0;
 			if (c == '\n') c = 0;
 			line[count++] = c;
+			if(inout == uart0io)
+				printf_P(PSTR("%c"),c);
 		}
 	}
 	else
@@ -459,11 +489,16 @@ void process_commands(FILE* inout)
 	if ((count > 0) && (c == 0))
 	{
 		//line received
-		//printf_P(PSTR("line received: '%s' %d\n"), line, count);
+		if(inout == uart0io)
+			printf_P(PSTR("\r\nline received: '%s' %d\r\n"), line, count);
+		else if(strcmp_P(line,PSTR("P0")) != 0)
+			fprintf_P(uart0io,PSTR("line received: '%s' %d\r\n"), line, count);
 		count = 0;
         //! T<nr.> change to filament <nr.>
 		if (sscanf_P(line, PSTR("T%d"), &value) > 0)
 		{
+
+			
 			if ((value >= 0) && (value < EXTRUDERS))
 			{
 			    state = S::Printing;
@@ -565,8 +600,121 @@ void process_commands(FILE* inout)
 				state = S::Idle;
 			}
 		}
-        else if (sscanf_P(line, PSTR("W%d"), &value) > 0)
-        {
+		else if(strcmp_P(line, PSTR("!D")) == 0)
+		{
+			fprintf_P(inout, PSTR("DUMPING TUBE LENGTH CALIBRATION\r\n")); 
+			for(int i=0;i<5;i++)
+			{
+				uint8_t filament = i;
+				if (1)//validFilament(filament))
+				{
+					uint16_t bowdenLength = eeprom_read_word(&(eepromBase->eepromBowdenLen[filament]));
+
+					fprintf_P(inout,PSTR("%d:%d\r\n"),i,bowdenLength);
+					//if (validBowdenLen(bowdenLength)) 
+					//	return bowdenLength;
+				}
+			}
+		}
+		else if(sscanf_P(line,PSTR("!S%d,%d"),&value,&value0) > 0)
+		{
+			if(value < 0 || value > 4)
+			{
+				fprintf_P(inout, PSTR("Invalid extruder #\r\n")); 
+			}
+			fprintf_P(inout, PSTR("Storing Extruder Tube Length %d to %d\r\n"),value,value0); 
+			if (validFilament(value))
+				eeprom_update_word(&(eepromBase->eepromBowdenLen[value]), value0);
+			else
+			{
+				fprintf_P(inout, PSTR("Invalid length\r\n")); 
+			}
+		}
+		else if (strcmp_P(line,PSTR("!CALI")) == 0)
+		{
+			fprintf_P(inout, PSTR("Entering Filamint Calibration Mode\r\n")); 
+			settings_select_filament();
+		}
+		
+		else if(strcmp_P(line,PSTR("!SETUP")) == 0)
+		{
+			fprintf_P(inout, PSTR("Entering Setup Menu\r\n")); 
+			setupMenu();
+		}
+		else if(strcmp_P(line,PSTR("!DISABLE")) == 0)
+		{
+			tmc2130_disable_axis(AX_PUL,STEALTH_MODE);
+			tmc2130_disable_axis(AX_SEL,STEALTH_MODE);
+			tmc2130_disable_axis(AX_IDL,STEALTH_MODE);
+		}
+		else if(sscanf_P(line,PSTR("!L%d"),&value) > 0)
+		{
+			if ((value >= 0) && (value < EXTRUDERS) && !isFilamentLoaded)
+			{
+				fprintf_P(inout, PSTR("Loading #%d\r\n"),value); 
+
+				select_extruder(value);
+				//feed_filament();
+				pbowdenLength = new BowdenLength();
+
+				load_filament_withSensor();
+
+				tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+
+			}	
+			else
+				fprintf_P(inout, PSTR("Load cmd error\r\n")); 	
+//			tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
+		}
+		else if(strcmp_P(line,PSTR("!U")) == 0)
+		{
+			if (isFilamentLoaded)
+			{
+				fprintf_P(inout, PSTR("Unloading\r\n")); 
+
+				unload_filament_withSensor();
+				if(pbowdenLength)
+					delete pbowdenLength;
+			}
+			else
+				fprintf_P(inout, PSTR("Unload cmd error\r\n")); 
+		}
+		else if (strcmp_P(line,PSTR("!INC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->increase() && isFilamentLoaded)
+			{
+				set_pulley_dir_push();
+				for(auto i = pbowdenLength->stepSize; i > 0; --i)
+				{
+					delayMicroseconds(1200);
+					do_pulley_step();
+				}
+				delay(400);
+				fprintf_P(uart0io,PSTR("Inc: %d\r\n"),pbowdenLength->m_length);
+			}
+			else
+				fprintf_P(uart0io,PSTR("Cannot increase\r\n"),pbowdenLength->m_length);
+
+		}
+		else if (strcmp_P(line,PSTR("!DEC"))==0)
+		{
+			if (pbowdenLength != 0 && pbowdenLength->decrease() && isFilamentLoaded)
+			{
+				set_pulley_dir_pull();
+
+				for(auto i = pbowdenLength->stepSize; i > 0; --i)
+				{
+					delayMicroseconds(1200);
+					do_pulley_step();
+				}
+				delay(400);
+				fprintf_P(uart0io,PSTR("Dec: %d\r\n"),pbowdenLength->m_length);
+			}
+			else
+				fprintf_P(uart0io,PSTR("Cannot decrease\r\n"),pbowdenLength->m_length);
+		}
+    else if (sscanf_P(line, PSTR("W%d"), &value) > 0)
+    {
             if (value == 0) //! W0 Wait for user click
             {
                 state = S::Wait;
@@ -583,6 +731,14 @@ void process_commands(FILE* inout)
 	}
 	else
 	{ //nothing received
+	}
+	if(inout == uart0io)
+	{
+		count_usb = count;
+	}
+	else
+	{
+		count_hw = count;
 	}
 }
 
