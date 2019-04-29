@@ -22,7 +22,7 @@ static const int selector_steps = 2790/4;
 static const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
 static const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
 
-
+static uint16_t sg;
 static int set_idler_direction(int _steps);
 static int set_selector_direction(int _steps);
 static int set_pulley_direction(int _steps);
@@ -108,41 +108,21 @@ bool home_idler()
 	return true;
 }
 
-bool home_selector()
+bool home_selector() //now selector homing works correctly (idler homing, work in progress)
 {
     // if FINDA is sensing filament do not home
-    check_filament_not_present();
+   	check_filament_not_present();
 
-    tmc2130_init(HOMING_MODE);
-	 
-    move(0, -100,0); // move a bit in opposite direction
-
-	int _c = 0;
-	int _l = 2;
-
-	for (int c = 5; c > 0; c--)   // not really functional, let's do it rather more times to be sure
+   	tmc2130_init(HOMING_MODE);
+   	move(0, 40,0); // move a bit in opposite direction
+   	delay(50);
+   	for (int i = 0; i < 4000; i++)
 	{
-		move(0, (c*20) * -1,0);
-		delay(50);
-		for (int i = 0; i < 4000; i++)
-		{
-			move(0, 1,0);
-			uint16_t sg = tmc2130_read_sg(1);
-			if ((i > 16) && (sg < 6))	break;
-
-			_c++;
-			if (i == 3000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
-		}
+		move(0, -1,0);
+		if ((i > 40) && (sg > 370))	break;//400
 	}
-
-	move(0, selector_steps_after_homing,0); // move to initial position
-
-    tmc2130_init(tmc2130_mode);
-
+    	tmc2130_init(tmc2130_mode);
 	delay(500);
-
 	return true;
 }
 
@@ -223,7 +203,7 @@ void move(int _idler, int _selector, int _pulley)
 		if (_pulley > 0) { pulley_step_pin_set(); }
 		asm("nop");
 		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000); }
-		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(800); }
+		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(200);sg = tmc2130_read_sg(1); }
 		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
