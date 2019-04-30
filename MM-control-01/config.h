@@ -59,13 +59,13 @@
 #define TMC2130_SPSR           SPI_SPSR(TMC2130_SPI_RATE)
 //params:
 // SG_THR stallguard treshold (sensitivity), range -128..127, real 0-3
-#define TMC2130_SG_THR_0       5
-#define TMC2130_SG_THR_1       6
-#define TMC2130_SG_THR_2       1
+#define TMC2130_SG_THR_0       0
+#define TMC2130_SG_THR_1       10
+#define TMC2130_SG_THR_2       5
 // TCOOLTHRS coolstep treshold, usable range 400-600
-#define TMC2130_TCOOLTHRS_0    450
-#define TMC2130_TCOOLTHRS_1    450
-#define TMC2130_TCOOLTHRS_2    450
+#define TMC2130_TCOOLTHRS_0    0
+#define TMC2130_TCOOLTHRS_1    0
+#define TMC2130_TCOOLTHRS_2    0
 
 //0 - PULLEY
 //1 - SELECTOR
@@ -75,11 +75,11 @@
 #define AX_IDL 2
 
 // currents
-#define CURRENT_HOLDING_STEALTH {1, 7, 16}
-#define CURRENT_HOLDING_NORMAL {1, 10, 22}
+#define CURRENT_HOLDING_STEALTH {0, 7, 16}
+#define CURRENT_HOLDING_NORMAL {0, 10, 22}
 #define CURRENT_RUNNING_STEALTH {35, 35, 35}
 #define CURRENT_RUNNING_NORMAL {30, 35, 35}
-#define CURRENT_HOMING {1, 35, 30}
+#define CURRENT_HOMING {0, 20, 20}
 
 //mode
 #define HOMING_MODE 0
