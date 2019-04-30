@@ -22,7 +22,7 @@ static const int selector_steps = 2790/4;
 static const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
 static const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
 
-
+static uint16_t sg;
 static int set_idler_direction(int _steps);
 static int set_selector_direction(int _steps);
 static int set_pulley_direction(int _steps);
@@ -72,39 +72,20 @@ void do_pulley_step()
 //! @retval false Failed
 bool home_idler()
 {
-	int _c = 0;
-	int _l = 0;
-
 	tmc2130_init(HOMING_MODE);
-
-	move(-10, 0, 0); // move a bit in opposite direction
-
-	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
-	{
-		delay(50);
-		for (int i = 0; i < 2000; i++)
+	move(-150, 0, 0); // move a bit in opposite direction
+	delay(50);
+	for (int i = 0; i < 3000; i++)
 		{
-			move(1, 0,0);
-			delayMicroseconds(100);
-			tmc2130_read_sg(0);
-
-			_c++;
-			if (i == 1000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
+      		int _sg = sg;    
+		move(1, 0, 0);
+      		if ((i > 150) && (sg >(_sg +250)))  break;
 		}
-	}
-
 	move(idler_steps_after_homing, 0, 0); // move to initial position
-
 	tmc2130_init(tmc2130_mode);
-
 	delay(500);
-
-    isIdlerParked = false;
-
+    	isIdlerParked = false;
 	park_idler(false);
-
 	return true;
 }
 
@@ -112,38 +93,17 @@ bool home_selector()
 {
     // if FINDA is sensing filament do not home
     check_filament_not_present();
-
     tmc2130_init(HOMING_MODE);
-	 
-    move(0, -100,0); // move a bit in opposite direction
-
-	int _c = 0;
-	int _l = 2;
-
-	for (int c = 5; c > 0; c--)   // not really functional, let's do it rather more times to be sure
-	{
-		move(0, (c*20) * -1,0);
-		delay(50);
-		for (int i = 0; i < 4000; i++)
+    for (int i = 0; i < 4000; i++)
 		{
-			move(0, 1,0);
-			uint16_t sg = tmc2130_read_sg(1);
-			if ((i > 16) && (sg < 6))	break;
-
-			_c++;
-			if (i == 3000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
+      		int _sg = sg;
+		move(0, 1, 0);
+		if ((i > 100) && (sg >(_sg +100)))	break;
 		}
-	}
-
-	move(0, selector_steps_after_homing,0); // move to initial position
-
-    tmc2130_init(tmc2130_mode);
-
-	delay(500);
-
-	return true;
+     move(0, selector_steps_after_homing,0); // move to initial position
+     tmc2130_init(tmc2130_mode);
+     delay(500);
+     return true;
 }
 
 //! @brief Home both idler and selector if already not done
@@ -216,22 +176,21 @@ void move(int _idler, int _selector, int _pulley)
 	_pulley = set_pulley_direction(_pulley);
 	
 
-	do
+	while(_selector != 0 || _idler != 0)
 	{
-		if (_idler > 0) { idler_step_pin_set(); }
-		if (_selector > 0) { selector_step_pin_set();}
+    		delayMicroseconds(10);
+		if (_idler > 0) { idler_step_pin_set();sg = tmc2130_read_sg(2); }
+		if (_selector > 0) { selector_step_pin_set();sg = tmc2130_read_sg(1);}
 		if (_pulley > 0) { pulley_step_pin_set(); }
 		asm("nop");
-		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000); }
-		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(800); }
+		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000);}
+		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(1000);}
 		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
 		if (_acc > 0) { delayMicroseconds(_acc*10); _acc = _acc - 1; }; // super pseudo acceleration control
 
-	} while (_selector != 0 || _idler != 0 || _pulley != 0);
-}
-
+	}
 
 void set_idler_dir_down()
 {
