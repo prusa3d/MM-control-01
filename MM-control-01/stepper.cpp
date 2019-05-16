@@ -191,7 +191,7 @@ void move(int _idler, int _selector, int _pulley)
 		if (_acc > 0) { delayMicroseconds(_acc*10); _acc = _acc - 1; }; // super pseudo acceleration control
 
 	}
-
+}
 void set_idler_dir_down()
 {
 	shr16_set_dir(shr16_get_dir() & ~4);
