@@ -73,13 +73,13 @@ void do_pulley_step()
 bool home_idler()
 {
 	tmc2130_init(HOMING_MODE);
-	move(-150, 0, 0); // move a bit in opposite direction
+	move(-50, 0, 0); // move a bit in opposite direction
 	delay(50);
 	for (int i = 0; i < 3000; i++)
 		{
       		int _sg = sg;    
 		move(1, 0, 0);
-      		if ((i > 150) && (sg >(_sg +250)))  break;
+      		if ((i > 50) && (sg >(_sg +250)))  break;
 		}
 	move(idler_steps_after_homing, 0, 0); // move to initial position
 	tmc2130_init(tmc2130_mode);
