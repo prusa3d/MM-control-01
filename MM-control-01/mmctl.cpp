@@ -30,11 +30,11 @@ static const int cut_steps_post = 150;
 //! There is no timeout!
 void feed_filament()
 {
-	bool _feed = true;
-	bool _loaded = false;
+	bool feed = true;
+	bool loaded = false;
 
-	int _c = 0;
-	int _delay = 0;
+	int blinker = 0;
+	int button_blanking = 0;
 	motion_engage_idler();
 
 	set_pulley_dir_push();
@@ -47,16 +47,16 @@ void feed_filament()
 	{
 		do_pulley_step();
 		
-		_c++;
-		if (_c > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
-		if (_c > 100) { shr16_set_led(0x000); _c = 0; _delay++; };
+		blinker++;
+		if (blinker > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
+		if (blinker > 100) { shr16_set_led(0x000); blinker = 0; button_blanking++; };
 
-		if (digitalRead(A1) == 1) { _loaded = true; _feed = false; };
-		if (buttonClicked() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
+		if (digitalRead(A1) == 1) { loaded = true; feed = false; };
+		if (buttonClicked() != Btn::none && button_blanking > 10) { loaded = false; feed = false; }
 		delayMicroseconds(4000);
-	} while (_feed);
+	} while (feed);
 
-	if (_loaded)
+	if (loaded)
 	{
 		// unload to PTFE tube
 		set_pulley_dir_pull();
