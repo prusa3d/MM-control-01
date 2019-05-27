@@ -23,9 +23,10 @@ static const int eject_steps = 2500;
 static const int cut_steps_pre = 700;
 static const int cut_steps_post = 150;
 
-//! @brief Feed filament to the extruder
+//! @brief Feed filament to FINDA
 //!
 //! Continuously feed filament until FINDA is not switched ON
+//! and than retracts to align filament 600 steps away from FINDA.
 //! There is no timeout!
 void feed_filament()
 {
