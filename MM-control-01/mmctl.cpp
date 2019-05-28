@@ -31,7 +31,7 @@ static const int cut_steps_post = 150;
 void feed_filament()
 {
 	bool loaded = false;
-	int blinker = 0;
+	uint_least8_t blinker = 0;
 	int button_blanking = 0;
 
 	motion_engage_idler();
@@ -48,7 +48,7 @@ void feed_filament()
 	for (;true;)
 	{
 		do_pulley_step();
-		blinker++;
+		++blinker;
 		
 		if (blinker > 50)
 		{
