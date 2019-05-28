@@ -34,6 +34,7 @@ void feed_filament()
 	uint_least8_t blinker = 0;
 	uint_least8_t button_blanking = 0;
 	const uint_least8_t button_blanking_limit = 11;
+	const uint_least8_t finda_limit = 10;
 
 	motion_engage_idler();
 	set_pulley_dir_push();
@@ -46,7 +47,7 @@ void feed_filament()
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
 	}
 
-	for (;true;)
+	for (uint_least8_t finda_triggers = 0;;)
 	{
 		do_pulley_step();
 		++blinker;
@@ -62,7 +63,8 @@ void feed_filament()
 		    if (button_blanking <= button_blanking_limit) ++button_blanking;
 		}
 
-		if (digitalRead(A1) == 1)
+		if (digitalRead(A1) == 1) ++finda_triggers;
+		if (finda_triggers >= finda_limit)
 		{
 		    loaded = true;
 		    break;
@@ -79,7 +81,7 @@ void feed_filament()
 	{
 		// unload to PTFE tube
 		set_pulley_dir_pull();
-		for (int i = 600; i > 0; i--)   // 570
+		for (int i = 600 + finda_limit; i > 0; i--)
 		{
 			do_pulley_step();
 			delayMicroseconds(3000);
