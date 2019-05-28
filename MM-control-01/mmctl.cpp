@@ -30,7 +30,6 @@ static const int cut_steps_post = 150;
 //! There is no timeout!
 void feed_filament()
 {
-	bool feed = true;
 	bool loaded = false;
 	int blinker = 0;
 	int button_blanking = 0;
@@ -46,7 +45,7 @@ void feed_filament()
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
 	}
 
-	for (;feed;)
+	for (;true;)
 	{
 		do_pulley_step();
 		blinker++;
@@ -65,12 +64,12 @@ void feed_filament()
 		if (digitalRead(A1) == 1)
 		{
 		    loaded = true;
-		    feed = false;
+		    break;
 		}
 		if ((buttonClicked() != Btn::none) && (button_blanking > 10))
 		{
 		    loaded = false;
-		    feed = false;
+		    break;
 		}
 		delayMicroseconds(4000);
 	}
