@@ -32,7 +32,8 @@ void feed_filament()
 {
 	bool loaded = false;
 	uint_least8_t blinker = 0;
-	int button_blanking = 0;
+	uint_least8_t button_blanking = 0;
+	const uint_least8_t button_blanking_limit = 11;
 
 	motion_engage_idler();
 	set_pulley_dir_push();
@@ -58,7 +59,7 @@ void feed_filament()
 		{
 		    shr16_set_led(0x000);
 		    blinker = 0;
-		    button_blanking++;
+		    if (button_blanking <= button_blanking_limit) ++button_blanking;
 		}
 
 		if (digitalRead(A1) == 1)
@@ -66,7 +67,7 @@ void feed_filament()
 		    loaded = true;
 		    break;
 		}
-		if ((buttonClicked() != Btn::none) && (button_blanking > 10))
+		if ((buttonClicked() != Btn::none) && (button_blanking >= button_blanking_limit))
 		{
 		    loaded = false;
 		    break;
