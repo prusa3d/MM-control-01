@@ -28,7 +28,9 @@ static const int cut_steps_post = 150;
 //! Continuously feed filament until FINDA is not switched ON
 //! and than retracts to align filament 600 steps away from FINDA.
 //! There is no timeout!
-void feed_filament()
+//! @retval true Selector is aligned on FINDA, FINDA was switched ON
+//! @retval false Selector is not probably aligned on FINDA ,FINDA was not switched ON
+bool feed_filament()
 {
 	bool loaded = false;
 	uint_least8_t blinker = 0;
@@ -71,7 +73,6 @@ void feed_filament()
 		}
 		if ((buttonClicked() != Btn::none) && (button_blanking >= button_blanking_limit))
 		{
-		    loaded = false;
 		    break;
 		}
 		delayMicroseconds(4000);
@@ -91,6 +92,8 @@ void feed_filament()
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 	motion_disengage_idler();
 	shr16_set_led(1 << 2 * (4 - active_extruder));
+
+	return loaded;
 }
 
 //! @brief Try to feed filament to the extruder
