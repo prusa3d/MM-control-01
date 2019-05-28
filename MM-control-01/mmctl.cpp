@@ -27,15 +27,14 @@ static const int cut_steps_post = 150;
 //!
 //! Continuously feed filament until FINDA is not switched ON
 //! and than retracts to align filament 600 steps away from FINDA.
-//! There is no timeout!
+//! @par timeout
+//!  * true feed phase is limited, doesn't react on button press
+//!  * false feed phase is unlimited, can be interrupted by any button press after blanking time
 //! @retval true Selector is aligned on FINDA, FINDA was switched ON
 //! @retval false Selector is not probably aligned on FINDA ,FINDA was not switched ON
-bool feed_filament()
+bool feed_filament(bool timeout)
 {
 	bool loaded = false;
-	uint_least8_t blinker = 0;
-	uint_least8_t button_blanking = 0;
-	const uint_least8_t button_blanking_limit = 11;
 	const uint_least8_t finda_limit = 10;
 
 	motion_engage_idler();
@@ -49,33 +48,40 @@ bool feed_filament()
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
 	}
 
-	for (uint_least8_t finda_triggers = 0;;)
 	{
-		do_pulley_step();
-		++blinker;
-		
-		if (blinker > 50)
-		{
-		    shr16_set_led(2 << 2 * (4 - active_extruder));
-		}
-		if (blinker > 100)
-		{
-		    shr16_set_led(0x000);
-		    blinker = 0;
-		    if (button_blanking <= button_blanking_limit) ++button_blanking;
-		}
+	    uint_least8_t blinker = 0;
+	    uint_least8_t button_blanking = 0;
+	    const uint_least8_t button_blanking_limit = 11;
+	    uint_least8_t finda_triggers = 0;
 
-		if (digitalRead(A1) == 1) ++finda_triggers;
-		if (finda_triggers >= finda_limit)
-		{
-		    loaded = true;
-		    break;
-		}
-		if ((buttonClicked() != Btn::none) && (button_blanking >= button_blanking_limit))
-		{
-		    break;
-		}
-		delayMicroseconds(4000);
+        for (unsigned int steps = 0; !timeout || (steps < 1000); ++steps)
+        {
+            do_pulley_step();
+            ++blinker;
+
+            if (blinker > 50)
+            {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
+            }
+            if (blinker > 100)
+            {
+                shr16_set_led(0x000);
+                blinker = 0;
+                if (button_blanking <= button_blanking_limit) ++button_blanking;
+            }
+
+            if (digitalRead(A1) == 1) ++finda_triggers;
+            if (finda_triggers >= finda_limit)
+            {
+                loaded = true;
+                break;
+            }
+            if (!timeout && (buttonClicked() != Btn::none) && (button_blanking >= button_blanking_limit))
+            {
+                break;
+            }
+            delayMicroseconds(4000);
+        }
 	}
 
 	if (loaded)
@@ -96,55 +102,6 @@ bool feed_filament()
 	return loaded;
 }
 
-//! @brief Try to feed filament to the extruder
-//!
-//! Feed filament for specific time or until FINDA is not switched ON
-//! @par timeout_ms Time in millisecond for how long will be fillament fed
-//! @retval true Selector is aligned on FINDA, FINDA was switched ON
-//! @retval false Selector is not probably aligned on FINDA ,FINDA was not switched ON 
-bool try_feed_filament(int timeout_ms)
-{
-	bool _loaded = false;
-	int steps = 0;
-    
-    motion_engage_idler();
-
-	set_pulley_dir_push();
-	if(tmc2130_mode == NORMAL_MODE)	
-		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
-	else
-		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
-    
-    while((!_loaded) && (steps < timeout_ms)){
-        do_pulley_step();
-		
-		if (steps > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
-		if (steps > 100) { shr16_set_led(0x000); };
-
-		if (digitalRead(A1) == 1) { _loaded = true; };
-		delayMicroseconds(1000);
-        steps++;
-    }
-
-	if (_loaded){
-		//unload to PTFE tube
-		set_pulley_dir_pull();
-		for (int i = 0; i < steps; i++){
-			do_pulley_step();
-			delayMicroseconds(1000);
-		}
-
-        tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-        motion_disengage_idler();
-        shr16_set_led(1 << 2 * (4 - active_extruder));
-        return true;
-	}
-    else{
-        motion_disengage_idler();
-    }
-    return false;    
-}
-
 //! @brief Try to resolve non-loaded filamnt to selector
 //!
 //! button | action
@@ -161,14 +118,14 @@ void resolve_failed_loading(){
             case Btn::middle:
                 rehome();
                 motion_set_idler_selector(active_extruder);
-                if(try_feed_filament(1000)){resolved = true;}
+                if(feed_filament(true)){resolved = true;}
             break;
 
             case Btn::right:
                 if(!resolved){
                     rehome();
                     motion_set_idler_selector(active_extruder);
-                    if(try_feed_filament(1000)){resolved = true;}
+                    if(feed_filament(true)){resolved = true;}
                 }
                 
                 if(resolved){
@@ -246,7 +203,7 @@ void mmctl_cut_filament(uint8_t filament)
 
     if (isFilamentLoaded)  unload_filament_withSensor();
 
-    if(!try_feed_filament(1000)){resolve_failed_loading();}
+    if(!feed_filament(true)){resolve_failed_loading();}
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
     motion_set_idler_selector(filament, filament + 1);
@@ -272,7 +229,7 @@ void mmctl_cut_filament(uint8_t filament)
     motion_set_idler_selector(filament, 5);
     motion_set_idler_selector(filament, 0);
     motion_set_idler_selector(filament, filament);
-    if(!try_feed_filament(1000)){resolve_failed_loading();}
+    if(!feed_filament(true)){resolve_failed_loading();}
 }
 
 //! @brief eject filament
