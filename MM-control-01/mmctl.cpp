@@ -32,27 +32,46 @@ void feed_filament()
 {
 	bool feed = true;
 	bool loaded = false;
-
 	int blinker = 0;
 	int button_blanking = 0;
-	motion_engage_idler();
 
+	motion_engage_idler();
 	set_pulley_dir_push();
-	if(tmc2130_mode == NORMAL_MODE)	
+	if(tmc2130_mode == NORMAL_MODE)
+	{
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
+	}
 	else
+	{
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
+	}
 
 	for (;feed;)
 	{
 		do_pulley_step();
-		
 		blinker++;
-		if (blinker > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
-		if (blinker > 100) { shr16_set_led(0x000); blinker = 0; button_blanking++; };
+		
+		if (blinker > 50)
+		{
+		    shr16_set_led(2 << 2 * (4 - active_extruder));
+		}
+		if (blinker > 100)
+		{
+		    shr16_set_led(0x000);
+		    blinker = 0;
+		    button_blanking++;
+		}
 
-		if (digitalRead(A1) == 1) { loaded = true; feed = false; };
-		if (buttonClicked() != Btn::none && button_blanking > 10) { loaded = false; feed = false; }
+		if (digitalRead(A1) == 1)
+		{
+		    loaded = true;
+		    feed = false;
+		}
+		if ((buttonClicked() != Btn::none) && (button_blanking > 10))
+		{
+		    loaded = false;
+		    feed = false;
+		}
 		delayMicroseconds(4000);
 	}
 
