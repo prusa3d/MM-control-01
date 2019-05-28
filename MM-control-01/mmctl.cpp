@@ -43,7 +43,7 @@ void feed_filament()
 	else
 		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
 
-	do
+	for (;feed;)
 	{
 		do_pulley_step();
 		
@@ -54,7 +54,7 @@ void feed_filament()
 		if (digitalRead(A1) == 1) { loaded = true; feed = false; };
 		if (buttonClicked() != Btn::none && button_blanking > 10) { loaded = false; feed = false; }
 		delayMicroseconds(4000);
-	} while (feed);
+	}
 
 	if (loaded)
 	{
