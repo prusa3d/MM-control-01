@@ -54,7 +54,7 @@ bool feed_filament(bool timeout)
 	    const uint_least8_t button_blanking_limit = 11;
 	    uint_least8_t finda_triggers = 0;
 
-        for (unsigned int steps = 0; !timeout || (steps < 1000); ++steps)
+        for (unsigned int steps = 0; !timeout || (steps < 1500); ++steps)
         {
             do_pulley_step();
             ++blinker;
