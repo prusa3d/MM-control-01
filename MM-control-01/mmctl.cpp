@@ -16,12 +16,14 @@
 #include "permanent_storage.h"
 #include "config.h"
 
+//! Keeps track of selected filament. It is used for LED signalization and it is backed up to permanent storage
+//! so MMU can unload filament after power loss.
 int active_extruder = 0;
+//! Keeps track of filament crossing selector. Selector can not be moved if filament crosses it.
 bool isFilamentLoaded = false;
 
+//! Number of pulley steps to eject and un-eject filament
 static const int eject_steps = 2500;
-static const int cut_steps_pre = 700;
-static const int cut_steps_post = 150;
 
 //! @brief Feed filament to FINDA
 //!
@@ -199,6 +201,9 @@ void select_extruder(int new_extruder)
 //! @par filament filament 0 to 4
 void mmctl_cut_filament(uint8_t filament)
 {
+    const int cut_steps_pre = 700;
+    const int cut_steps_post = 150;
+
     active_extruder = filament;
 
     if (isFilamentLoaded)  unload_filament_withSensor();

@@ -78,6 +78,9 @@ private:
     static void getNext(uint8_t &status);
 };
 
+//! @brief Read and increment drive errors
+//!
+//! (Motor power rail voltage loss)
 class DriveError
 {
 public:
