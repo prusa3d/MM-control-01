@@ -1,5 +1,5 @@
-//! @file
-//! @brief Low level stepper routines
+// @file
+// @brief Low level stepper routines
 
 #ifndef STEPPER_H
 #define STEPPER_H

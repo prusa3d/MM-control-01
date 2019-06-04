@@ -207,8 +207,8 @@ int8_t tmc2130_init_axis_current_stealth(uint8_t axis, uint8_t current_h, uint8_
 	tmc2130_wr(axis, TMC2130_REG_COOLCONF, (((uint32_t)TMC2130_SG_THR) << 16));
 	tmc2130_wr(axis, TMC2130_REG_TCOOLTHRS, 0);
 	tmc2130_wr(axis, TMC2130_REG_GCONF, 0x00000004);
-	tmc2130_wr_PWMCONF(axis, 4 * current_r, 2, 2, 1, 0, 0);
-	tmc2130_wr_TPWMTHRS(axis, 0);
+	tmc2130_wr_PWMCONF(axis, 210, 6, 2, 1, 0, 0);
+	tmc2130_wr_TPWMTHRS(axis, 200);
 	return 0;
 }
 
