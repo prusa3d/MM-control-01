@@ -1,4 +1,4 @@
-// Buttons.h
+//! @file
 
 #ifndef _BUTTONS_h
 #define _BUTTONS_h

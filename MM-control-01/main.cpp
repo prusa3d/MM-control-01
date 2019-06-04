@@ -529,7 +529,7 @@ void process_commands(FILE* inout)
 			else if (value == 3) //! S3 Read drive errors
 			    fprintf_P(inout, PSTR("%dok\n"), DriveError::get());
 		}
-		//! F<nr.> <type> filament type. <nr.> filament number, <type> 0, 1 or 2. Does nothing.
+		//! F<nr.> \<type\> filament type. <nr.> filament number, \<type\> 0, 1 or 2. Does nothing.
 		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
 		{
 			if (((value >= 0) && (value < EXTRUDERS)) &&

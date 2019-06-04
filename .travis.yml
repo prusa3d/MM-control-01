@@ -1,7 +1,10 @@
-dist: trusty
+dist: xenial
 before_install:
   - sudo apt-get install -y ninja-build
   - sudo apt-get install -y srecord
+  - sudo apt-get install -y doxygen
+  - sudo apt-get install -y graphviz
+  - sudo apt-get install -y plantuml
 script:
   - git fetch --unshallow || if [ $? -eq 128 ]; then true; else false; fi
   - git rev-list --count HEAD
@@ -9,6 +12,8 @@ script:
   - bash -x build.sh
   - wget https://github.com/prusa3d/caterina/releases/download/V4/Caterina-prusa_mm_control.hex
   - srec_cat ../MM-control-01-build/MM-control-01.hex.tmp -Intel Caterina-prusa_mm_control.hex -Intel -Output MM-control-01_with_bootloader.hex -Intel
+  - mv Doxyfile MM-control-01/Doxyfile && cd MM-control-01
+  - doxygen && cd ..
 deploy:
   provider: releases
   api_key: $ACCESS_TOKEN

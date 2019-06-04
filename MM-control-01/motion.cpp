@@ -17,7 +17,7 @@ static bool s_selector_homed = false;
 static bool s_idler_engaged = true;
 static bool s_has_door_sensor = false;
 
-static void rehome()
+void rehome()
 {
     s_idler = 0;
     s_selector = 0;

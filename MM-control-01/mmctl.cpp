@@ -1,4 +1,6 @@
-//mmctl.cpp - multimaterial switcher control
+//! @file
+//! @brief High level multimaterial switcher control
+
 #include "main.h"
 #include <Arduino.h>
 #include <stdio.h>
@@ -14,57 +16,136 @@
 #include "permanent_storage.h"
 #include "config.h"
 
+//! Keeps track of selected filament. It is used for LED signalization and it is backed up to permanent storage
+//! so MMU can unload filament after power loss.
 int active_extruder = 0;
+//! Keeps track of filament crossing selector. Selector can not be moved if filament crosses it.
 bool isFilamentLoaded = false;
 
+//! Number of pulley steps to eject and un-eject filament
 static const int eject_steps = 2500;
-static const int cut_steps_pre = 700;
-static const int cut_steps_post = 150;
 
-void feed_filament()
+//! @brief Feed filament to FINDA
+//!
+//! Continuously feed filament until FINDA is not switched ON
+//! and than retracts to align filament 600 steps away from FINDA.
+//! @par timeout
+//!  * true feed phase is limited, doesn't react on button press
+//!  * false feed phase is unlimited, can be interrupted by any button press after blanking time
+//! @retval true Selector is aligned on FINDA, FINDA was switched ON
+//! @retval false Selector is not probably aligned on FINDA ,FINDA was not switched ON
+bool feed_filament(bool timeout)
 {
-	bool _feed = true;
-	bool _loaded = false;
+	bool loaded = false;
+	const uint_least8_t finda_limit = 10;
 
-	int _c = 0;
-	int _delay = 0;
 	motion_engage_idler();
-
 	set_pulley_dir_push();
-	if(tmc2130_mode == NORMAL_MODE)	
-		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
-	else
-		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
-
-	do
+	if(tmc2130_mode == NORMAL_MODE)
 	{
-		do_pulley_step();
-		
-		_c++;
-		if (_c > 50) { shr16_set_led(2 << 2 * (4 - active_extruder)); };
-		if (_c > 100) { shr16_set_led(0x000); _c = 0; _delay++; };
+		tmc2130_init_axis_current_normal(AX_PUL, 1, 15);
+	}
+	else
+	{
+		tmc2130_init_axis_current_stealth(AX_PUL, 1, 15); //probably needs tuning of currents
+	}
 
-		if (digitalRead(A1) == 1) { _loaded = true; _feed = false; };
-		if (buttonPressed() != Btn::none && _delay > 10) { _loaded = false; _feed = false; }
-		delayMicroseconds(4000);
-	} while (_feed);
+	{
+	    uint_least8_t blinker = 0;
+	    uint_least8_t button_blanking = 0;
+	    const uint_least8_t button_blanking_limit = 11;
+	    uint_least8_t finda_triggers = 0;
 
-	if (_loaded)
+        for (unsigned int steps = 0; !timeout || (steps < 1500); ++steps)
+        {
+            do_pulley_step();
+            ++blinker;
+
+            if (blinker > 50)
+            {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
+            }
+            if (blinker > 100)
+            {
+                shr16_set_led(0x000);
+                blinker = 0;
+                if (button_blanking <= button_blanking_limit) ++button_blanking;
+            }
+
+            if (digitalRead(A1) == 1) ++finda_triggers;
+            if (finda_triggers >= finda_limit)
+            {
+                loaded = true;
+                break;
+            }
+            if (!timeout && (buttonPressed() != Btn::none) && (button_blanking >= button_blanking_limit))
+            {
+                break;
+            }
+            delayMicroseconds(4000);
+        }
+	}
+
+	if (loaded)
 	{
 		// unload to PTFE tube
 		set_pulley_dir_pull();
-		for (int i = 600; i > 0; i--)   // 570
+		for (int i = 600 + finda_limit; i > 0; i--)
 		{
 			do_pulley_step();
 			delayMicroseconds(3000);
 		}
 	}
 
-
-
 	tmc2130_disable_axis(AX_PUL, tmc2130_mode);
 	motion_disengage_idler();
 	shr16_set_led(1 << 2 * (4 - active_extruder));
+
+	return loaded;
+}
+
+//! @brief Try to resolve non-loaded filamnt to selector
+//!
+//! button | action
+//! ------ | ------
+//! middle | Try to rehome selector and align filament to FINDA if it success, blinking will stop
+//! right  | If no red LED is blinking, resume print, else same as middle button 
+//!
+void resolve_failed_loading(){
+    bool resolved = false;
+    bool exit = false;
+    while(!exit){
+        switch (buttonClicked())
+        {
+            case Btn::middle:
+                rehome();
+                motion_set_idler_selector(active_extruder);
+                if(feed_filament(true)){resolved = true;}
+            break;
+
+            case Btn::right:
+                if(!resolved){
+                    rehome();
+                    motion_set_idler_selector(active_extruder);
+                    if(feed_filament(true)){resolved = true;}
+                }
+                
+                if(resolved){
+                    motion_set_idler_selector(active_extruder);
+                    motion_engage_idler();                    
+                    exit = true;
+                }
+            break;
+
+            default:
+                if(resolved){
+                    signal_ok_after_load_failure();}
+                else{
+                    signal_load_failure();}
+                
+            break;
+        }
+    }
 }
 
 //! @brief Change filament
@@ -120,11 +201,16 @@ void select_extruder(int new_extruder)
 //! @par filament filament 0 to 4
 void mmctl_cut_filament(uint8_t filament)
 {
+    const int cut_steps_pre = 700;
+    const int cut_steps_post = 150;
+
     active_extruder = filament;
 
     if (isFilamentLoaded)  unload_filament_withSensor();
 
-    feed_filament();
+    motion_set_idler_selector(filament, filament);
+
+    if(!feed_filament(true)){resolve_failed_loading();}
     tmc2130_init_axis(AX_PUL, tmc2130_mode);
 
     motion_set_idler_selector(filament, filament + 1);
@@ -150,7 +236,7 @@ void mmctl_cut_filament(uint8_t filament)
     motion_set_idler_selector(filament, 5);
     motion_set_idler_selector(filament, 0);
     motion_set_idler_selector(filament, filament);
-    feed_filament();
+    if(!feed_filament(true)){resolve_failed_loading();}
 }
 
 //! @brief eject filament
@@ -410,6 +496,7 @@ void load_filament_withSensor()
     motion_feed_to_bondtech();
 
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
+    motion_disengage_idler();
     isFilamentLoaded = true;  // filament loaded
 }
 

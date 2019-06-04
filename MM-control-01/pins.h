@@ -1,7 +1,4 @@
-/**
- * @file
- * @author Marek Bel
- */
+// @author Marek Bel
 
 #ifndef PINS_H_
 #define PINS_H_

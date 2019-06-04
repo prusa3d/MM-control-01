@@ -114,21 +114,19 @@ bool home_selector()
     check_filament_not_present();
 
     tmc2130_init(HOMING_MODE);
-	 
-    move(0, -100,0); // move a bit in opposite direction
 
 	int _c = 0;
 	int _l = 2;
 
-	for (int c = 5; c > 0; c--)   // not really functional, let's do it rather more times to be sure
+	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
 	{
-		move(0, (c*20) * -1,0);
+		move(0, c * -18, 0);
 		delay(50);
 		for (int i = 0; i < 4000; i++)
 		{
 			move(0, 1,0);
-			uint16_t sg = tmc2130_read_sg(1);
-			if ((i > 16) && (sg < 6))	break;
+			uint16_t sg = tmc2130_read_sg(AX_SEL);
+			if ((i > 16) && (sg < 5))	break;
 
 			_c++;
 			if (i == 3000) { _l++; }
