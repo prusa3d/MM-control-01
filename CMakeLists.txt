@@ -20,7 +20,7 @@ add_compile_definitions(
 	ARDUINO_ARCH_AVR
 	USB_VID=0x2c99
 	USB_PID=0x0004
-	USB_MANUFACTURER="Unknown"
+	USB_MANUFACTURER="Prusa Research \(prusa3d.com\)"
 	USB_PRODUCT="Original Prusa i3 MK3 Multi Material 2.0 upgrade"
 )
 
