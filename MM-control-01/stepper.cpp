@@ -167,9 +167,9 @@ void move_proportional(int _idler, int _selector)
 
 	float _idler_step = _selector ? (float)_idler/(float)_selector : 1.0;
 	float _idler_pos = 0;
-	int _speed = 2500;
-	int _start = _selector - 250;
-	int _end = 250;
+	int delay = 2500; //microstep period in microseconds
+	const int _start = _selector - 250;
+	const int _end = 250;
 
 	while (_selector != 0 || _idler != 0 )
 	{
@@ -197,9 +197,9 @@ void move_proportional(int _idler, int _selector)
 
 		_idler_pos = _idler_pos + _idler_step;
 
-		delayMicroseconds(_speed);
-		if (_speed > 900 && _selector > _start) { _speed = _speed - 10; }
-		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
+		delayMicroseconds(delay);
+		if (delay > 900 && _selector > _start) { delay -= 10; }
+		if (delay < 2500 && _selector < _end) { delay += 10; }
 
 	}
 }
