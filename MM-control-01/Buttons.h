@@ -30,6 +30,7 @@ inline bool operator& (Btn a, Btn b)
 }
 
 bool setupMenu();
+Btn buttonPressed();
 Btn buttonClicked();
 
 #endif //_BUTTONS_h

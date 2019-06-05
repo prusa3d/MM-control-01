@@ -105,11 +105,15 @@ bool home_selector()
     check_filament_not_present();
 
     tmc2130_init(HOMING_MODE);
+
     for (int i = 0; i < 4000; i++)
+
 		{
       			int _sg = sg;
 			move(0, 1,0);
+
 			if ((i > 100) && (sg >(_sg +100)))	break;
+
 		}
      move(0, selector_steps_after_homing,0); // move to initial position
      tmc2130_init(tmc2130_mode);
@@ -140,9 +144,9 @@ void move_proportional(int _idler, int _selector)
 
 	float _idler_step = _selector ? (float)_idler/(float)_selector : 1.0;
 	float _idler_pos = 0;
-	int _speed = 2500;
-	int _start = _selector - 250;
-	int _end = 250;
+	int delay = 2500; //microstep period in microseconds
+	const int _start = _selector - 250;
+	const int _end = 250;
 
 	while (_selector != 0 || _idler != 0 )
 	{
@@ -170,9 +174,9 @@ void move_proportional(int _idler, int _selector)
 
 		_idler_pos = _idler_pos + _idler_step;
 
-		delayMicroseconds(_speed);
-		if (_speed > 900 && _selector > _start) { _speed = _speed - 10; }
-		if (_speed < 2500 && _selector < _end) { _speed = _speed + 10; }
+		delayMicroseconds(delay);
+		if (delay > 900 && _selector > _start) { delay -= 10; }
+		if (delay < 2500 && _selector < _end) { delay += 10; }
 
 	}
 }

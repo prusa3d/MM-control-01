@@ -78,7 +78,7 @@ bool feed_filament(bool timeout)
                 loaded = true;
                 break;
             }
-            if (!timeout && (buttonClicked() != Btn::none) && (button_blanking >= button_blanking_limit))
+            if (!timeout && (buttonPressed() != Btn::none) && (button_blanking >= button_blanking_limit))
             {
                 break;
             }
@@ -440,7 +440,7 @@ void load_filament_withSensor()
                 signal_ok_after_load_failure();
             }
 
-            switch (buttonClicked())
+            switch (buttonPressed())
             {
                 case Btn::left:
                     // just move filament little bit
@@ -588,7 +588,7 @@ void unload_filament_withSensor()
             delay(100);
 
 
-            switch (buttonClicked())
+            switch (buttonPressed())
             {
             case Btn::left:
                 // just move filament little bit

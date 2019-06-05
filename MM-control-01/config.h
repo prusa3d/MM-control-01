@@ -73,12 +73,13 @@
 #define AX_SEL 1
 #define AX_IDL 2
 
-// currents
-#define CURRENT_HOLDING_STEALTH {0, 7, 16}
-#define CURRENT_HOLDING_NORMAL {0, 10, 22}
-#define CURRENT_RUNNING_STEALTH {35, 35, 35}
-#define CURRENT_RUNNING_NORMAL {30, 35, 35}
-#define CURRENT_HOMING {0, 20, 20 }
+
+#define CURRENT_HOLDING_STEALTH {0, 3, 22}  // {?,?,570 mA}   pulley unused , selector no force necessary for holding
+#define CURRENT_HOLDING_NORMAL {0, 3, 22}  // {?,?,570 mA}    pulley unused , selector no force necessary for holding
+#define CURRENT_RUNNING_STEALTH {35, 35, 45} // {?,?,910 mA}
+#define CURRENT_RUNNING_NORMAL {30, 35, 47} // {?,?,910 mA}
+#define CURRENT_HOMING {0, 20, 20}
+
 
 //mode
 #define HOMING_MODE 0
