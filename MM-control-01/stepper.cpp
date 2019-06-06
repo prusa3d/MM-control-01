@@ -85,13 +85,9 @@ bool home_idler()
 			move(1, 0,0);
      			if ((i > 50) && (sg >(_sg +250)))  break;
 		}
-
-	move(idler_steps_after_homing, 0, 0); // move to initial position
-
 	tmc2130_init(tmc2130_mode);
-
-	delay(500);
-
+	move(idler_steps_after_homing, 0, 0); // move to initial position
+		
     	isIdlerParked = false;
 
 	park_idler(false);
@@ -115,9 +111,8 @@ bool home_selector()
 			if ((i > 100) && (sg >(_sg +100)))	break;
 
 		}
-     move(0, selector_steps_after_homing,0); // move to initial position
      tmc2130_init(tmc2130_mode);
-     delay(500);
+     move(0, selector_steps_after_homing,0); // move to initial position
      return true;
 }
 
@@ -188,19 +183,18 @@ void move(int _idler, int _selector, int _pulley)
 	// gets steps to be done and set direction
 	_idler = set_idler_direction(_idler); 
 	_selector = set_selector_direction(_selector);
-	//_pulley = set_pulley_direction(_pulley);
+	_pulley = set_pulley_direction(_pulley);
 	
 
 	while(_selector != 0 || _idler != 0)
 	{
-    delayMicroseconds(10);
 		if (_idler > 0) { idler_step_pin_set();sg = tmc2130_read_sg(2); }
 		if (_selector > 0) { selector_step_pin_set();sg = tmc2130_read_sg(1);}
-		//if (_pulley > 0) { pulley_step_pin_set(); }
+		if (_pulley > 0) { pulley_step_pin_set(); }
 		asm("nop");
 		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000);}
 		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(1000);}
-		//if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
+		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
 		if (_acc > 0) { delayMicroseconds(_acc*10); _acc = _acc - 1; }; // super pseudo acceleration control
