@@ -86,7 +86,7 @@ bool home_idler()
      			if ((i > 50) && (sg >(_sg +250)))  break;
 		}
 	tmc2130_init(tmc2130_mode);
-	move(idler_steps_after_homing, 0, 0); // move to initial position
+	move_proportional(idler_steps_after_homing, 0, 0); // move to initial position
 		
     	isIdlerParked = false;
 
@@ -112,7 +112,7 @@ bool home_selector()
 
 		}
      tmc2130_init(tmc2130_mode);
-     move(0, selector_steps_after_homing,0); // move to initial position
+     move_proportional(0, selector_steps_after_homing,0); // move to initial position
      return true;
 }
 
