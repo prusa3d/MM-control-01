@@ -297,6 +297,8 @@ void setup()
     }
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
+  shr16_set_led(1 << 2 * (4 - active_extruder));
+
 
 }
 
@@ -329,7 +331,6 @@ void setup()
 //! @n b - blinking
 void manual_extruder_selector()
 {
-	shr16_set_led(1 << 2 * (4 - active_extruder));
 
 	if ((Btn::left|Btn::right) & buttonPressed())
 	{
@@ -350,6 +351,7 @@ void manual_extruder_selector()
 		default:
 			break;
 		}
+    shr16_set_led(1 << 2 * (4 - active_extruder));
 		delay(500);
 	}
 
