@@ -293,6 +293,7 @@ void setup()
     if(FilamentLoaded::get(filament))
     {
         motion_set_idler(filament);
+        active_extruder=filament; // set active extruder to eeprom stored filament
     }
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
