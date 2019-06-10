@@ -391,8 +391,8 @@ void loop()
         manual_extruder_selector();
         if(Btn::middle == buttonPressed() && active_extruder < 5)
         {
-            shr16_set_led(2 << 2 * (4 - active_extruder));
             delay(500);
+            shr16_set_led(2 << 2 * (4 - active_extruder));
             if (Btn::middle == buttonPressed())
             {
                 motion_set_idler_selector(active_extruder);

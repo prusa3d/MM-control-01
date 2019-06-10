@@ -61,7 +61,7 @@
 // SG_THR stallguard treshold (sensitivity), range -128..127, real 0-3
 #define TMC2130_SG_THR_0       5
 #define TMC2130_SG_THR_1       6
-#define TMC2130_SG_THR_2       1
+#define TMC2130_SG_THR_2       10
 // TCOOLTHRS coolstep treshold, usable range 400-600
 #define TMC2130_TCOOLTHRS_0    450
 #define TMC2130_TCOOLTHRS_1    450
@@ -74,12 +74,22 @@
 #define AX_SEL 1
 #define AX_IDL 2
 
-// currents
-#define CURRENT_HOLDING_STEALTH {1, 7, 22}  // {?,?,570 mA}
-#define CURRENT_HOLDING_NORMAL {1, 10, 22}  // {?,?,570 mA}
-#define CURRENT_RUNNING_STEALTH {35, 35, 45} // {?,?,910 mA}
-#define CURRENT_RUNNING_NORMAL {30, 35, 47} // {?,?,910 mA}
-#define CURRENT_HOMING {1, 35, 30}
+// currents (R 0.22) 
+// registers are from 0 to 31 only
+// 0=1/32 31=32/32 from 0.96A with vsense=0 0.53A with vsense=1
+// if current running <=31 vsense=1 
+// if its more then its rigth shifted 1 bit
+//           000 001 002 003 004 005 006 007 008 009 010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029 030 031
+// vsense=1  017 033 050 066 083 099 116 133 149 166 182 199 215 232 248 265 282 298 315 331 348 364 381 398 414 431 447 464 480 497 513 530
+// vsense=0  030 060 090 120 150 180 210 240 270 300 330 360 390 420 450 480 510 540 570 600 630 660 690 720 750 780 810 840 870 900 930 960
+//
+//           032 033 034 035 036 037 038 039 040 041 042 043 044 045 046 047 048 049 050 051 052 053 054 055 056 057 058 059 060 061 062 063
+//           510 510 540 540 570 570 600 600 630 630 660 660 690 690 720 720 750 750 780 780 810 810 840 840 870 870 900 900 930 930 960 960    
+#define CURRENT_HOLDING_STEALTH {1, 7, 22}  // {60,240,690 mA}
+#define CURRENT_HOLDING_NORMAL {1, 10, 22}  // {17,330,690 mA}
+#define CURRENT_RUNNING_STEALTH {35, 35, 45} // {540,540,690 mA}
+#define CURRENT_RUNNING_NORMAL {30, 35, 47} // {513,540,720 mA}
+#define CURRENT_HOMING {1, 35, 30} //
 
 //mode
 #define HOMING_MODE 0
