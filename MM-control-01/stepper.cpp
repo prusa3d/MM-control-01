@@ -238,7 +238,6 @@ void move_with_stallguard(int _idler, int _selector, int _pulley, int _sg)
     if (_idler > 0 && _acc <34) {sg_idler= tmc2130_read_sg(AX_IDL);}
     if (_selector > 0 && _acc <34) {sg_selector= tmc2130_read_sg(AX_SEL);}
     if (_pulley > 0 && _acc <34) {sg_pulley= tmc2130_read_sg(AX_PUL);}
-    printf("%u ",sg_idler);
     if((sg_selector <= _sg || sg_idler <= _sg || sg_pulley <= _sg) && _sg > 0){break;}
     if (_acc > 0) { delayMicroseconds(_acc*10); _acc--; }; // super pseudo acceleration control
 
