@@ -392,9 +392,9 @@ void loop()
         if(Btn::middle == buttonPressed() && active_extruder < 5)
         {
             delay(500);
-            shr16_set_led(2 << 2 * (4 - active_extruder));
             if (Btn::middle == buttonPressed())
             {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
                 motion_set_idler_selector(active_extruder);
                 feed_filament();
             }
