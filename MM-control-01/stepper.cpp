@@ -29,7 +29,12 @@ static int set_pulley_direction(int _steps);
 static void set_idler_dir_down();
 static void set_idler_dir_up();
 static void move(int _idler, int _selector, int _pulley);
-static uint16_t sg;
+static int _sg_idler;
+static int _sg_selector;
+static int _sg_pulley;
+uint16_t sg_selector;
+uint16_t sg_idler;
+uint16_t sg_pulley;
 //! @brief Compute steps for selector needed to change filament
 //! @par current_filament Currently selected filament
 //! @par next_filament Filament to be selected
@@ -81,9 +86,9 @@ bool home_idler()
 	delay(50);
 		for (int i = 0; i < 3000; i++)
 		{
-      			int _sg = sg;    
+      			int  _sg_idler = sg_idler; 
 			move(1, 0,0);
-     			if ((i > 50) && (sg >(_sg +250)))  break;
+     			if ((i > 50) && (sg_idler <(_sg_idler -200)))  break;
 		}
 	tmc2130_init(tmc2130_mode);
 	move_proportional(idler_steps_after_homing, 0); // move to initial position
@@ -105,11 +110,10 @@ bool home_selector()
     for (int i = 0; i < 4000; i++)
 
 		{
-      			int _sg = sg;
+      			int _sg_selector = sg_selector;
 			move(0, 1,0);
 
-			if ((i > 100) && (sg >(_sg +100)))	break;
-
+			if ((i > 100) && (sg_selector <(_sg_selector -250)))	break;
 		}
      tmc2130_init(tmc2130_mode);
      move_proportional(0, selector_steps_after_homing); // move to initial position
@@ -188,12 +192,12 @@ void move(int _idler, int _selector, int _pulley)
 
 	while(_selector != 0 || _idler != 0)
 	{
-		if (_idler > 0) { idler_step_pin_set();sg = tmc2130_read_sg(2); }
-		if (_selector > 0) { selector_step_pin_set();sg = tmc2130_read_sg(1); }
-		if (_pulley > 0) { pulley_step_pin_set(); }
+		if (_idler > 0) { idler_step_pin_set();sg_idler = tmc2130_read_sg(AX_IDL); }
+		if (_selector > 0) { selector_step_pin_set();sg_selector = tmc2130_read_sg(AX_SEL);}
+		if (_pulley > 0) { pulley_step_pin_set(); }  
 		asm("nop");
-		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000); }
-		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(1000); }
+		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(50);}
+		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(50);}
 		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
