@@ -60,8 +60,8 @@
 //params:
 // SG_THR stallguard treshold (sensitivity), range -64..63
 #define TMC2130_SG_THR_0       0
-#define TMC2130_SG_THR_1       10
-#define TMC2130_SG_THR_2       5
+#define TMC2130_SG_THR_1       25
+#define TMC2130_SG_THR_2       7
 // TCOOLTHRS coolstep treshold, usable range 0..1048575
 #define TMC2130_TCOOLTHRS_0    0
 #define TMC2130_TCOOLTHRS_1    0
@@ -78,7 +78,7 @@
 #define CURRENT_HOLDING_NORMAL {0, 3, 22}  // {?,?,570 mA}    pulley unused , selector no force necessary for holding
 #define CURRENT_RUNNING_STEALTH {35, 35, 45} // {?,?,910 mA}
 #define CURRENT_RUNNING_NORMAL {30, 35, 47} // {?,?,910 mA}
-#define CURRENT_HOMING {0, 20, 20}
+#define CURRENT_HOMING {0, 30, 20}
 
 
 //mode
