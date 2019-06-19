@@ -113,7 +113,7 @@ bool home_selector()
       			int _sg_selector = sg_selector;
 			move(0, 1,0);
 
-			if ((i > 100) && (sg_selector <(_sg_selector -200)))	break;
+			if ((i > 100) && (sg_selector <(_sg_selector -100)))	break;
 		}
      tmc2130_init(tmc2130_mode);
      move_proportional(0, selector_steps_after_homing); // move to initial position
