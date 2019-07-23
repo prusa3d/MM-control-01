@@ -51,8 +51,8 @@ void motion_set_idler_selector(uint8_t idler_selector)
 //! In case of drive error re-home and try to recover 3 times.
 //! If the drive error is permanent call unrecoverable_error();
 //!
-//! @par idler idler
-//! @par selector selector
+//! @param idler idler
+//! @param selector selector
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
     if (!s_selector_homed)

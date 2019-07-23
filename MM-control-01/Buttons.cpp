@@ -180,7 +180,7 @@ void settings_bowden_length()
 	if (!isFilamentLoaded)
 	{
 		BowdenLength bowdenLength;
-		load_filament_withSensor();
+		load_filament_withSensor(false);
 
 		tmc2130_init_axis_current_normal(AX_PUL, 1, 30);
 		uint32_t saved_millis=millis();

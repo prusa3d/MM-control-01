@@ -31,8 +31,8 @@ static void set_idler_dir_up();
 static void move(int _idler, int _selector, int _pulley);
 
 //! @brief Compute steps for selector needed to change filament
-//! @par current_filament Currently selected filament
-//! @par next_filament Filament to be selected
+//! @param current_filament Currently selected filament
+//! @param next_filament Filament to be selected
 //! @return selector steps
 int get_selector_steps(int current_filament, int next_filament)
 {
@@ -40,8 +40,8 @@ int get_selector_steps(int current_filament, int next_filament)
 }
 
 //! @brief Compute steps for idler needed to change filament
-//! @par current_filament Currently selected filament
-//! @par next_filament Filament to be selected
+//! @param current_filament Currently selected filament
+//! @param next_filament Filament to be selected
 //! @return idler steps
 int get_idler_steps(int current_filament, int next_filament)
 {
@@ -61,7 +61,7 @@ void do_pulley_step()
 
 //! @brief home idler
 //!
-//! @par toLastFilament
+//! @param toLastFilament
 //!   - true
 //! Move idler to previously loaded filament and disengage. Returns true.
 //! Does nothing if last filament used is not known and returns false.
@@ -294,7 +294,7 @@ void set_pulley_dir_pull()
 
 //! @brief Park idler
 //! each filament selected has its park position, there is no park position for all filaments.
-//! @par _unpark
+//! @param _unpark
 //!  * false park
 //!  * true engage
 void park_idler(bool _unpark)
