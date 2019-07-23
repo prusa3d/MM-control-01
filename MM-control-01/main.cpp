@@ -431,7 +431,7 @@ void loop()
 }
 
 //! @brief receive and process commands from serial line
-//! @par inout FILE* struct connected to serial line to be used
+//! @param[in,out] inout struct connected to serial line to be used
 //!
 //! All commands have syntax in form of one letter integer number.
 void process_commands(FILE* inout)

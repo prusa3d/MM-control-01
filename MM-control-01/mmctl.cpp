@@ -29,7 +29,7 @@ static const int eject_steps = 2500;
 //!
 //! Continuously feed filament until FINDA is not switched ON
 //! and than retracts to align filament 600 steps away from FINDA.
-//! @par timeout
+//! @param timeout
 //!  * true feed phase is limited, doesn't react on button press
 //!  * false feed phase is unlimited, can be interrupted by any button press after blanking time
 //! @retval true Selector is aligned on FINDA, FINDA was switched ON
@@ -155,7 +155,7 @@ void resolve_failed_loading(){
 //! Home if not homed.
 //! Switch to requested filament (this does nothing if requested filament is currently selected).
 //! Load filament if not loaded.
-//! @par new_extruder Filament to be selected
+//! @param new_extruder Filament to be selected
 void switch_extruder_withSensor(int new_extruder)
 {
 	shr16_set_led(2 << 2 * (4 - active_extruder));
@@ -198,7 +198,7 @@ void select_extruder(int new_extruder)
 	shr16_set_led(1 << 2 * (4 - active_extruder));
 }
 //! @brief cut filament
-//! @par filament filament 0 to 4
+//! @param filament filament 0 to 4
 void mmctl_cut_filament(uint8_t filament)
 {
     const int cut_steps_pre = 700;
@@ -246,7 +246,7 @@ void mmctl_cut_filament(uint8_t filament)
 //! If we are want to eject fil 0-2, move selector to position 4 (right),
 //! if we want to eject filament 3 - 4, move selector to position 0 (left)
 //! maybe we can also move selector to service position in the future?
-//! @par filament filament 0 to 4
+//! @param filament filament 0 to 4
 void eject_filament(uint8_t filament)
 {
     active_extruder = filament;

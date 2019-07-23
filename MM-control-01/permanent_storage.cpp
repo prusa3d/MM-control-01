@@ -227,7 +227,7 @@ int16_t FilamentLoaded::getIndex()
 }
 
 //! @brief Get last filament loaded
-//! @par [in,out] filament filament number 0 to 4
+//! @param [in,out] filament filament number 0 to 4
 //! @retval true success
 //! @retval false failed
 bool FilamentLoaded::get(uint8_t& filament)
@@ -252,7 +252,7 @@ bool FilamentLoaded::get(uint8_t& filament)
 //! If it is not possible store filament, it tries all other
 //! keys. Fails if storing with all other keys failed.
 //!
-//! @par filament bottom 4 bits are stored
+//! @param filament bottom 4 bits are stored
 //! but only value 0 to 4 passes validation in FilamentLoaded::get()
 //! @retval true success
 //! @retval false failed
@@ -277,8 +277,8 @@ bool FilamentLoaded::set(uint8_t filament)
 //!
 //! Get next available index following index input parameter to store filament in eepromFilament[].
 //! If index would reach behind indexable space, status is updated to next and first index matching status indexing mode is returned.
-//! @par [in,out] status
-//! @par [in,out] index
+//! @param [in,out] status
+//! @param [in,out] index
 void FilamentLoaded::getNext(uint8_t& status, int16_t& index)
 {
     switch(status)
@@ -312,7 +312,7 @@ void FilamentLoaded::getNext(uint8_t& status, int16_t& index)
 //!
 //! Sets status to next indexing mode.
 //!
-//! @par [in,out] status
+//! @param [in,out] status
 void FilamentLoaded::getNext(uint8_t& status)
 {
     switch(status)
