@@ -370,7 +370,11 @@ bool mmctl_IsOk()
     return retval;
 }
 
-void load_filament_withSensor()
+//! @brief Load filament through bowden
+//! @param disengageIdler
+//!  * true Disengage idler after movement
+//!  * false Do not disengage idler after movement
+void load_filament_withSensor(bool disengageIdler)
 {
     FilamentLoaded::set(active_extruder);
     motion_engage_idler();
@@ -496,7 +500,7 @@ void load_filament_withSensor()
     motion_feed_to_bondtech();
 
     tmc2130_disable_axis(AX_PUL, tmc2130_mode);
-    motion_disengage_idler();
+    if (disengageIdler) motion_disengage_idler();
     isFilamentLoaded = true;  // filament loaded
 }
 
