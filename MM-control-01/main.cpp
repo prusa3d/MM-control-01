@@ -293,9 +293,12 @@ void setup()
     if(FilamentLoaded::get(filament))
     {
         motion_set_idler(filament);
+        active_extruder=filament; // set active extruder to eeprom stored filament
     }
 
 	if (digitalRead(A1) == 1) isFilamentLoaded = true;
+  shr16_set_led(1 << 2 * (4 - active_extruder));
+
 
 }
 
@@ -328,7 +331,6 @@ void setup()
 //! @n b - blinking
 void manual_extruder_selector()
 {
-	shr16_set_led(1 << 2 * (4 - active_extruder));
 
 	if ((Btn::left|Btn::right) & buttonPressed())
 	{
@@ -349,6 +351,7 @@ void manual_extruder_selector()
 		default:
 			break;
 		}
+    shr16_set_led(1 << 2 * (4 - active_extruder));
 		delay(500);
 	}
 
@@ -388,10 +391,10 @@ void loop()
         manual_extruder_selector();
         if(Btn::middle == buttonPressed() && active_extruder < 5)
         {
-            shr16_set_led(2 << 2 * (4 - active_extruder));
             delay(500);
             if (Btn::middle == buttonPressed())
             {
+                shr16_set_led(2 << 2 * (4 - active_extruder));
                 motion_set_idler_selector(active_extruder);
                 feed_filament();
             }

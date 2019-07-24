@@ -29,6 +29,7 @@ static int set_pulley_direction(int _steps);
 static void set_idler_dir_down();
 static void set_idler_dir_up();
 static void move(int _idler, int _selector, int _pulley);
+static void move_with_stallguard(int _idler, int _selector, int _pulley, int _sg);
 
 //! @brief Compute steps for selector needed to change filament
 //! @param current_filament Currently selected filament
@@ -76,25 +77,18 @@ bool home_idler()
 	int _l = 0;
 
 	tmc2130_init(HOMING_MODE);
+  shr16_set_led(2 << 2 * 0);
 
 	move(-10, 0, 0); // move a bit in opposite direction
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
 		delay(50);
-		for (int i = 0; i < 2000; i++)
-		{
-			move(1, 0,0);
-			delayMicroseconds(100);
-			tmc2130_read_sg(0);
+		move_with_stallguard(2000, 0,0,0);
+    //move(200, 0, 0); // move a bit in direction
 
-			_c++;
-			if (i == 1000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
-		}
 	}
-
+  shr16_set_led(2 << 2 * 1);
 	move(idler_steps_after_homing, 0, 0); // move to initial position
 
 	tmc2130_init(tmc2130_mode);
@@ -104,7 +98,6 @@ bool home_idler()
     isIdlerParked = false;
 
 	park_idler(false);
-
 	return true;
 }
 
@@ -116,31 +109,20 @@ bool home_selector()
     tmc2130_init(HOMING_MODE);
 
 	int _c = 0;
-	int _l = 2;
-
-	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
+  shr16_set_led(2 << 2 * 2);
+	for (int c = 5; c > 0; c--)   // not really functional, let's do it rather more times to be sure
 	{
 		move(0, c * -18, 0);
 		delay(50);
-		for (int i = 0; i < 4000; i++)
-		{
-			move(0, 1,0);
-			uint16_t sg = tmc2130_read_sg(AX_SEL);
-			if ((i > 16) && (sg < 5))	break;
+		move_with_stallguard(0, 4000,0,5);
 
-			_c++;
-			if (i == 3000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
-		}
 	}
-
+  shr16_set_led(2 << 2 * 3);
 	move(0, selector_steps_after_homing,0); // move to initial position
 
     tmc2130_init(tmc2130_mode);
 
 	delay(500);
-
 	return true;
 }
 
@@ -229,7 +211,38 @@ void move(int _idler, int _selector, int _pulley)
 
 	} while (_selector != 0 || _idler != 0 || _pulley != 0);
 }
+//_sg=0 is stallguard off
+void move_with_stallguard(int _idler, int _selector, int _pulley, int _sg)
+{
+  int _acc = 50;
+  uint16_t sg_selector=1023;
+  uint16_t sg_idler=1023;
+  uint16_t sg_pulley=1023;
 
+  // gets steps to be done and set direction
+  _idler = set_idler_direction(_idler); 
+  _selector = set_selector_direction(_selector);
+  _pulley = set_pulley_direction(_pulley);
+  
+
+  do
+  {
+    if (_idler > 0) { idler_step_pin_set(); }
+    if (_selector > 0) { selector_step_pin_set();}
+    if (_pulley > 0) { pulley_step_pin_set(); }
+    asm("nop");
+    if (_idler > 0) { idler_step_pin_reset(); _idler--;  delayMicroseconds(1000); }
+    if (_selector > 0) { selector_step_pin_reset(); _selector--; delayMicroseconds(800); }
+    if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
+    asm("nop");
+    if (_idler > 0 && _acc <34) {sg_idler= tmc2130_read_sg(AX_IDL);}
+    if (_selector > 0 && _acc <34) {sg_selector= tmc2130_read_sg(AX_SEL);}
+    if (_pulley > 0 && _acc <34) {sg_pulley= tmc2130_read_sg(AX_PUL);}
+    if((sg_selector <= _sg || sg_idler <= _sg || sg_pulley <= _sg) && _sg > 0){break;}
+    if (_acc > 0) { delayMicroseconds(_acc*10); _acc--; }; // super pseudo acceleration control
+
+  } while (_selector != 0 || _idler != 0 || _pulley != 0);
+}
 
 void set_idler_dir_down()
 {
