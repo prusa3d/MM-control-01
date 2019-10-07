@@ -77,8 +77,8 @@
 // currents (Drive?, Selector?, Idler)
 #define CURRENT_HOLDING_STEALTH {1, 7, 22}  // {?,?,570 mA}
 #define CURRENT_HOLDING_NORMAL {1, 10, 22}  // {?,?,570 mA}
-#define CURRENT_RUNNING_STEALTH {35, 35, 45} // {?,?,910 mA}
-#define CURRENT_RUNNING_NORMAL {30, 35, 47} // {?,?,910 mA}
+#define CURRENT_RUNNING_STEALTH {35, 35, 42} // {?,?,910 mA}
+#define CURRENT_RUNNING_NORMAL {30, 35, 42} // {?,?,910 mA}
 #define CURRENT_HOMING {1, 35, 35}
 
 //mode
