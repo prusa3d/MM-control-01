@@ -71,14 +71,14 @@ bool home_idler()
 
 	tmc2130_init(HOMING_MODE);
 
-	move(-10, 0, 0); // move a bit in opposite direction
+	move(-10*idler_homing_direction, 0, 0); // move a bit in opposite direction
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
 		delay(50);
 		for (int i = 0; i < 2000; i++)
 		{
-			move(1, 0,0);
+			move(idler_homing_direction, 0,0);
 			delayMicroseconds(100);
 			tmc2130_read_sg(0);
 
