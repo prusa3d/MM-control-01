@@ -1,4 +1,29 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.3)
+
+#
+# Command Line Options
+#
+# You should specify those options when invoking CMake. Example:
+# ~~~
+# cmake .. <other options> -DPRINTER=MINI
+# ~~~
+
+SET(MODEL_VALID_OPTS "MMUv2" "FANTAv1")
+
+SET(MODEL
+    "MMUv2"
+    CACHE
+    STRING
+    "Select the model for which you want to compile the project (valid values are ${MODEL_VALID_OPTS})."
+    )
+
+# Validate options
+foreach(OPTION "MODEL")
+    if(NOT ${OPTION} IN_LIST ${OPTION}_VALID_OPTS)
+        message(FATAL_ERROR "Invalid ${OPTION} ${${OPTION}}: Valid values are ${${OPTION}_VALID_OPTS}")
+    endif()
+endforeach()
+
 
 SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_C_COMPILER avr-gcc)
@@ -44,9 +69,16 @@ git_count_parent_commits(GIT_PARENT_COMMITS)
 git_local_changes(GIT_LOCAL_CHANGES)
 
 configure_file(
-${CMAKE_SOURCE_DIR}/MM-control-01/version.h.in
-version.h
+    ${CMAKE_SOURCE_DIR}/MM-control-01/version.h.in
+    version.h
 )
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/MM-control-01/configuration_${MODEL}.h.in
+    configuration.h
+    COPYONLY
+)
+
 # The 'real' git information file
 set(GITREV_BARE_FILE dirty.h)
 # The temporary git information file
@@ -126,18 +158,18 @@ add_custom_target(
 
 
 add_custom_command(
-  OUTPUT ${GITREV_TMP}
-  COMMAND ${CMAKE_COMMAND} -E echo_append "#define FW_LOCAL_CHANGES " > ${GITREV_TMP}
-  COMMAND ${GIT_EXECUTABLE} diff-index --quiet HEAD -- && echo 0 >> ${GITREV_TMP} || echo 1 >> ${GITREV_TMP}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GITREV_TMP} ${GITREV_FILE}
-  COMMAND ${CMAKE_COMMAND} -E remove ${GITREV_TMP}
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  VERBATIM
+    OUTPUT ${GITREV_TMP}
+    COMMAND ${CMAKE_COMMAND} -E echo_append "#define FW_LOCAL_CHANGES " > ${GITREV_TMP}
+    COMMAND ${GIT_EXECUTABLE} diff-index --quiet HEAD -- && echo 0 >> ${GITREV_TMP} || echo 1 >> ${GITREV_TMP}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GITREV_TMP} ${GITREV_FILE}
+    COMMAND ${CMAKE_COMMAND} -E remove ${GITREV_TMP}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    VERBATIM
 )
 
 if ("Windows" STREQUAL CMAKE_HOST_SYSTEM_NAME)
-configure_file(
-${CMAKE_SOURCE_DIR}/build.bat.in
-build.bat
-)
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/build.bat.in
+        build.bat
+     )
 endif()
