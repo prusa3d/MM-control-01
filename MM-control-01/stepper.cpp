@@ -89,15 +89,15 @@ bool home_idler()
 		}
 	}
 
-	move(idler_steps_after_homing, 0, 0); // move to initial position
+    move(idler_steps_after_homing, 0, 0); // move to initial position
 
-	tmc2130_init(tmc2130_mode);
+    tmc2130_init(tmc2130_mode);
 
-	delay(500);
+    delay(500);
 
-    isIdlerParked = false;
+	    isIdlerParked = false;
 
-	park_idler(false);
+	    park_idler(true);
 
 	return true;
 }
@@ -288,17 +288,17 @@ void set_pulley_dir_pull()
 
 //! @brief Park idler
 //! each filament selected has its park position, there is no park position for all filaments.
-//! @param _unpark
-//!  * false park
-//!  * true engage
-void park_idler(bool _unpark)
+//! @param park
+//!  * true park
+//!  * false engage
+void park_idler(bool park)
 {
-    if (_unpark && isIdlerParked) // get idler in contact with filament
+    if (!park && isIdlerParked) // get idler in contact with filament
     {
         move_proportional(idler_parking_steps, 0);
         isIdlerParked = false;
     }
-    else if (!_unpark && !isIdlerParked) // park idler so filament can move freely
+    else if (park && !isIdlerParked) // park idler so filament can move freely
     {
         move_proportional(idler_parking_steps*-1, 0);
         isIdlerParked = true;

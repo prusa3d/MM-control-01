@@ -26,7 +26,7 @@ void rehome()
     shr16_set_ena(7);
     tmc2130_init(tmc2130_mode);
     home();
-    if (s_idler_engaged) park_idler(true);
+    park_idler(!s_idler_engaged);
 }
 
 static void rehome_idler()
@@ -38,7 +38,7 @@ static void rehome_idler()
     home_idler();
     int idler_steps = get_idler_steps(0, s_idler);
     move_proportional(idler_steps, 0);
-    if (s_idler_engaged) park_idler(true);
+    park_idler(!s_idler_engaged);
 }
 
 void motion_set_idler_selector(uint8_t idler_selector)
@@ -100,14 +100,14 @@ static void check_idler_drive_error()
 void motion_engage_idler()
 {
     s_idler_engaged = true;
-    park_idler(true);
+    park_idler(false);
     check_idler_drive_error();
 }
 
 void motion_disengage_idler()
 {
     s_idler_engaged = false;
-    park_idler(false);
+    park_idler(true);
     check_idler_drive_error();
 }
 
