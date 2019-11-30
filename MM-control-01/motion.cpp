@@ -14,6 +14,7 @@
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
 static bool s_selector_homed = false;
+static bool s_idler_homed = false;
 static bool s_idler_engaged = true;
 static bool s_has_door_sensor = false;
 
@@ -55,12 +56,15 @@ void motion_set_idler_selector(uint8_t idler_selector)
 //! @param selector selector
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
+    if (!s_idler_homed)
+    {
+        motion_set_idler(0);
+    }
     if (!s_selector_homed)
     {
-            home();
-            s_selector = 0;
-            s_idler = 0;
-            s_selector_homed = true;
+        home_selector();
+        s_selector = 0;
+        s_selector_homed = true;
     }
     const uint8_t tries = 2;
     for (uint8_t i = 0; i <= tries; ++i)
@@ -223,6 +227,7 @@ void motion_door_sensor_detected()
 void motion_set_idler(uint8_t idler)
 {
     home_idler();
+    s_idler_homed = true;
     int idler_steps = get_idler_steps(0, idler);
     move_proportional(idler_steps, 0);
     s_idler = idler;
