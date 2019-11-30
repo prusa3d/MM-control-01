@@ -6,11 +6,11 @@
 
 static constexpr int idler_homing_direction = -1;
 
-static constexpr int selector_steps_after_homing = -3700;
+static constexpr int selector_steps_after_homing = 0;
 static constexpr int idler_steps_after_homing = 533;
 
-static constexpr int selector_steps = 2790/4;
 static constexpr int idler_steps = -500;
+static constexpr int selector_steps = -828;
 static constexpr int idler_parking_steps = 533;
 static constexpr bool idler_single_parking_position = true;
 
