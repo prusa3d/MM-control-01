@@ -639,7 +639,7 @@ void unload_filament_withSensor()
         // correct unloading
         // unload to PTFE tube
         set_pulley_dir_pull();
-        for (int i = 450; i > 0; i--)   // 570
+        for (int i = pulley_parking_steps - 150; i > 0; i--)   // 570
         {
             do_pulley_step();
             delayMicroseconds(5000);
