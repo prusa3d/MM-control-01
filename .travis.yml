@@ -20,7 +20,7 @@ deploy:
   file:
     - ../MM-control-01-build/MM-control-01_MMUv2.hex
     - ../MM-control-01_FANTAv1-build/MM-control-01_FANTAv1.hex
-    - MM-control-01_with_bootloader.hex
+    - MM-control-01_MMUv2_with_bootloader.hex
   skip_cleanup: true
   on:
     tags: true

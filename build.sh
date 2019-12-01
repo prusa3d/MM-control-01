@@ -35,6 +35,7 @@ if [ ! -f "$BUILD_ENV.version" ]; then
 fi
 
 cmake --build . || exit 10
+cd ..
 
 if [ ! -d "MM-control-01_FANTAv1-build" ]; then
     mkdir MM-control-01_FANTAv1-build  || exit 11
@@ -49,3 +50,4 @@ if [ ! -f "$BUILD_ENV.version" ]; then
 fi
 
 cmake --build . || exit 15
+cd ..
