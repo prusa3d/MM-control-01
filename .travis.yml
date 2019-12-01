@@ -11,14 +11,15 @@ script:
   - bash -x test.sh
   - bash -x build.sh
   - wget https://github.com/prusa3d/caterina/releases/download/V4/Caterina-prusa_mm_control.hex
-  - srec_cat ../MM-control-01-build/MM-control-01.hex.tmp -Intel Caterina-prusa_mm_control.hex -Intel -Output MM-control-01_with_bootloader.hex -Intel
+  - srec_cat ../MM-control-01-build/MM-control-01.hex.tmp -Intel Caterina-prusa_mm_control.hex -Intel -Output MM-control-01_MMUv2_with_bootloader.hex -Intel
   - mv Doxyfile MM-control-01/Doxyfile && cd MM-control-01
   - doxygen && cd ..
 deploy:
   provider: releases
   api_key: $ACCESS_TOKEN
   file:
-    - ../MM-control-01-build/MM-control-01.hex
+    - ../MM-control-01-build/MM-control-01_MMUv2.hex
+    - ../MM-control-01_FANTAv1-build/MM-control-01_FANTAv1.hex
     - MM-control-01_with_bootloader.hex
   skip_cleanup: true
   on:

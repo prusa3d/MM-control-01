@@ -35,3 +35,17 @@ if [ ! -f "$BUILD_ENV.version" ]; then
 fi
 
 cmake --build . || exit 10
+
+if [ ! -d "MM-control-01_FANTAv1-build" ]; then
+    mkdir MM-control-01_FANTAv1-build  || exit 11
+fi
+
+cd MM-control-01_FANTAv1-build || exit 12
+
+if [ ! -f "$BUILD_ENV.version" ]; then
+    rm -r *
+    cmake -G "$BUILD_GENERATOR" -DMODEL=FANTAv1 $SCRIPT_PATH || exit 13
+    touch $BUILD_ENV.version || exit 14
+fi
+
+cmake --build . || exit 15

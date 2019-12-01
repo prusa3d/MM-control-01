@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.3)
 #
 # You should specify those options when invoking CMake. Example:
 # ~~~
-# cmake .. <other options> -DPRINTER=MINI
+# cmake .. <other options> -DMODEL=FANTAv1
 # ~~~
 
 SET(MODEL_VALID_OPTS "MMUv2" "FANTAv1")
@@ -135,7 +135,7 @@ add_custom_command(
 	COMMAND		${CAT}
 	ARGS		${CMAKE_SOURCE_DIR}/MM-control-01.hex.in
 			MM-control-01.hex.tmp
-			> MM-control-01.hex
+			> MM-control-01_${MODEL}.hex
 	COMMENT		"Generating HEX image"
 	VERBATIM
 )
