@@ -11,16 +11,10 @@
 #include "permanent_storage.h"
 #include "pins.h"
 #include "tmc2130.h"
+#include "configuration.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
 static bool isIdlerParked = false;
-
-static const int selector_steps_after_homing = -3700;
-static const int idler_steps_after_homing = -130;
-
-static const int selector_steps = 2790/4;
-static const int idler_steps = 1420 / 4;    // 2 msteps = 180 / 4
-static const int idler_parking_steps = (idler_steps / 2) + 40;  // 40
 
 
 static int set_idler_direction(int _steps);
@@ -77,14 +71,14 @@ bool home_idler()
 
 	tmc2130_init(HOMING_MODE);
 
-	move(-10, 0, 0); // move a bit in opposite direction
+	move(-10*idler_homing_direction, 0, 0); // move a bit in opposite direction
 
 	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
 	{
 		delay(50);
 		for (int i = 0; i < 2000; i++)
 		{
-			move(1, 0,0);
+			move(idler_homing_direction, 0,0);
 			delayMicroseconds(100);
 			tmc2130_read_sg(0);
 
@@ -95,15 +89,15 @@ bool home_idler()
 		}
 	}
 
-	move(idler_steps_after_homing, 0, 0); // move to initial position
+    move(idler_steps_after_homing, 0, 0); // move to initial position
 
-	tmc2130_init(tmc2130_mode);
+    tmc2130_init(tmc2130_mode);
 
-	delay(500);
+    delay(500);
 
-    isIdlerParked = false;
+	    isIdlerParked = false;
 
-	park_idler(false);
+	    park_idler(true);
 
 	return true;
 }
@@ -294,17 +288,17 @@ void set_pulley_dir_pull()
 
 //! @brief Park idler
 //! each filament selected has its park position, there is no park position for all filaments.
-//! @param _unpark
-//!  * false park
-//!  * true engage
-void park_idler(bool _unpark)
+//! @param park
+//!  * true park
+//!  * false engage
+void park_idler(bool park)
 {
-    if (_unpark && isIdlerParked) // get idler in contact with filament
+    if (!park && isIdlerParked) // get idler in contact with filament
     {
         move_proportional(idler_parking_steps, 0);
         isIdlerParked = false;
     }
-    else if (!_unpark && !isIdlerParked) // park idler so filament can move freely
+    else if (park && !isIdlerParked) // park idler so filament can move freely
     {
         move_proportional(idler_parking_steps*-1, 0);
         isIdlerParked = true;

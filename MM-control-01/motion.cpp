@@ -10,10 +10,12 @@
 #include "config.h"
 #include "tmc2130.h"
 #include "shr16.h"
+#include "configuration.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
 static bool s_selector_homed = false;
+static bool s_idler_homed = false;
 static bool s_idler_engaged = true;
 static bool s_has_door_sensor = false;
 
@@ -26,7 +28,7 @@ void rehome()
     shr16_set_ena(7);
     tmc2130_init(tmc2130_mode);
     home();
-    if (s_idler_engaged) park_idler(true);
+    park_idler(!s_idler_engaged);
 }
 
 static void rehome_idler()
@@ -38,7 +40,7 @@ static void rehome_idler()
     home_idler();
     int idler_steps = get_idler_steps(0, s_idler);
     move_proportional(idler_steps, 0);
-    if (s_idler_engaged) park_idler(true);
+    park_idler(!s_idler_engaged);
 }
 
 void motion_set_idler_selector(uint8_t idler_selector)
@@ -55,20 +57,29 @@ void motion_set_idler_selector(uint8_t idler_selector)
 //! @param selector selector
 void motion_set_idler_selector(uint8_t idler, uint8_t selector)
 {
+    if (!s_idler_homed)
+    {
+        motion_set_idler(0);
+    }
     if (!s_selector_homed)
     {
-            home();
-            s_selector = 0;
-            s_idler = 0;
-            s_selector_homed = true;
+        home_selector();
+        s_selector = 0;
+        s_selector_homed = true;
     }
     const uint8_t tries = 2;
     for (uint8_t i = 0; i <= tries; ++i)
     {
         int idler_steps = get_idler_steps(s_idler, idler);
         int selector_steps = get_selector_steps(s_selector, selector);
-
-        move_proportional(idler_steps, selector_steps);
+        if (idler_single_parking_position && !s_idler_engaged)
+        {
+            move_proportional(0, selector_steps);
+        }
+        else
+        {
+            move_proportional(idler_steps, selector_steps);
+        }
         s_idler = idler;
         s_selector = selector;
 
@@ -100,14 +111,28 @@ static void check_idler_drive_error()
 void motion_engage_idler()
 {
     s_idler_engaged = true;
-    park_idler(true);
+    if (idler_single_parking_position)
+    {
+        motion_set_idler(s_idler);
+    }
+    park_idler(false);
     check_idler_drive_error();
 }
 
 void motion_disengage_idler()
 {
     s_idler_engaged = false;
-    park_idler(false);
+    if (idler_single_parking_position)
+    {
+        if (!s_idler_homed)
+        {
+            home_idler();
+            s_idler_homed = true;
+        }
+        int idler_steps = get_idler_steps(s_idler, 0);
+        move_proportional(idler_steps, 0);
+    }
+    park_idler(true);
     check_idler_drive_error();
 }
 
@@ -222,7 +247,11 @@ void motion_door_sensor_detected()
 
 void motion_set_idler(uint8_t idler)
 {
-    home_idler();
+    if (!s_idler_homed)
+    {
+        home_idler();
+        s_idler_homed = true;
+    }
     int idler_steps = get_idler_steps(0, idler);
     move_proportional(idler_steps, 0);
     s_idler = idler;

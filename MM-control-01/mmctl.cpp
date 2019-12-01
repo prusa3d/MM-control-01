@@ -15,6 +15,7 @@
 #include "motion.h"
 #include "permanent_storage.h"
 #include "config.h"
+#include "configuration.h"
 
 //! Keeps track of selected filament. It is used for LED signalization and it is backed up to permanent storage
 //! so MMU can unload filament after power loss.
@@ -90,7 +91,7 @@ bool feed_filament(bool timeout)
 	{
 		// unload to PTFE tube
 		set_pulley_dir_pull();
-		for (int i = 600 + finda_limit; i > 0; i--)
+		for (int i = pulley_parking_steps + finda_limit; i > 0; i--)
 		{
 			do_pulley_step();
 			delayMicroseconds(3000);
@@ -337,7 +338,7 @@ static bool checkOk()
             // looks ok !
             // unload to PTFE tube
             set_pulley_dir_pull();
-            for (int i = 600; i > 0; i--)   // 570
+            for (int i = pulley_parking_steps; i > 0; i--)
             {
                 do_pulley_step();
                 delayMicroseconds(3000);
@@ -638,7 +639,7 @@ void unload_filament_withSensor()
         // correct unloading
         // unload to PTFE tube
         set_pulley_dir_pull();
-        for (int i = 450; i > 0; i--)   // 570
+        for (int i = pulley_parking_steps - 150; i > 0; i--)   // 570
         {
             do_pulley_step();
             delayMicroseconds(5000);
