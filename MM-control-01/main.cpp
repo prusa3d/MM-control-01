@@ -23,6 +23,7 @@
 
 
 uint8_t tmc2130_mode = NORMAL_MODE;
+uint8_t pinda_state = 0;
 
 #if (UART_COM == 0)
 FILE* uart_com = uart0io;
@@ -100,13 +101,6 @@ static void led_blink(int _no)
 //! @n 1 - active
 //! @n 0 - inactive
 //! @n b - blinking
-static void signal_filament_present()
-{
-    shr16_set_led(0x2aa);
-    delay(300);
-    shr16_set_led(0x000);
-    delay(300);
-}
 
 void signal_load_failure()
 {
@@ -125,24 +119,6 @@ void signal_ok_after_load_failure()
     shr16_set_led(2 << 2 * (4 - active_extruder));
     delay(100);
     delay(800);
-}
-
-//! @brief Signal filament presence
-//!
-//! @retval true still present
-//! @retval false not present any more
-bool filament_presence_signaler()
-{
-    if (digitalRead(A1) == 1)
-    {
-        signal_filament_present();
-        return true;
-    }
-    else
-    {
-        isFilamentLoaded = false;
-        return false;
-    }
 }
 
 
@@ -167,27 +143,6 @@ bool filament_presence_signaler()
 //! @n 1 - active
 //! @n 0 - inactive
 //! @n b - blinking
-
-void check_filament_not_present()
-{
-    while (digitalRead(A1) == 1)
-    {
-        while (Btn::right != buttonPressed())
-        {
-            if (digitalRead(A1) == 1)
-            {
-                signal_filament_present();
-            }
-            else
-            {
-                shr16_set_led(0x155);
-                delay(300);
-                shr16_set_led(0x000);
-                delay(300);
-            }
-        }
-    }
-}
 
 static void signal_drive_error()
 {
@@ -295,8 +250,6 @@ void setup()
         motion_set_idler(filament);
     }
 
-	if (digitalRead(A1) == 1) isFilamentLoaded = true;
-
 }
 
 
@@ -382,7 +335,7 @@ void loop()
     case S::Printing:
         break;
     case S::SignalFilament:
-        if (!filament_presence_signaler()) state = S::Idle;
+        //if (!filament_presence_signaler()) state = S::Idle;
         break;
     case S::Idle:
         manual_extruder_selector();
@@ -392,8 +345,7 @@ void loop()
             delay(500);
             if (Btn::middle == buttonPressed())
             {
-                motion_set_idler_selector(active_extruder);
-                feed_filament();
+                motion_set_idler(active_extruder);
             }
         }
         break;
@@ -402,7 +354,7 @@ void loop()
         switch(buttonClicked())
         {
         case Btn::middle:
-            if (mmctl_IsOk()) state = S::WaitOk;
+            state = S::WaitOk;
             break;
         case Btn::right:
             state = S::Idle;
@@ -417,7 +369,7 @@ void loop()
         switch(buttonClicked())
         {
         case Btn::middle:
-            if (!mmctl_IsOk()) state = S::Wait;
+            state = S::Wait;
             break;
         case Btn::right:
             state = S::Idle;
@@ -480,7 +432,6 @@ void process_commands(FILE* inout)
 			    else
 			    {
                     select_extruder(value);
-                    feed_filament();
 			    }
                 fprintf_P(inout, PSTR("ok\n"));
 			}
@@ -503,7 +454,7 @@ void process_commands(FILE* inout)
 		else if (sscanf_P(line, PSTR("U%d"), &value) > 0)
 		{
 
-			unload_filament_withSensor();
+			unload_filament_withoutSensor();
 			fprintf_P(inout, PSTR("ok\n"));
 
 			state = S::Idle;
@@ -516,7 +467,7 @@ void process_commands(FILE* inout)
 		else if (sscanf_P(line, PSTR("P%d"), &value) > 0)
 		{
 			if (value == 0) //! P0 Read finda
-				fprintf_P(inout, PSTR("%dok\n"), digitalRead(A1));
+				fprintf_P(inout, PSTR("%dok\n"), pinda_state);
 		}
 		else if (sscanf_P(line, PSTR("S%d"), &value) > 0)
 		{
@@ -576,7 +527,6 @@ void process_commands(FILE* inout)
         {
             if ((value >= 0) && (value < EXTRUDERS)) //! K<nr.> cut filament
             {
-                mmctl_cut_filament(value);
                 fprintf_P(inout, PSTR("ok\n"));
             }
         }

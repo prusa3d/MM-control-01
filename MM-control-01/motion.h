@@ -8,8 +8,7 @@
 
 #include <stdint.h>
 
-void motion_set_idler_selector(uint8_t idler_selector);
-void motion_set_idler_selector(uint8_t idler, uint8_t selector);
+void motion_set_idler2(uint8_t idler);
 void motion_engage_idler();
 void motion_disengage_idler();
 void motion_feed_to_bondtech();

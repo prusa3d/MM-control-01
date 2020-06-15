@@ -31,16 +31,15 @@ static const uint8_t layoutVersion = 0xff;
 //c = pi * d        pulley circumference
 //FSPR = 200        full steps per revolution (stepper motor constant) (1.8 deg/step)
 //mres = 2          pulley microstep resolution (uint8_t __res(AX_PUL))
-//mres = 2          selector microstep resolution (uint8_t __res(AX_SEL))
 //mres = 16         idler microstep resolution (uint8_t __res(AX_IDL))
 //1 pulley ustep = (d*pi)/(mres*FSPR) = 49.48 um
 
 static eeprom_t * const eepromBase = reinterpret_cast<eeprom_t*>(0); //!< First EEPROM address
 static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
-static const uint16_t eepromLengthCorrectionBase = 7900u; //!< legacy bowden length correction base (~391mm)
-static const uint16_t eepromBowdenLenDefault = 8900u; //!< Default bowden length (~427 mm)
-static const uint16_t eepromBowdenLenMinimum = 6900u; //!< Minimum bowden length (~341 mm)
-static const uint16_t eepromBowdenLenMaximum = 16000u; //!< Maximum bowden length (~792 mm)
+static const uint16_t eepromLengthCorrectionBase = 7900u/4; //!< legacy bowden length correction base (~391mm)
+static const uint16_t eepromBowdenLenDefault = 8900u/4; //!< Default bowden length (~427 mm)
+static const uint16_t eepromBowdenLenMinimum = 6900u/4; //!< Minimum bowden length (~341 mm)
+static const uint16_t eepromBowdenLenMaximum = 16000u/4; //!< Maximum bowden length (~792 mm)
 
 void permanentStorageInit()
 {

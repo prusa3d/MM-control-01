@@ -130,29 +130,26 @@ inline uint16_t __tcoolthrs(uint8_t axis)
 	switch (axis)
 	{
 	case AX_PUL: return TMC2130_TCOOLTHRS_0;
-	case AX_SEL: return TMC2130_TCOOLTHRS_1;
 	case AX_IDL: return TMC2130_TCOOLTHRS_2;
 	}
 	return TMC2130_TCOOLTHRS;
 }
 
-inline int8_t __sg_thr(uint8_t axis)
+static inline int8_t __sg_thr(uint8_t axis)
 {
 	switch (axis)
 	{
 	case AX_PUL: return TMC2130_SG_THR_0;
-	case AX_SEL: return TMC2130_SG_THR_1;
 	case AX_IDL: return TMC2130_SG_THR_2;
 	}
 	return TMC2130_SG_THR;
 }
 
-inline int8_t __res(uint8_t axis)
+static inline int8_t __res(uint8_t axis)
 {
 	switch (axis)
 	{
 	case AX_PUL: return tmc2130_usteps2mres((uint16_t)2);
-	case AX_SEL: return tmc2130_usteps2mres((uint16_t)2);
 	case AX_IDL: return tmc2130_usteps2mres((uint16_t)16);
 	}
 	return 16;
@@ -244,17 +241,14 @@ int8_t tmc2130_init(uint8_t mode)
 	PORTD |= 0x80; //PD7 CSN U6
 	PORTB |= 0x80; //PB7 CSN U7
 
-	selector_step_pin_init();
 	pulley_step_pin_init();
 	idler_step_pin_init();
-	selector_step_pin_reset(); //PD4
 	pulley_step_pin_reset();   //PB4
 	idler_step_pin_reset();    //PD6
 
 	int8_t ret = 0;
 	
 	ret += tmc2130_init_axis(AX_PUL,mode)?-1:0;
-	ret += tmc2130_init_axis(AX_SEL,mode)?-2:0;
 	ret += tmc2130_init_axis(AX_IDL,mode)?-4:0;
 
 	return ret;
@@ -269,7 +263,7 @@ uint16_t tmc2130_read_sg(uint8_t axis)
 }
 
 
-inline void tmc2130_cs_low(uint8_t axis)
+static inline void tmc2130_cs_low(uint8_t axis)
 {
 	switch (axis)
 	{
@@ -279,7 +273,7 @@ inline void tmc2130_cs_low(uint8_t axis)
 	}
 }
 
-inline void tmc2130_cs_high(uint8_t axis)
+static inline void tmc2130_cs_high(uint8_t axis)
 {
 	switch (axis)
 	{
@@ -356,11 +350,10 @@ uint8_t tmc2130_rx(uint8_t axis, uint8_t addr, uint32_t* rval)
 uint8_t tmc2130_read_gstat()
 {
     uint8_t retval = 0;
-    for (uint8_t axis = AX_PUL; axis <= AX_IDL ; ++ axis)
-    {
         uint32_t result;
-        tmc2130_rd(axis, TMC2130_REG_GSTAT, &result);
-        if (result & 0x7) retval += (1 << axis);
-    }
+        tmc2130_rd(AX_PUL, TMC2130_REG_GSTAT, &result);
+        if (result & 0x7) retval += (1 << AX_PUL);
+		tmc2130_rd(AX_IDL, TMC2130_REG_GSTAT, &result);
+        if (result & 0x7) retval += (1 << AX_IDL);
     return retval;
 }

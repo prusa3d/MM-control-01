@@ -68,10 +68,8 @@
 #define TMC2130_TCOOLTHRS_2    450
 
 //0 - PULLEY
-//1 - SELECTOR
-//2 - IDLER
+//1 - IDLER
 #define AX_PUL 0
-#define AX_SEL 1
 #define AX_IDL 2
 
 // currents
