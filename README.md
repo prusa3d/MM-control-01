@@ -1,3 +1,10 @@
+MMU2S firmware for the MMU2+1S edition with splitter
+
+Pre-compiled firmware in the firmware/ directory
+
+
+---------
+
 # MM-control-01
 MMU 3-axis stepper control
 [![Build Status](https://api.travis-ci.org/prusa3d/MM-control-01.svg?branch=master)](https://api.travis-ci.org/prusa3d/MM-control-01.svg?branch=master)
