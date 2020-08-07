@@ -111,7 +111,7 @@ int8_t tmc2130_setup_chopper(uint8_t axis, uint8_t mres, uint8_t current_h, uint
 	uint8_t fd3 = 0;
 	uint8_t rndtf = 0; //random off time
 	uint8_t chm = 0; //spreadCycle
-	uint8_t tbl = 2; //blanking time
+	uint8_t tbl = 1; //blanking time
 	if (current_r <= 31)
 	{
 		if (tmc2130_wr_CHOPCONF(axis, toff, hstrt, hend, fd3, 0, rndtf, chm, tbl, 1, 0, 0, 0, mres, intpol, 0, 0)) return -1;

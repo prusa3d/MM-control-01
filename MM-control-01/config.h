@@ -74,12 +74,12 @@
 #define AX_SEL 1
 #define AX_IDL 2
 
-// currents
+// currents (Drive?, Selector?, Idler)
 #define CURRENT_HOLDING_STEALTH {1, 7, 22}  // {?,?,570 mA}
 #define CURRENT_HOLDING_NORMAL {1, 10, 22}  // {?,?,570 mA}
-#define CURRENT_RUNNING_STEALTH {35, 35, 45} // {?,?,910 mA}
-#define CURRENT_RUNNING_NORMAL {30, 35, 47} // {?,?,910 mA}
-#define CURRENT_HOMING {1, 35, 30}
+#define CURRENT_RUNNING_STEALTH {35, 35, 42} // {?,?,910 mA}
+#define CURRENT_RUNNING_NORMAL {30, 35, 42} // {?,?,910 mA}
+#define CURRENT_HOMING {1, 35, 35}
 
 //mode
 #define HOMING_MODE 0
