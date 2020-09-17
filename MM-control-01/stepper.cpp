@@ -33,6 +33,7 @@ static int _sg_idler;
 static int _sg_selector;
 int16_t sg_selector;
 int16_t sg_idler;
+static int max_sg;
 
 
 //! @brief Compute steps for selector needed to change filament
@@ -87,30 +88,31 @@ bool home_idler()
     {
         for (int test= 0; test< 3000; test++)
           {
-                    int  _sg_idler = sg_idler;    
+                    _sg_idler = sg_idler;    
                     move(1, 0,0);                  
                     if ((test > 50) && ((_sg_idler - sg_idler) > 200))  break;//250
-                   // if(max_sg < sg_idler) max_sg = sg_idler;
+                    if(max_sg < sg_idler) max_sg = sg_idler;
                     if (sg_idler >650) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    //printf("%u ", max_sg);
-                    //printf("%u \n", sg_idler);
-                    delayMicroseconds(50);
+                    delayMicroseconds(200);
           }  
+        //printf("%u ", max_sg);
+       
+                
         for (int test= 0; test< 3000; test++)
           {
                     int  _sg_idler = sg_idler;    
                     move(-1, 0,0);                   
                     if ((test > 50) && ((_sg_idler - sg_idler) > 200))  break;//250
-                   // if(max_sg < sg_idler) max_sg = sg_idler;
+                    if(max_sg < sg_idler) max_sg = sg_idler;
                     if (sg_idler >650) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    //printf("%u ", max_sg);
-                    //printf("%u \n", sg_idler);
-                    delayMicroseconds(50);
+                    delayMicroseconds(200);
           }  
+          
+        //printf("%u ", max_sg);
     }
     shr16_set_led(0x00);    
     ////end testing tension springs
@@ -119,9 +121,10 @@ bool home_idler()
     {
      int  _sg_idler = sg_idler;  
       move(1, 0,0);    
-      printf("%u ", _sg_idler);
-      printf("%u \n", sg_idler);
-      if ((i > 50) && ((_sg_idler - sg_idler) > 200))  break;//250
+      //printf("%u ", _sg_idler);
+      //printf("%u \n", sg_idler);
+      if ((i > 50) && ((_sg_idler - sg_idler) > 200))  break;
+      delayMicroseconds(200);
     }
 
     tmc2130_init(tmc2130_mode);

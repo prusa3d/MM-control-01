@@ -61,7 +61,7 @@
 // SG_THR stallguard treshold (sensitivity), range -128..127, real 0-3
 #define TMC2130_SG_THR_0       0
 #define TMC2130_SG_THR_1       10
-#define TMC2130_SG_THR_2       11
+#define TMC2130_SG_THR_2       10
 // TCOOLTHRS coolstep treshold, usable range 400-600
 #define TMC2130_TCOOLTHRS_0    450
 #define TMC2130_TCOOLTHRS_1    450
