@@ -29,6 +29,12 @@ static int set_pulley_direction(int _steps);
 static void set_idler_dir_down();
 static void set_idler_dir_up();
 static void move(int _idler, int _selector, int _pulley);
+static int _sg_idler;
+static int _sg_selector;
+int16_t sg_selector;
+int16_t sg_idler;
+
+
 
 //! @brief Compute steps for selector needed to change filament
 //! @param current_filament Currently selected filament
@@ -72,40 +78,52 @@ void do_pulley_step()
 //! @retval false Failed
 bool home_idler()
 {
-	int _c = 0;
-	int _l = 0;
 
 	tmc2130_init(HOMING_MODE);
+  move(-50, 0,0); // move a bit in opposite direction
+  delay(50);
 
-	move(-10, 0, 0); // move a bit in opposite direction
+////start testing tension springs
+  for (int i = 0; i < 2; i++)
+    {
+        for (int test= 0; test< 3000; test++)
+          {
+                    _sg_idler = sg_idler;    
+                    move(1, 0,0);                  
+                    if ((test > 50) && ((_sg_idler - sg_idler) > 200))  break;
+                    if (sg_idler >650) shr16_set_led(0x155);
+                    if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
+                    if (sg_idler <400) shr16_set_led(0x2aa);
+                    delayMicroseconds(80);
+          }        
+                
+        for (int test= 0; test< 3000; test++)
+          {
+                    int  _sg_idler = sg_idler;    
+                    move(-1, 0,0);                   
+                    if ((test > 50) && ((_sg_idler - sg_idler) > 200))  break;
+                    if (sg_idler >600) shr16_set_led(0x155);
+                    if ((sg_idler > 400) && (sg_idler < 600)) shr16_set_led(0x3ff);
+                    if (sg_idler <400) shr16_set_led(0x2aa);
+                    delayMicroseconds(80);
+          }            
+    }
+    shr16_set_led(0x00);    
+////end testing tension springs
 
-	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
-	{
-		delay(50);
-		for (int i = 0; i < 2000; i++)
-		{
-			move(1, 0,0);
-			delayMicroseconds(100);
-			tmc2130_read_sg(0);
+    for (int i = 0; i < 3000; i++)
+    {
+     int  _sg_idler = sg_idler;  
+      move(1, 0,0);    
+      if ((i > 50) && ((_sg_idler - sg_idler) > 200))  break;
+      delayMicroseconds(80);
+    }
 
-			_c++;
-			if (i == 1000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
-		}
-	}
-
-	move(idler_steps_after_homing, 0, 0); // move to initial position
-
-	tmc2130_init(tmc2130_mode);
-
-	delay(500);
-
+    tmc2130_init(tmc2130_mode);
+    move_proportional(idler_steps_after_homing, 0); // move to initial position
     isIdlerParked = false;
-
-	park_idler(false);
-
-	return true;
+    park_idler(false);
+  	return true;
 }
 
 bool home_selector()
@@ -115,31 +133,16 @@ bool home_selector()
 
     tmc2130_init(HOMING_MODE);
 
-	int _c = 0;
-	int _l = 2;
-
-	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
-	{
-		move(0, c * -18, 0);
-		delay(50);
 		for (int i = 0; i < 4000; i++)
 		{
+      int _sg_selector = sg_selector;
 			move(0, 1,0);
-			uint16_t sg = tmc2130_read_sg(AX_SEL);
-			if ((i > 16) && (sg < 5))	break;
-
-			_c++;
-			if (i == 3000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
+      if ((i > 100) && ((_sg_selector - sg_selector) >150)) break;//100
 		}
-	}
+	
 
-	move(0, selector_steps_after_homing,0); // move to initial position
-
-    tmc2130_init(tmc2130_mode);
-
-	delay(500);
+  tmc2130_init(tmc2130_mode); 
+  move_proportional(0, selector_steps_after_homing); // move to initial position
 
 	return true;
 }
@@ -214,14 +217,14 @@ void move(int _idler, int _selector, int _pulley)
 	_pulley = set_pulley_direction(_pulley);
 	
 
-	do
+	while(_selector != 0 || _idler != 0 || _pulley!= 0)
 	{
-		if (_idler > 0) { idler_step_pin_set(); }
-		if (_selector > 0) { selector_step_pin_set();}
-		if (_pulley > 0) { pulley_step_pin_set(); }
+    if (_idler > 0) { idler_step_pin_set();sg_idler = tmc2130_read_sg(AX_IDL); }
+    if (_selector > 0) { selector_step_pin_set();sg_selector = tmc2130_read_sg(AX_SEL);}
+    if (_pulley > 0) { pulley_step_pin_set(); }
 		asm("nop");
-		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(1000); }
-		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(800); }
+		if (_idler > 0) { idler_step_pin_reset(); _idler--; delayMicroseconds(50); }
+		if (_selector > 0) { selector_step_pin_reset(); _selector--;  delayMicroseconds(500); }
 		if (_pulley > 0) { pulley_step_pin_reset(); _pulley--;  delayMicroseconds(700); }
 		asm("nop");
 
