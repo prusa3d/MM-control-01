@@ -91,8 +91,8 @@ bool home_idler()
                     _sg_idler = sg_idler;    
                     move(1, 0,0);                  
                     if ((test > 50) && ((_sg_idler - sg_idler) > 200))  break;
-                    if (sg_idler >600) shr16_set_led(0x155);
-                    if ((sg_idler > 400) && (sg_idler < 600)) shr16_set_led(0x3ff);
+                    if (sg_idler >650) shr16_set_led(0x155);
+                    if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
                     delayMicroseconds(80);
           }        
