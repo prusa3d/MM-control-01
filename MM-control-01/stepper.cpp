@@ -94,7 +94,7 @@ bool home_idler()
                     if (sg_idler >650) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    delayMicroseconds(80);
+                    delayMicroseconds(90);
           }        
                 
         for (int test= 0; test< 3000; test++)
@@ -105,7 +105,7 @@ bool home_idler()
                     if (sg_idler >600) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 600)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    delayMicroseconds(80);
+                    delayMicroseconds(90);
           }            
     }
     shr16_set_led(0x00);    
@@ -116,7 +116,7 @@ bool home_idler()
      int  _sg_idler = sg_idler;  
       move(1, 0,0);    
       if ((i > 50) && ((_sg_idler - sg_idler) > 200))  break;
-      delayMicroseconds(80);
+      delayMicroseconds(90);
     }
 
     tmc2130_init(tmc2130_mode);
