@@ -12,6 +12,7 @@ void motion_set_idler2(uint8_t idler);
 void motion_engage_idler();
 void motion_disengage_idler();
 void motion_feed_to_bondtech();
+void motion_feed_into_mmu(uint16_t steps);
 void motion_unload_to_finda();
 void motion_door_sensor_detected();
 void motion_set_idler(uint8_t idler);

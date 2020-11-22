@@ -432,6 +432,7 @@ void process_commands(FILE* inout)
 			    else
 			    {
                     select_extruder(value);
+					motion_feed_into_mmu(5000);
 			    }
                 fprintf_P(inout, PSTR("ok\n"));
 			}

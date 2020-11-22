@@ -37,7 +37,8 @@ static const uint8_t layoutVersion = 0xff;
 static eeprom_t * const eepromBase = reinterpret_cast<eeprom_t*>(0); //!< First EEPROM address
 static const uint16_t eepromEmpty = 0xffff; //!< EEPROM content when erased
 static const uint16_t eepromLengthCorrectionBase = 7900u/4; //!< legacy bowden length correction base (~391mm)
-static const uint16_t eepromBowdenLenDefault = 8900u/4; //!< Default bowden length (~427 mm)
+//static const uint16_t eepromBowdenLenDefault = 8900u/4; //!< Default bowden length (~427 mm)
+static const uint16_t eepromBowdenLenDefault = 2500; //!< Default bowden length (~427 mm)
 static const uint16_t eepromBowdenLenMinimum = 6900u/4; //!< Minimum bowden length (~341 mm)
 static const uint16_t eepromBowdenLenMaximum = 16000u/4; //!< Maximum bowden length (~792 mm)
 

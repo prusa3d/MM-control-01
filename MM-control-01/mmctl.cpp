@@ -69,7 +69,7 @@ void select_extruder(int new_extruder)
 
 	active_extruder = new_extruder;
 
-    motion_set_idler2((new_extruder < EXTRUDERS) ? new_extruder : (EXTRUDERS - 1));
+    motion_set_idler2(active_extruder);
 
 	shr16_set_led(0x000);
 	shr16_set_led(1 << 2 * (4 - active_extruder));
