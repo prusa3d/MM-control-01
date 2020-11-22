@@ -185,19 +185,6 @@ void motion_feed_to_bondtech()
 }
 
 
-void motion_feed_into_mmu(uint16_t steps)
-{
-    set_pulley_dir_push();
-    unsigned long delay = 4500;
-
-    for (uint16_t i = 0; i < steps; i++)
-    {
-        delayMicroseconds(delay);
-        do_pulley_step();
-    }
-}
-
-
 //! @brief unload to FINDA
 //!
 //! Check for drive error and try to recover 3 times.

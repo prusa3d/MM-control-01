@@ -16,5 +16,7 @@ void unload_filament_withoutSensor();
 void eject_filament(uint8_t filament);
 void recover_after_eject();
 bool mmctl_IsOk();
+void motion_feed_into_mmu(uint16_t steps);
+
 
 #endif //_MMCTL_H

@@ -346,6 +346,7 @@ void loop()
             if (Btn::middle == buttonPressed())
             {
                 motion_set_idler(active_extruder);
+				motion_feed_into_mmu(5000);
             }
         }
         break;
