@@ -455,6 +455,9 @@ void process_commands(FILE* inout)
 	}
 	int value = 0;
 	int value0 = 0;
+	int value1 = 0;
+	int value2 = 0;
+	int nr; // number of matched items
 
 	if ((count > 0) && (c == 0))
 	{
@@ -530,12 +533,24 @@ void process_commands(FILE* inout)
 			    fprintf_P(inout, PSTR("%dok\n"), DriveError::get());
 		}
 		//! F<nr.> \<type\> filament type. <nr.> filament number, \<type\> 0, 1 or 2. Does nothing.
-		else if (sscanf_P(line, PSTR("F%d %d"), &value, &value0) > 0)
+		else if ((nr = sscanf_P(line, PSTR("F%d %d %d %d"),
+					&value, &value0,
+					&value1, &value2)) > 0)
 		{
 			if (((value >= 0) && (value < EXTRUDERS)) &&
 				((value0 >= 0) && (value0 <= 2)))
 			{
 				filament_type[value] = value0;
+				if (nr == 4)
+				  {
+				    filament_load_speed[value] = value1 / 256.0;
+				    filament_unload_speed[value] = value2 / 256.0;
+				  }
+				else
+				  {
+				    filament_load_speed[value] = 1.0;
+				    filament_unload_speed[value] = 1.0;
+				  }
 				fprintf_P(inout, PSTR("ok\n"));
 			}
 		}
