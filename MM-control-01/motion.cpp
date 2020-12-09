@@ -10,6 +10,7 @@
 #include "config.h"
 #include "tmc2130.h"
 #include "shr16.h"
+#include "mmctl.h"
 
 static uint8_t s_idler = 0;
 static uint8_t s_selector = 0;
@@ -115,6 +116,8 @@ void motion_disengage_idler()
 static void unload_to_finda()
 {
     int delay = 2000; //microstep period in microseconds
+    int min_delay_stealth = round (550 / filament_unload_speed[active_extruder]);
+    int min_delay_normal = round (330 / filament_unload_speed[active_extruder]);
     const int _first_point = 1800;
 
     uint8_t _endstop_hit = 0;
@@ -133,8 +136,8 @@ static void unload_to_finda()
         if (_unloadSteps < _first_point && delay < 2500) delay += 2;
         if (_unloadSteps < _second_point && _unloadSteps > 5000)
         {
-            if (delay > 550) delay -= 1;
-            if (delay > 330 && (NORMAL_MODE == tmc2130_mode)) delay -= 1;
+            if (delay > min_delay_stealth) delay -= 1;
+            if (delay > min_delay_normal && (NORMAL_MODE == tmc2130_mode)) delay -= 1;
         }
 
         delayMicroseconds(delay);
@@ -153,6 +156,8 @@ void motion_feed_to_bondtech()
     {
         set_pulley_dir_push();
         unsigned long delay = 4500;
+	int min_delay_stealth = round (650 / filament_load_speed[active_extruder]);
+	int min_delay_normal = round (350 / filament_load_speed[active_extruder]);;
 
         for (uint16_t i = 0; i < steps; i++)
         {
@@ -161,10 +166,12 @@ void motion_feed_to_bondtech()
 
             if (i < 4000)
             {
-                if (stepPeriod > 2600) stepPeriod -= 4;
-                if (stepPeriod > 1300) stepPeriod -= 2;
-                if (stepPeriod > 650) stepPeriod -= 1;
-                if (stepPeriod > 350 && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) stepPeriod -= 1;
+                if (min_delay_stealth < 2600 && stepPeriod > 2600)
+		  stepPeriod -= 4;
+                if (min_delay_stealth < 1300 && stepPeriod > 1300)
+		  stepPeriod -= 2;
+                if (stepPeriod > min_delay_stealth) stepPeriod -= 1;
+                if (stepPeriod > min_delay_normal && (NORMAL_MODE == tmc2130_mode) && s_has_door_sensor) stepPeriod -= 1;
             }
             if (i > (steps - 800) && stepPeriod < 2600) stepPeriod += 10;
             if ('A' == getc(uart_com))

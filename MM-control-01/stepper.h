@@ -8,6 +8,8 @@
 #include <inttypes.h>
 
 extern int8_t filament_type[EXTRUDERS];
+extern float filament_load_speed[EXTRUDERS];
+extern float filament_unload_speed[EXTRUDERS];
 
 void home();
 bool home_idler();

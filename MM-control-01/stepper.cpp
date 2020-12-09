@@ -13,6 +13,8 @@
 #include "tmc2130.h"
 
 int8_t filament_type[EXTRUDERS] = {-1, -1, -1, -1, -1};
+float filament_load_speed[EXTRUDERS] = {1.0, 1.0, 1.0, 1.0, 1.0};
+float filament_unload_speed[EXTRUDERS] = {1.0, 1.0, 1.0, 1.0, 1.0};
 static bool isIdlerParked = false;
 
 static const int selector_steps_after_homing = -3700;
