@@ -94,9 +94,9 @@ bool home_idler()
                     if (sg_idler >650) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 650)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    delayMicroseconds(90);
+                    delayMicroseconds(50);
           }        
-                
+          
         for (int test= 0; test< 3000; test++)
           {
                     int  _sg_idler = sg_idler;    
@@ -105,8 +105,8 @@ bool home_idler()
                     if (sg_idler >600) shr16_set_led(0x155);
                     if ((sg_idler > 400) && (sg_idler < 600)) shr16_set_led(0x3ff);
                     if (sg_idler <400) shr16_set_led(0x2aa);
-                    delayMicroseconds(90);
-          }            
+                    delayMicroseconds(50);
+          }                  
     }
     shr16_set_led(0x00);    
 ////end testing tension springs
@@ -116,9 +116,8 @@ bool home_idler()
      int  _sg_idler = sg_idler;  
       move(1, 0,0);    
       if ((i > 50) && ((_sg_idler - sg_idler) > 200))  break;
-      delayMicroseconds(90);
+      delayMicroseconds(50);
     }
-
     tmc2130_init(tmc2130_mode);
     move_proportional(idler_steps_after_homing, 0); // move to initial position
     isIdlerParked = false;
