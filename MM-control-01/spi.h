@@ -26,7 +26,7 @@ inline void spi_setup(uint8_t spcr, uint8_t spsr)
 	SPSR = spsr;
 }
 
-inline uint8_t spi_txrx(uint8_t tx)
+static inline uint8_t spi_txrx(uint8_t tx)
 {
 	SPDR = tx;
 	while (!(SPSR & (1 << SPIF)));

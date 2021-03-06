@@ -136,7 +136,7 @@ inline uint16_t __tcoolthrs(uint8_t axis)
 	return TMC2130_TCOOLTHRS;
 }
 
-inline int8_t __sg_thr(uint8_t axis)
+static inline int8_t __sg_thr(uint8_t axis)
 {
 	switch (axis)
 	{
@@ -147,7 +147,7 @@ inline int8_t __sg_thr(uint8_t axis)
 	return TMC2130_SG_THR;
 }
 
-inline int8_t __res(uint8_t axis)
+static inline int8_t __res(uint8_t axis)
 {
 	switch (axis)
 	{
@@ -269,7 +269,7 @@ uint16_t tmc2130_read_sg(uint8_t axis)
 }
 
 
-inline void tmc2130_cs_low(uint8_t axis)
+static inline void tmc2130_cs_low(uint8_t axis)
 {
 	switch (axis)
 	{
@@ -279,7 +279,7 @@ inline void tmc2130_cs_low(uint8_t axis)
 	}
 }
 
-inline void tmc2130_cs_high(uint8_t axis)
+static inline void tmc2130_cs_high(uint8_t axis)
 {
 	switch (axis)
 	{
