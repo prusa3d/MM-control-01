@@ -260,14 +260,19 @@ void setup()
 
     // wait until +24V reaches at least 10V
 	{
-		constexpr int ten_volts = 10 / 5 * 1024 * 1 / 11;
+		constexpr double ten_volts = 10;
+		constexpr double Vref = 5;
+		constexpr double ADCresolution = 1024;
+		constexpr double R17_kOhm = 1;
+		constexpr double R16_kOhm = 10;
+		constexpr int ten_volts_raw = ten_volts / Vref * ADCresolution * R17_kOhm / (R17_kOhm + R16_kOhm);
 		int raw_supply_voltage = 0;
 		do
 		{
 			led_blink(0);
 			raw_supply_voltage = analogRead(A0);
 		}
-		while(raw_supply_voltage < ten_volts);
+		while(raw_supply_voltage < ten_volts_raw);
 	}
 
 	shr16_set_ena(7); //enable motors
