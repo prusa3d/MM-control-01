@@ -240,7 +240,7 @@ void unrecoverable_error()
 //!
 //! RG | RG | RG | RG | RG | meaning
 //! -- | -- | -- | -- | -- | ------------------------
-//! 00 | 00 | 00 | 00 | 0b | Shift register initialized
+//! 00 | 00 | 00 | 00 | 0b | Shift register initialized, waiting for 24V supply rail
 //! 00 | 00 | 00 | 0b | 00 | uart initialized
 //! 00 | 00 | 0b | 00 | 00 | spi initialized
 //! 00 | 0b | 00 | 00 | 00 | tmc2130 initialized
@@ -255,7 +255,23 @@ void setup()
 {
     permanentStorageInit();
 	shr16_init(); // shift register
-	led_blink(0);
+
+	shr16_set_ena(0); //disable motors
+
+    // wait until +24V reaches at least 10V
+	{
+		constexpr int ten_volts = 10 / 5 * 1024 * 1 / 11;
+		int raw_supply_voltage = 0;
+		do
+		{
+			led_blink(0);
+			raw_supply_voltage = analogRead(A0);
+		}
+		while(raw_supply_voltage < ten_volts);
+	}
+
+	shr16_set_ena(7); //enable motors
+
 
 	uart0_init(); //uart0
 	uart1_init(); //uart1
