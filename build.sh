@@ -1,5 +1,5 @@
 #!/bin/bash 
-BUILD_ENV="1.0.0"
+BUILD_ENV="1.0.1"
 BUILD_GENERATOR="Eclipse CDT4 - Ninja"
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
