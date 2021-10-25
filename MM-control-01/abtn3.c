@@ -10,7 +10,7 @@ uint8_t abtn_state = 0;
 uint8_t abtn_click = 0;
 
 
-inline uint8_t abtn3_sample(void)
+static inline uint8_t abtn3_sample(void)
 {
 	int raw = adc_val[0];
 	// Button 1 - 0

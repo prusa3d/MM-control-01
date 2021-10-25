@@ -5,7 +5,9 @@
 
 #include <stdint.h>
 
-const uint8_t selector_step_pin = 0x10;
+extern const uint8_t selector_step_pin;
+extern const uint8_t idler_step_pin;
+extern const uint8_t pulley_step_pin;
 
 inline void selector_step_pin_init()
 {
@@ -20,8 +22,6 @@ inline void selector_step_pin_reset()
     PORTD &= ~selector_step_pin;
 }
 
-const uint8_t idler_step_pin = 0x40;
-
 inline void idler_step_pin_init()
 {
     DDRD |= idler_step_pin;
@@ -34,8 +34,6 @@ inline void idler_step_pin_reset()
 {
     PORTD &= ~idler_step_pin;
 }
-
-const uint8_t pulley_step_pin = 0x10;
 
 inline void pulley_step_pin_init()
 {
