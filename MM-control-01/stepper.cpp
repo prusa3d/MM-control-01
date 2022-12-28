@@ -77,36 +77,41 @@ bool home_idler()
 
 	tmc2130_init(HOMING_MODE);
 
-	move(-10, 0, 0); // move a bit in opposite direction
 
-	for (int c = 1; c > 0; c--)  // not really functional, let's do it rather more times to be sure
-	{
-		delay(50);
-		for (int i = 0; i < 2000; i++)
-		{
-			move(1, 0,0);
-			delayMicroseconds(100);
-			tmc2130_read_sg(0);
+	for (int c = 10; c > 0; c--)   // not really functional, let's do it rather more times to be sure
+  {
+    delay(50);
+    for (int i = 0; i < 4000; i++)
+    {
+      move(1, 0, 0);
+      delayMicroseconds(1000);
+      uint16_t sg = tmc2130_read_sg(AX_IDL);
+      if ((i > 50) && (sg < 1)) {
+        move(c * -18, 0, 0);
+        break;
+      }
 
-			_c++;
-			if (i == 1000) { _l++; }
-			if (_c > 100) { shr16_set_led(1 << 2 * _l); };
-			if (_c > 200) { shr16_set_led(0x000); _c = 0; };
-		}
-	}
+      _c++;
+      if (i == 3000) { _l++; }
+      if (_c > 100) { shr16_set_led(1 << 2 * _l); };
+      if (_c > 200) { shr16_set_led(0x000); _c = 0; };
+    }
+  }
 
 	move(idler_steps_after_homing, 0, 0); // move to initial position
-
+  
 	tmc2130_init(tmc2130_mode);
 
 	delay(500);
 
-    isIdlerParked = false;
+  isIdlerParked = false;
 
 	park_idler(false);
 
+  
 	return true;
 }
+
 
 bool home_selector()
 {
@@ -121,12 +126,15 @@ bool home_selector()
 	for (int c = 7; c > 0; c--)   // not really functional, let's do it rather more times to be sure
 	{
 		move(0, c * -18, 0);
-		delay(50);
+		delay(100);
 		for (int i = 0; i < 4000; i++)
 		{
 			move(0, 1,0);
+      
 			uint16_t sg = tmc2130_read_sg(AX_SEL);
-			if ((i > 16) && (sg < 5))	break;
+			if ((i > 16) && (sg < 5))	{
+			  break;
+			}
 
 			_c++;
 			if (i == 3000) { _l++; }
